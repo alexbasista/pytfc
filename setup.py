@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.9',
     install_requires=[
-        #"pyhcl>=0.4.4",
+        "pyhcl>=0.4.4",
         "requests>=2.26.0",
     ],
     extras_require={

@@ -3,7 +3,7 @@ Module for TFC/E Workspace Variables endpoint.
 """
 #import sys
 import json
-import hcl
+import hcl as pyhcl
 #import requests
 from pytfc.exceptions import MissingWorkspace
 
@@ -68,7 +68,7 @@ class WorkspaceVariables(object):
         """
         try:
             with open(var_file, 'r') as fp:
-                tfvars = hcl.load(fp)
+                tfvars = pyhcl.load(fp)
             for key, value in tfvars.items():
                 if isinstance(value, dict):
                     value = json.dumps(value).replace(':', ' =')
