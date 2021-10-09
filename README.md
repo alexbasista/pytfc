@@ -16,11 +16,9 @@ A _client_ object must be initialized with certain parameters. The parameters ca
 
 ### Initializing a Client
 With environment variables:
-```
-export TFE_HOSTNAME='tfe.whatever.com'
-export TFE_TOKEN='abcdefghijklmn.atlasv1.opqrstuvwxyz012345678987654321abcdefghijklmnopqrstuvwxyz01234567890'
-```
 ```python
+os.environ['TFE_HOSTNAME']='tfe.whatever.com'
+os.environ['TFE_TOKEN']='abcdefghijklmn.atlasv1.opqrstuvwxyz012345678987654321abcdefghijklmnopqrstuvwxyz01234567890'
 client = pytfc.Client(org='my-existing-tfe-org')
 ```
 
