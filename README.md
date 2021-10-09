@@ -40,6 +40,9 @@ client.set_org(name='my-existing-tfe-org')
 client.set_ws(name='my-existing-tfe-ws')
 ```
 > Assumes the TFE_HOSTNAME and TFE_TOKEN environment variables are set.
+
+
+See the [docs](./docs/main.md) page for more details and examples on usage.
 <p>&nbsp;</p>
 
 
