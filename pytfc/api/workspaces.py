@@ -1,10 +1,10 @@
 """
 Module for TFC/E Workspace endpoints.
 """
-import sys
+#import sys
 from pytfc.exceptions import MissingOrganization
 from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import MissingOauthClient
+#from pytfc.exceptions import MissingOauthClient
 from pytfc.exceptions import MissingVcsProvider
 from pytfc.api.oauth_clients import OauthClients
 

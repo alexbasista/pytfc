@@ -3,7 +3,7 @@ Entry-point module to initialize and configure a client object
 to interact with almost all TFC/E API endpoints and resources.
 """
 import os
-import sys
+#import sys
 from pytfc.exceptions import MissingHostname
 from pytfc.exceptions import MissingToken
 from pytfc.requestor import Requestor

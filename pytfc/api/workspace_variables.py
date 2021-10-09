@@ -1,10 +1,10 @@
 """
 Module for TFC/E Workspace Variables endpoint.
 """
-import sys
+#import sys
 import json
 import hcl
-import requests
+#import requests
 from pytfc.exceptions import MissingWorkspace
 
 
@@ -65,8 +65,6 @@ class WorkspaceVariables(object):
         """
         Enable users to specify location of terraform.tfvars
         file to create an experience similar to Terraform OSS.
-
-        This method leverages the create() method also in this class.
         """
         try:
             with open(var_file, 'r') as fp:
