@@ -106,3 +106,7 @@ venv.bak/
 # Terraform files
 *.tfvars
 *.tar.gz
+
+# Sentinel files
+sentinel.hcl
+mock*.sentinel

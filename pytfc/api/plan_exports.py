@@ -4,6 +4,7 @@ Module for TFC/E Plan Exports endpoint.
 import requests
 import tarfile
 from pytfc.exceptions import MissingWorkspace
+from pytfc.exceptions import MissingRunId
 
 
 class PlanExports(object):
@@ -89,7 +90,17 @@ class PlanExports(object):
         
         return pe_object
     
-    def _extract_tarball(self, filepath, destination_folder='./'):
+    def _get_run_id_from_pe(self, pe_id):
+        plan_id = self.show(plan_export_id=pe_id).json()['data']['relationships']['plan']['data']['id']
+        
+        runs_list = self.client.runs.list()
+        for run in runs_list.json()['data']:
+            if run['type'] == "runs" and run['relationships']['plan']['data']['id'] == plan_id:
+                return run['id']
+            else:
+                raise MissingRunId
+    
+    def _extract_tarball(self, filepath, destination_folder):
         tarball = tarfile.open(filepath, 'r:gz')
         tarball.extractall(destination_folder)
         tarball.close()
@@ -115,9 +126,11 @@ class PlanExports(object):
             pe_id = plan_export_id
         
         data = requests.get(url=self._get_download_url(plan_export_id=pe_id))
-        print("Info: Downloaded Plan Export.")
+        print("Info: Downloaded Plan Export: {}".format(pe_id))
 
-        filename = pe_id + '-sentinel-mocks.tar.gz'
+        run_id = self._get_run_id_from_pe(pe_id=pe_id)
+
+        filename = run_id + '-sentinel-mocks.tar.gz'
         if destination_folder == './':
             destination_path = destination_folder + filename
         else:
@@ -128,7 +141,7 @@ class PlanExports(object):
         print("Info: Created archive: '{}'".format(destination_path))
 
         self._extract_tarball(filepath=destination_path, destination_folder=destination_folder)
-        print("Info: Extracted archive {}.".format(destination_path))
+        print("Info: Extracted archive '{}'".format(destination_path))
 
     
 
