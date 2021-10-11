@@ -80,6 +80,29 @@ client.workspaces.unassign_ssh_key(name='my-existing-tfe-ws')
 ## Runs
 
 
+# Plans
+```python
+# Requires an Org and Workspace to be set (if they aren't already)
+client.set_org(name='my-existing-tfe-org')
+cilent.set_ws(name='my-existing-tfe-ws')
+
+# Show a Plan by Plan ID
+client.plans.show(plan_id='plan-abcdefghijklmnop').json()
+
+# Show a Plan by Run ID
+client.plans.show(run_id='run-abcdefghijklmnop').json()
+
+# Show a Plan by latest Run
+client.plans.show(run_id='latest').json()
+
+# Show a Plan by Commit Message of Run
+client.plans.show(commit_message='this is a commit message').json()
+
+# Show JSON output of Plans
+# Use the following function with any of the four parameters above
+client.plans.get_json_output(...)
+```
+
 ## Plan Exports (Sentinel Mocks)
 ```python
 # Requires an Org and Workspace to be set (if they aren't already)
