@@ -1,4 +1,4 @@
-# How To
+# Examples
 The following sections display examples of how to call each API endpoint that is supported by **pytfc**.
 
 ## Organizations
