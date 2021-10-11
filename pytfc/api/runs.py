@@ -183,50 +183,6 @@ class Runs(object):
         into a workflow to execute a remote Terraform Plan
         """
         print('coming soon')
-        # # create Terraform tar.gz
-        # tf_tar = self.client.configuration_versions._create_tf_tarfile(source=source_tf_path, dest=dest_tf_tar)
-        
-        # # handle if Workspace (ws) argument explicitly specified
-        # if kwargs.get('ws'):
-        #     ws_id = self.client.workspaces._get_ws_id(kwargs.get('ws'))
-        # else:
-        #     ws_id = self._ws_id
-        
-        # # create Configuration Version
-        # cv = self.client.configuration_versions.create(ws_id=ws_id, auto_queue_runs='false', speculative=speculative)
-        # cv_id = cv['data']['id']
-        # cv_upload_url = cv['data']['attributes']['upload-url']
-
-        # # get Configuration Version status
-        # cv_status = self.client.configuration_versions.get_cv_status(cv_id=cv_id)
-        
-        # # poll Configuration Version status until it is ready to use
-        # while (cv_status is not 'uploaded'):
-        #     time.sleep(1)
-        #     cv_status = self.client.configuration_versions.get_cv_status(cv_id=cv_id)
-        #     if cv_status is 'uploaded':
-        #         break
-        
-        # # upload Terraform tar.gz to Configuration Version
-        # with open(tf_tar, 'rb') as tf_upload:
-        #     self.client.configuration_versions.upload(cv_upload_url=cv_upload_url, tf_tarfile=tf_upload)
-
-        # # evaluate if Speculative Plan was specified
-        # #if speculative is 'true':
-            
-
-        # # create Terraform Run
-        # #self.create()
-
-        # # delete temporary Terraform tar.gz after upload
-        # if cleanup is 'true':
-        #     self.client.configuration_versions._cleanup_tf_tarfile(path=tf_tar)
-        # elif cleanup is 'false':
-        #     print("INFO: skipping cleanup of {}".format(tf_tar))
-        # else:
-        #     raise ValueError("ERROR: '{}' is an invalid argument for 'cleanup' parameter. Valid arguments: 'true' or 'false'.".format(cleanup))
-
-        # return run_id
 
     def terraform_apply(self, run_id, **kwargs):
         print('coming soon')
