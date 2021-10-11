@@ -2,6 +2,7 @@
 Module for TFC/E Configuration Versions endpoint.
 """
 import os
+import time
 import tarfile
 import requests
 from datetime import datetime
@@ -50,26 +51,31 @@ class ConfigurationVersions(object):
         """
         return self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id]))
 
+    def show_commit(self, cv_id):
+        """
+        GET /configuration-versions/:configuration-id/ingress-attributes
+        """
+        return self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id, 'ingress-attributes']))
 
-    def get_cv_status(self, cv_id):
+    def _get_cv_status(self, cv_id):
         """
         GET /configuration-versions/:configuration-id
         """
-        resp = self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id]))
-        return resp['data']['attributes']['status']
-
+        cv_object = self.show(cv_id=cv_id)
+        return cv_object.json()['data']['attributes']['status']
 
     def get_cv_upload_url(self, cv_id):
         """
         GET /configuration-versions/:configuration-id
         """
-        resp = self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id]))
-        return resp['data']['attributes']['upload-url']
+        cv_object = self.show(cv_id=cv_id)
+        return cv_object.json()['data']['attributes']['upload-url']
 
 
     def create(self, auto_queue_runs='true', speculative='false', **kwargs):
         """
         POST /workspaces/:workspace_id/configuration-versions
+        Only returns Configuration Version `upload-url`.
         """
         if auto_queue_runs not in ['true', 'false']:
             raise ValueError("ERROR: Invalid argument for 'auto_queue_runs'. Valid arguments: 'true' or 'false'.")
@@ -88,89 +94,90 @@ class ConfigurationVersions(object):
 
         if kwargs.get('ws_id'):
             url = '/'.join([self.client._base_uri_v2, 'workspaces', kwargs.get('ws_id'), 'configuration-versions'])
-            return self.client._requestor.post(url=url, payload=payload)
+            cv_object = self.client._requestor.post(url=url, payload=payload)
         else:
-            return self.client._requestor.post(url=self._cv_endpoint, payload=payload)
+            cv_object = self.client._requestor.post(url=self._cv_endpoint, payload=payload)
+        
+        return cv_object
 
 
-    def _create_tf_tarfile(self, source, dest='./'):
+    def _create_tf_tarball(self, source_dir, dest_dir='./'):
         """
-        Helper method that creates tarball of Terraform configuration from specified path.
+        Helper method to create tarball of Terraform files from specified path.
         Configuration Version API requires tar.gz file format for upload.
         """
-        if dest[-1] != '/':
-            dest = dest + '/'
+        if dest_dir[-1] != '/':
+            dest_dir = dest_dir + '/'
         
         now = datetime.now()
         timestamp = now.strftime("%m%d%Y_%H%M%S")
         tf_tarfile_out = 'tf_{}.tar.gz'.format(timestamp)
         
         try:
-            with tarfile.open(dest + tf_tarfile_out, 'w:gz') as tar:
-                tar.add(source, arcname=os.path.sep)
+            with tarfile.open(dest_dir + tf_tarfile_out, 'w:gz') as tar:
+                tar.add(source_dir, arcname=os.path.sep)
             
-            return(dest + tf_tarfile_out)
+            return(dest_dir + tf_tarfile_out)
         
         except Exception as e:
             print(e)
             raise
-    
 
-    def _cleanup_tf_tarfile(self, path):
-        if os.path.exists(path):
-            print("INFO: deleting temporary Terraform bundle {}".format(path))
-            os.remove(path)
-        else:
-            print("WARNING: {} not found.".format(path))
-            pass
-
-
-    def upload(self, cv_upload_url, tf_tarfile):
+    def upload(self, cv_upload_url, tf_tarball):
         """
         PUT https://archivist.<TFC/E HOSTNAME>/v1/object/<UNIQUE OBJECT ID>
         """
         try:
-            resp = requests.put(url=cv_upload_url, data=tf_tarfile)
+            resp = requests.put(url=cv_upload_url, data=tf_tarball)
             resp.raise_for_status()
             return resp.status_code
         except Exception as e:
             raise ConfigurationVersionUploadError("ERROR: Exception occurred uploading Terraform configuration bundle to archivist: {}".format(e))
-
-
-    def cv_tf_plan(self, source, dest='./', auto_queue_runs='true', speculative='false', cleanup='true', **kwargs):
-        """
-        Wraps multiple Configuration Versions functions
-        into a workflow to execute a remote Terraform Run
-        """
-        # create Terraform tar.gz
-        tf_tar = self._create_tf_tarfile(source=source, dest=dest)
-        
-        # handle if Workspace (ws) argument explicitly specified
-        if kwargs.get('ws'):
-            ws_id = self.client.workspaces._get_ws_id(kwargs.get('ws'))
+    
+    def _cleanup_tf_tarball(self, path):
+        if os.path.exists(path):
+            os.remove(path)
         else:
-            ws_id = self._ws_id
+            print("Warning: {} not found.".format(path))
+            pass
+    
+    def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
+                          auto_queue_runs='true', speculative='false', **kwargs):
+        """
+        Method that wraps multiple other methods to more easily
+        create and upload a Configuration Version in a Workspace.
+        Returns newly created Configuration Version ID.
+        """
+        # 1. Create CV and return upload-url
+        cv_object = self.create(auto_queue_runs=auto_queue_runs, speculative=speculative)
+        cv_id=cv_object.json()['data']['id']
+        cv_upload_url = cv_object.json()['data']['attributes']['upload-url']
+        print("Info: Created Configuration Version: '{}'".format(cv_object.json()['data']['id']))
         
-        # create Configuration Version
-        cv = self.create(ws_id=ws_id, auto_queue_runs=auto_queue_runs, speculative=speculative)
-        cv_id = cv['data']['id']
-        cv_upload_url = cv['data']['attributes']['upload-url']
+        # 2. Create tarball of TF files
+        tf_tarball = self._create_tf_tarball(source_dir=source_tf_dir, dest_dir=dest_tf_dir)
+        print("Info: Created Terraform tarball: '{}'".format(tf_tarball))
+        
+        # 3. Upload tarball to CV
+        with open(tf_tarball, 'rb') as tf_tarball_upload:
+            self.upload(cv_upload_url=cv_upload_url, tf_tarball=tf_tarball_upload)
+        print("Info: Uploaded Terraform tarball: '{}'".format(tf_tarball))
 
-        # get Configuration Version status
-        cv_status = self.get_cv_status(cv_id=cv_id)
-        print(cv_status)
+        # 4. Check Configuration Version status
+        cv_status = self._get_cv_status(cv_id=cv_id)
+        print("Info: Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+        while cv_status != 'uploaded':
+            if self._get_cv_status(cv_id=cv_id) == 'uploaded':
+                break
+            else:
+                cv_status = self._get_cv_status(cv_id=cv_id)
+                print("Info: Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+                time.sleep(3)
 
-        # upload Terraform tar.gz to Configuration Version
-        with open(tf_tar, 'rb') as tf_upload:
-            self.upload(cv_upload_url=cv_upload_url, tf_tarfile=tf_upload)
-
-        # delete temporary Terraform tar.gz after upload
-        if cleanup == 'true':
-            self._cleanup_tf_tarfile(path=tf_tar)
-        elif cleanup == 'false':
-            print("INFO: skipping cleanup of {}".format(tf_tar))
-        else:
-            raise ValueError("ERROR: '{}' is an invalid argument for 'cleanup' parameter. Valid arguments: 'true' or 'false'.".format(cleanup))
+        # 5. Cleanup
+        if kwargs.get('cleanup') == 'true':
+            print("Info: Deleting local Terraform tarball: '{}'".format(tf_tarball))
+            self._cleanup_tf_tarball(path=tf_tarball)
 
         return cv_id
 

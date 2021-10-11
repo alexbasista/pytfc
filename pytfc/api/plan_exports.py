@@ -40,15 +40,15 @@ class PlanExports(object):
         return pe_id
             
     def _get_download_url(self, plan_export_id):
-        '''
+        """
         GET /plan-exports/:id/download
-        '''
+        """
         return self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, plan_export_id, 'download'])).url
     
     def create(self, **kwargs):
-        '''
+        """
         POST /plan-exports
-        '''
+        """
         if kwargs.get('plan_id'):
             plan_id = self.client.plans.show(plan_id=kwargs.get('plan_id')).json()['data']['id']
         else:
@@ -75,9 +75,9 @@ class PlanExports(object):
         return pe_object
 
     def show(self, **kwargs):
-        '''
+        """
         GET /plan-exports/:id
-        '''
+        """
         if kwargs.get('plan_export_id'):
             pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, kwargs.get('plan_export_id')]))
         elif self._get_plan_export_id() is None:
@@ -106,9 +106,9 @@ class PlanExports(object):
         tarball.close()
     
     def download(self, destination_folder='./', **kwargs):
-        '''
+        """
         GET /plan-exports/:id/download
-        '''
+        """
         if kwargs.get('plan_export_id'):
             plan_export_id = kwargs.get('plan_export_id')
         elif kwargs.get('plan_id'):

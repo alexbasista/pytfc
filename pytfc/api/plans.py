@@ -38,9 +38,9 @@ class Plans(object):
         return run_object.json()['data']['relationships']['plan']['data']['id']
     
     def show(self, **kwargs):
-        '''
+        """
         GET /plans/:id
-        '''
+        """
         if kwargs.get('plan_id'):
           if kwargs.get('plan_id') == 'latest':
             # retrieve Plan ID of latest Run
@@ -61,10 +61,9 @@ class Plans(object):
         return self.client._requestor.get(url="/".join([self.plans_endpoint, plan_id]))
     
     def get_json_output(self, **kwargs):
-        '''
+        """
         GET /plans/:id/json-output
-        GET /runs/:id/plan/json-output
-        '''
+        """
         if kwargs.get('plan_id'):
           # retrieve Plan by Plan ID
           plan_id = kwargs.get('plan_id')

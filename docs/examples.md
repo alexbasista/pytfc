@@ -75,12 +75,25 @@ client.workspaces.unassign_ssh_key(name='my-existing-tfe-ws')
 
 
 ## Configuration Versions
+```python
+# List Configuration Versions
+client.configuration_versions.list().json()
 
+# Show a Configuration Version
+client.configuration_versions.show(cv_id='cv-abcdefghijklmnop').json()
+
+# Show a Configuration Version's Commit Information
+client.configuration_versions.show_commit(cv_id='cv-abcdefghijklmnop').json()
+
+# Create and Upload a Configuration Version (returns Confiugration Version ID)
+# Requires 'ws_id' parameter if Workspace not already set
+client.configuration_versions.create(source_tf_dir='./terraform/main', auto_queue_runs='false', speculative='false')
+```
 
 ## Runs
 
 
-# Plans
+## Plans
 ```python
 # Requires an Org and Workspace to be set (if they aren't already)
 client.set_org(name='my-existing-tfe-org')
@@ -99,7 +112,7 @@ client.plans.show(run_id='latest').json()
 client.plans.show(commit_message='this is a commit message').json()
 
 # Show JSON output of Plans
-# Use the following function with any of the four parameters above
+# Use the following method with any of the four parameters above
 client.plans.get_json_output(...)
 ```
 

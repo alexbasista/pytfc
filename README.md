@@ -44,10 +44,3 @@ client.set_ws(name='my-existing-tfe-ws')
 
 See the [docs](./docs/examples.md) page for more details and examples on usage.
 <p>&nbsp;</p>
-
-
-
-
-
-
-
