@@ -1,5 +1,5 @@
 # How To
-The following sections display examples of how to use each API endpoint supported by **pytfc**.
+The following sections display examples of how to call each API endpoint that is supported by **pytfc**.
 
 ## Organizations
 ```python
@@ -78,3 +78,14 @@ client.workspaces.unassign_ssh_key(name='my-existing-tfe-ws')
 
 
 ## Runs
+
+
+## Plan Exports (Sentinel Mocks)
+```python
+# Requires an Org and Workspace to be set (if they aren't already)
+client.set_org(name='my-existing-tfe-org')
+cilent.set_ws(name='my-existing-tfe-ws')
+
+# Download Sentinel mock data into specific directory
+client.plan_exports.download(destination_folder='./sentinel/test/policy1')
+```

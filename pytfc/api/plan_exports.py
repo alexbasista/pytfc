@@ -2,6 +2,7 @@
 Module for TFC/E Plan Exports endpoint.
 """
 import requests
+import tarfile
 from pytfc.exceptions import MissingWorkspace
 
 
@@ -88,7 +89,15 @@ class PlanExports(object):
         
         return pe_object
     
-    def download(self, output_filepath='./sentinel-mocks-bundle.tar.gz', **kwargs):
+    def _extract_tarball(self, filepath, destination_folder='./'):
+        tarball = tarfile.open(filepath, 'r:gz')
+        tarball.extractall(destination_folder)
+        tarball.close()
+    
+    def download(self, destination_folder='./', **kwargs):
+        '''
+        GET /plan-exports/:id/download
+        '''
         if kwargs.get('plan_export_id'):
             plan_export_id = kwargs.get('plan_export_id')
         elif kwargs.get('plan_id'):
@@ -108,9 +117,18 @@ class PlanExports(object):
         data = requests.get(url=self._get_download_url(plan_export_id=pe_id))
         print("Info: Downloaded Plan Export.")
 
-        with open(output_filepath, 'wb') as file:
+        filename = pe_id + '-sentinel-mocks.tar.gz'
+        if destination_folder == './':
+            destination_path = destination_folder + filename
+        else:
+            destination_path = destination_folder + '/' + filename
+
+        with open(destination_path, 'wb') as file:
             file.write(data.content)
-        print("Info: Created file: {}".format(output_filepath))
+        print("Info: Created archive: '{}'".format(destination_path))
+
+        self._extract_tarball(filepath=destination_path, destination_folder=destination_folder)
+        print("Info: Extracted archive {}.".format(destination_path))
 
     
 
