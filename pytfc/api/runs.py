@@ -90,10 +90,18 @@ class Runs(object):
         """
         runs_list = self.list()
         for run in runs_list.json()['data']:
-            if run['type'] == "runs" and run['attributes']['message'] == commit_message:
-                return run['id']
+            print(run['id'])
+            if run['type'] == 'runs' and run['attributes']['message'] == commit_message:
+                run_id = run['id']
+                break
             else:
-                raise MissingRunId
+                run_id = None
+                continue
+        
+        if run_id is None:
+            raise MissingRunId
+        else:
+            return run_id
 
     def _get_latest_run_id(self):
         """

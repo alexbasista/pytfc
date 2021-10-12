@@ -21,9 +21,7 @@ class PlanExports(object):
                 self.ws = self.client.ws
             else:
                 raise MissingWorkspace
-        
-        #self.run_object = self.client.runs.show() # get latest Run by default
-        #self.plan_id = self.run_object.json()['data']['relationships']['plan']['data']['id'] # get latest Plan
+
         self.plan_exports_endpoint = '/'.join([self.client._base_uri_v2, 'plan-exports'])
     
     def _get_plan_export_id(self, **kwargs):

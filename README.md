@@ -1,5 +1,5 @@
 # pytfc
-**pytfc** is an HTTP client library for the Terraform Cloud and Terraform Enterprise API.
+**pytfc** is a Python HTTP client library for the Terraform Cloud and Terraform Enterprise API.
 
 ```python
 import pytfc
