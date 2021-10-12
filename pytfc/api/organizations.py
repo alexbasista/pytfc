@@ -36,6 +36,7 @@ class Organizations(object):
                 name = self.client.org
             else:
               raise MissingOrganization
+        
         return self.client._requestor.get(url='/'.join([self.organizations_endpoint, name]))
 
     def create(self, name, email, **kwargs):
@@ -66,6 +67,7 @@ class Organizations(object):
                 name = self.client.org
             else:
               raise MissingOrganization
+        
         payload = {}
         data = {}
         data['type'] = 'organizations'
@@ -78,6 +80,7 @@ class Organizations(object):
                 print("WARNING: '{}' is an invalid key for Organizations API.".format(key))
         data['attributes'] = attributes
         payload['data'] = data
+        
         return self.client._requestor.patch(url='/'.join([self.organizations_endpoint, name]), payload=payload)
 
     def delete(self, name):
@@ -95,4 +98,5 @@ class Organizations(object):
                 name = self.client.org
             else:
               raise MissingOrganization
+        
         return self.client._requestor.get(url='/'.join([self.organizations_endpoint, name, 'entitlement-set']))

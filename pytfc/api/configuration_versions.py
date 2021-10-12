@@ -14,7 +14,6 @@ class ConfigurationVersions(object):
     """
     TFC/E Configuration Version methods.
     """
-
     def __init__(self, client, **kwargs):
         self.client = client
         
@@ -41,8 +40,7 @@ class ConfigurationVersions(object):
         """
         Helper method that returns latest Configuration Version ID in Workspace.
         """
-        cv_list = self.list()
-        return cv_list['data'][0]['id']
+        return self.list().json()['data'][0]['id']
 
 
     def show(self, cv_id):
@@ -75,6 +73,7 @@ class ConfigurationVersions(object):
     def create(self, auto_queue_runs='true', speculative='false', **kwargs):
         """
         POST /workspaces/:workspace_id/configuration-versions
+        
         Only returns Configuration Version `upload-url`.
         """
         if auto_queue_runs not in ['true', 'false']:
@@ -118,7 +117,6 @@ class ConfigurationVersions(object):
                 tar.add(source_dir, arcname=os.path.sep)
             
             return(dest_dir + tf_tarfile_out)
-        
         except Exception as e:
             print(e)
             raise
@@ -144,8 +142,8 @@ class ConfigurationVersions(object):
     def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
                           auto_queue_runs='true', speculative='false', **kwargs):
         """
-        Method that wraps multiple other methods to more easily
-        create and upload a Configuration Version in a Workspace.
+        Method that wraps multiple other methods to more easily create
+        and upload a Configuration Version in a Workspace in one call.
         Returns newly created Configuration Version ID.
         """
         # 1. Create CV and return upload-url
@@ -175,7 +173,7 @@ class ConfigurationVersions(object):
                 time.sleep(3)
 
         # 5. Cleanup
-        if kwargs.get('cleanup') == 'true':
+        if kwargs.get('cleanup', 'true'):
             print("Info: Deleting local Terraform tarball: '{}'".format(tf_tarball))
             self._cleanup_tf_tarball(path=tf_tarball)
 

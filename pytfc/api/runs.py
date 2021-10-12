@@ -98,10 +98,8 @@ class Runs(object):
     def _get_latest_run_id(self):
         """
         Helper method that returns Run ID of latest Run in Workspace.
-        """
-        runs_list = self.list()
-        
-        return runs_list.json()['data'][0]['id']
+        """       
+        return self.list().json()['data'][0]['id']
 
     def show(self, run_id='latest', commit_message=None):
         """

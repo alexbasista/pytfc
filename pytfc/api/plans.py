@@ -42,7 +42,7 @@ class Plans(object):
         GET /plans/:id
         """
         if kwargs.get('plan_id'):
-          if kwargs.get('plan_id') == 'latest':
+          if kwargs.get('plan_id', 'latest'):
             # retrieve Plan ID of latest Run
             plan_id = self._get_plan_id(run_id='latest')
           else:

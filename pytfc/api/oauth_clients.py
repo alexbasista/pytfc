@@ -14,11 +14,10 @@ class OauthClients(object):
 
     def _get_oc_id(self, name):
         """
-        Helper function to retrieve the OAuth Client ID of an OAuth Client based on OAuth Client display name
+        Helper method to retrieve the OAuth Client ID of an OAuth Client based on OAuth Client display name
         """
         oc_list = self.list()
         oc_id = [ i['id'] for i in oc_list.json()['data'] if i['attributes']['name'] == name ]
-        
         return oc_id[0]
 
     def list(self):
@@ -35,7 +34,6 @@ class OauthClients(object):
         GET /oauth-clients/:id
         """
         oc_id = self._get_oc_id(name=name)
-        
         return self.client._requestor.get(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id]))
 
     def create(self, service_provider, name, http_url, api_url, oauth_token_string, **kwargs):
@@ -89,5 +87,4 @@ class OauthClients(object):
         DELETE /oauth-clients/:id
         """
         oc_id = self._get_oc_id(name=name)
-        
         return self.client._requestor.delete(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id]))

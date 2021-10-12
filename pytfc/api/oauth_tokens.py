@@ -16,10 +16,10 @@ class OauthTokens(object):
     def list(self, oauth_client_name):
         """
         GET /oauth-clients/:oauth_client_id/oauth-tokens
+        
         Must be listed within the confines of a specific OAuth Client.
         """
         oc_id = self.oauth_clients._get_oc_id(name=oauth_client_name)
-        
         return self.client._requestor.get(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id, 'oauth-tokens']))
 
     def show(self, oauth_token_id):

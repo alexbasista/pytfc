@@ -22,6 +22,7 @@ class Workspaces(object):
                 self.org = self.client.org
             else:
                 raise MissingOrganization
+        
         self.workspaces_endpoint = '/'.join([self.client._base_uri_v2, 'organizations', self.org, 'workspaces'])
         self.ws_attributes_list = [
             'name',
@@ -63,6 +64,7 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -76,52 +78,52 @@ class Workspaces(object):
             elif key in self.ws_vcs_attributes_list:
                 vcs_repo[key] = value
             else:
-                print("WARNING: '{}' is an invalid key for Workspaces API.".format(key))
+                print("Warning: '{}' is an invalid key for Workspaces API.".format(key))
         
         # handle multiple scenarios with obtaining the OAuth Token ID attribute
         if kwargs.get('identifier'):
-            print("INFO: VCS repo identifier '{}' was specified.".format(kwargs.get('identifier')))
+            print("Info: VCS repo identifier '{}' was specified.".format(kwargs.get('identifier')))
             oc = OauthClients(client=self.client)
             try: # validate an OAuth Client (VCS Provider) actually exists in the Org
-                print("INFO: Retrieving list of OAuth Clients (VCS Providers) in '{}' Organization.".format(self.org))
+                print("Info: Retrieving list of OAuth Clients (VCS Providers) in '{}' Organization.".format(self.org))
                 oc_list = oc.list()
                 if len(oc_list.json()['data']) < 1:
-                    print("ERROR: VCS repo identifier '{}' was specified but no OAuth Client (VCS Provider) was found in '{}' Organization.".format(kwargs.get('identifier'), self.org))
+                    print("Error: VCS repo identifier '{}' was specified but no OAuth Client (VCS Provider) was found in '{}' Organization.".format(kwargs.get('identifier'), self.org))
                     raise MissingVcsProvider
                 elif len(oc_list.json()['data']) >= 1:
                     oc_display_name = oc_list.json()['data'][0]['attributes']['name']
                     ot_id = oc_list.json()['data'][0]['relationships']['oauth-tokens']['data'][0]['id']
             except Exception as e:
-                print("ERROR: Unable to retrieve OAuth Clients (VCS Providers) list from '{}' Organization.".format(self.org))
+                print("Error: Unable to retrieve OAuth Clients (VCS Providers) list from '{}' Organization.".format(self.org))
                 print(e)
             
             # explicitly specifying an OAuth Token ID gets first priority
             if kwargs.get('oauth_token_id'):
-                print("INFO: An OAuth Token ID was specified directly.")
+                print("Info: An OAuth Token ID was specified directly.")
                 vcs_repo['oauth-token-id'] = kwargs.get('oauth_token_id')
             
             # explicitly specifying an OAuth Client (VCS Provider) Display Name gets second priority
             elif kwargs.get('oauth_client_name'):
-                print("INFO: An OAuth Client Display Name was specified directly.")
+                print("Info: An OAuth Client Display Name was specified directly.")
                 oauth_client = oc.show(name=kwargs.get('oauth_client_name'))
                 vcs_repo['oauth-token-id'] = oauth_client.json()['data']['relationships']['oauth-tokens']['data'][0]['id']
             
             # if neither are specified and there's only one OAuth Client in the Org just default to using that
             elif kwargs.get('oauth_token_id') is None and kwargs.get('oauth_client_name') is None and len(oc_list.json()['data']) == 1:
-                print("INFO: Detected '{}' is the only OAuth Client. Proceeding with using this one.".format(oc_display_name))
+                print("Info: Detected '{}' is the only OAuth Client. Proceeding with using this one.".format(oc_display_name))
                 vcs_repo['oauth-token-id'] = ot_id
             
             # if neither are specified and there's multiple OAuth Clients in the Org,
             # print a warning but default to the first OAuth Client returned in the list
             elif kwargs.get('oauth_token_id') is None and kwargs.get('oauth_client_name') is None and len(oc_list.json()['data']) > 1:
-                print("WARNING: Detected multiple OAuth Clients exist but a specific one was not specified.".format(self.org))
-                print("INFO: Proceeding with using '{}' OAuth Client because it was first in the list.".format(oc_display_name))
+                print("Warning: Detected multiple OAuth Clients exist but a specific one was not specified.".format(self.org))
+                print("Info: Proceeding with using '{}' OAuth Client because it was first in the list.".format(oc_display_name))
                 vcs_repo['oauth-token-id'] = ot_id
             else:
-                print("ERROR: An unknown error occured determining which OAuth Client and/or OAuth Token ID to use.")
+                print("Error: An unknown error occured determining which OAuth Client and/or OAuth Token ID to use.")
                 exit
         else:
-            print("INFO: No VCS repo identifier specified. Proceeding to Workspace creation without VCS integration.")
+            print("Info: No VCS repo identifier specified. Proceeding to Workspace creation without VCS integration.")
         
         if len(vcs_repo) > 0:
             attributes['vcs-repo'] = vcs_repo
@@ -199,6 +201,7 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         ws_id = self._get_ws_id(name=name)
         reason = kwargs.pop('reason', 'Locked by pytfc')
         payload = { 'reason': reason }
@@ -216,6 +219,7 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         ws_id = self._get_ws_id(name=name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
@@ -230,6 +234,7 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         ws_id = self._get_ws_id(name=name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
@@ -244,7 +249,9 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         ws_id = self._get_ws_id(name=name)
+        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -266,7 +273,9 @@ class Workspaces(object):
                 name = self.client.ws
             else:
               raise MissingWorkspace
+        
         ws_id = self._get_ws_id(name=name)
+        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
