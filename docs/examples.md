@@ -85,13 +85,16 @@ client.configuration_versions.show(cv_id='cv-abcdefghijklmnop').json()
 # Show a Configuration Version's Commit Information
 client.configuration_versions.show_commit(cv_id='cv-abcdefghijklmnop').json()
 
-# Create and Upload a Configuration Version (returns Confiugration Version ID)
+# Create and Upload a Configuration Version (returns Configuration Version ID)
 # Requires 'ws_id' parameter if Workspace not already set
 client.configuration_versions.create(source_tf_dir='./terraform/main', auto_queue_runs='false', speculative='false')
 ```
 
-## Runs
 
+## Runs
+```python
+
+```
 
 ## Plans
 ```python
@@ -115,6 +118,18 @@ client.plans.show(commit_message='this is a commit message').json()
 # Use the following method with any of the four parameters above
 client.plans.get_json_output(...)
 ```
+
+
+## Applies
+```python
+# Requires an Org and Workspace to be set (if they aren't already)
+client.set_org(name='my-existing-tfe-org')
+cilent.set_ws(name='my-existing-tfe-ws')
+
+# Show an Apply
+client.applies.show(apply_id='apply-abcdefghijklmnop')
+```
+
 
 ## Plan Exports (Sentinel Mocks)
 ```python

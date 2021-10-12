@@ -16,6 +16,7 @@ from pytfc.api.configuration_versions import ConfigurationVersions
 from pytfc.api.runs import Runs
 from pytfc.api.plan_exports import PlanExports
 from pytfc.api.plans import Plans
+from pytfc.api.applies import Applies
 
 class Client(object):
     """
@@ -60,6 +61,9 @@ class Client(object):
             self.workspace_variables = None
             self.configuration_versions = None
             self.runs = None
+            self.plans = None
+            self.plan_exports = None
+            self.applies = None
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self)
@@ -70,6 +74,7 @@ class Client(object):
             self.runs = Runs(client=self)
             self.plans = Plans(client=self)
             self.plan_exports = PlanExports(client=self)
+            self.applies = Applies(client=self)
         else:
             self.organizations = Organizations(client=self)
 
@@ -95,3 +100,4 @@ class Client(object):
         self.runs = Runs(client=self)
         self.plans = Plans(client=self)
         self.plan_exports = PlanExports(client=self)
+        self.applies = Applies(client=self)
