@@ -1,12 +1,12 @@
 """
-Module for TFC/E Applies endpoint.
+Module for TFC/E Applies API endpoint.
 """
 from pytfc.exceptions import MissingWorkspace
 
 
 class Applies(object):
     """
-    TFC/E Plans methods.
+    TFC/E Applies methods.
     """
     def __init__(self, client, **kwargs):
         self.client = client
@@ -42,7 +42,7 @@ class Applies(object):
         """
         GET /applies/:id
 
-        Defaults to querying latest Run ID with no args passed.
+        Defaults to querying latest Run ID in Workspace if no args passed.
         """
         if kwargs.get('apply_id') and kwargs.get('apply_id') != 'latest':
             apply_id = kwargs.get('apply_id')
