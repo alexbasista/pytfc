@@ -136,7 +136,7 @@ class ConfigurationVersions(object):
         if os.path.exists(path):
             os.remove(path)
         else:
-            print("Warning: {} not found.".format(path))
+            print("Warning: '{}' not found.".format(path))
             pass
     
     def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
@@ -170,7 +170,7 @@ class ConfigurationVersions(object):
             else:
                 cv_status = self._get_cv_status(cv_id=cv_id)
                 print("Info: Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
-                time.sleep(3)
+                time.sleep(2)
 
         # 5. Cleanup
         if kwargs.get('cleanup', 'true'):

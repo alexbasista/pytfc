@@ -45,6 +45,8 @@ class Runs(object):
         attributes = {}
         attributes['is-destroy'] = is_destroy
         attributes['message'] = message
+        attributes['refresh'] = 'true'
+        attributes['refresh-only'] = 'false'
         data['attributes'] = attributes
         relationships = {}
         workspace = {}
@@ -58,7 +60,8 @@ class Runs(object):
         configuration_version_data['type'] = 'configuration-versions'
         configuration_version_data['id'] = cv_id
         configuration_version['data'] = configuration_version_data
-        data['configuration-version'] = configuration_version
+        relationships['configuration-version'] = configuration_version
+        data['relationships'] = relationships
         payload['data'] = data
 
         return self.client._requestor.post(url='/'.join([self.client.base_url_v2, 'runs']), payload=payload)
@@ -90,7 +93,6 @@ class Runs(object):
         """
         runs_list = self.list()
         for run in runs_list.json()['data']:
-            print(run['id'])
             if run['type'] == 'runs' and run['attributes']['message'] == commit_message:
                 run_id = run['id']
                 break
