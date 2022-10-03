@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Terraform files
+*.tfvars
+*.tar.gz
+
+# Sentinel files
+sentinel.hcl
+mock*.sentinel
