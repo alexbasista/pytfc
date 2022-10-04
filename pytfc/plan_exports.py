@@ -69,7 +69,7 @@ class PlanExports(object):
         payload['data'] = data
 
         pe_object = self.client._requestor.post(url=self.plan_exports_endpoint, payload=payload)
-        print("Info: Plan Export has been created: {}".format(pe_object.json()['data']['id']))
+        print("[INFO] Plan Export has been created: {}".format(pe_object.json()['data']['id']))
         return pe_object
 
     def show(self, **kwargs):
@@ -79,11 +79,11 @@ class PlanExports(object):
         if kwargs.get('plan_export_id'):
             pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, kwargs.get('plan_export_id')]))
         elif self._get_plan_export_id() is None:
-            print("Info: Plan Export ID not found in Plan.")
-            print("Info: Plan Export must be created for Plan first.")
+            print("[INFO] Plan Export ID not found in Plan.")
+            print("[INFO] Plan Export must be created for Plan first.")
             pe_object = None
         else:
-            print("Info: Found Plan Export ID: {}".format(self._get_plan_export_id()))
+            print("[INFO] Found Plan Export ID: {}".format(self._get_plan_export_id()))
             pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, self._get_plan_export_id()]))
         
         return pe_object
@@ -119,12 +119,12 @@ class PlanExports(object):
         if plan_export_id is None:
             pe_object = self.create(plan_id=plan_id)
             pe_id = pe_object.json()['data']['id']
-            print("Info: Created Plan Export: {}".format(pe_id))
+            print("[INFO] Created Plan Export: {}".format(pe_id))
         else:
             pe_id = plan_export_id
         
         data = requests.get(url=self._get_download_url(plan_export_id=pe_id))
-        print("Info: Downloaded Plan Export: {}".format(pe_id))
+        print("[INFO] Downloaded Plan Export: {}".format(pe_id))
 
         run_id = self._get_run_id_from_pe(pe_id=pe_id)
 
@@ -136,10 +136,10 @@ class PlanExports(object):
 
         with open(destination_path, 'wb') as file:
             file.write(data.content)
-        print("Info: Created archive: '{}'".format(destination_path))
+        print("[INFO] Created archive: '{}'".format(destination_path))
 
         self._extract_tarball(filepath=destination_path, destination_folder=destination_folder)
-        print("Info: Extracted archive '{}'".format(destination_path))
+        print("[INFO] Extracted archive '{}'".format(destination_path))
 
     
 

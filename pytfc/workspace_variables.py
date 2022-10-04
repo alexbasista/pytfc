@@ -26,7 +26,7 @@ class WorkspaceVariables(object):
         try:
             self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         except Exception:
-            print("EError: Unable to retrieve Workspace ID for '{}' Workspace.".format(self.ws))
+            print("E[ERROR] Unable to retrieve Workspace ID for '{}' Workspace.".format(self.ws))
             raise MissingWorkspace
 
         self._workspace_variables_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces', self._ws_id, 'vars'])
@@ -36,11 +36,11 @@ class WorkspaceVariables(object):
         POST /workspaces/:workspace_id/vars
         """
         if category not in ['terraform', 'env']:
-            raise ValueError("Error: '{}' is an invalid argument for 'category'. Valid arguments: 'terraform', 'env'.".format(category))
+            raise ValueError("[ERROR] '{}' is an invalid argument for 'category'. Valid arguments: 'terraform', 'env'.".format(category))
         if hcl not in ['true', 'false', True, False]:
-            raise ValueError("Error: '{}' is an invalid argument for 'hcl'. Valid arguments: 'true', 'false'.".format(hcl))
+            raise ValueError("[ERROR] '{}' is an invalid argument for 'hcl'. Valid arguments: 'true', 'false'.".format(hcl))
         if sensitive not in ['true', 'false', True, False]:
-            raise ValueError("Error: '{}' is an invalid argument for 'sensitive'. Valid arguments: 'true', 'false'.".format(sensitive))
+            raise ValueError("[ERROR] '{}' is an invalid argument for 'sensitive'. Valid arguments: 'true', 'false'.".format(sensitive))
 
         if isinstance(value, list):
             value = json.dumps(value)
@@ -78,6 +78,6 @@ class WorkspaceVariables(object):
                 else:
                     self.create(key=key, value=value, hcl=False)
         except Exception as e:
-            print("Error: Unknown exception occured: {}".format(e))
+            print("[ERROR] Unknown exception occured: {}".format(e))
 
 

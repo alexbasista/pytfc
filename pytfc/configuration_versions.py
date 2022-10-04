@@ -81,10 +81,10 @@ class ConfigurationVersions(object):
         Only returns Configuration Version `upload-url`.
         """
         if auto_queue_runs not in ['true', 'false']:
-            raise ValueError("ERROR: Invalid argument for 'auto_queue_runs'. Valid arguments: 'true' or 'false'.")
+            raise ValueError("[ERROR] Invalid argument for 'auto_queue_runs'. Valid arguments: 'true' or 'false'.")
         
         if speculative not in ['true', 'false']:
-            raise ValueError("ERROR: Invalid argument for 'speculative'. Valid arguments: 'true' or 'false'.")
+            raise ValueError("[ERROR] Invalid argument for 'speculative'. Valid arguments: 'true' or 'false'.")
 
         payload = {}
         data = {}
@@ -134,13 +134,13 @@ class ConfigurationVersions(object):
             resp.raise_for_status()
             return resp.status_code
         except Exception as e:
-            raise ConfigurationVersionUploadError("ERROR: Exception occurred uploading Terraform configuration bundle to archivist: {}".format(e))
+            raise ConfigurationVersionUploadError("[ERROR] Exception occurred uploading Terraform configuration bundle to archivist: {}".format(e))
     
     def _cleanup_tf_tarball(self, path):
         if os.path.exists(path):
             os.remove(path)
         else:
-            print("Warning: '{}' not found.".format(path))
+            print("[WARNING] '{}' not found.".format(path))
             pass
     
     def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
@@ -154,31 +154,31 @@ class ConfigurationVersions(object):
         cv_object = self.create(auto_queue_runs=auto_queue_runs, speculative=speculative)
         cv_id=cv_object.json()['data']['id']
         cv_upload_url = cv_object.json()['data']['attributes']['upload-url']
-        print("Info: Created Configuration Version: '{}'".format(cv_object.json()['data']['id']))
+        print("[INFO] Created Configuration Version: '{}'".format(cv_object.json()['data']['id']))
         
         # 2. Create tarball of TF files
         tf_tarball = self._create_tf_tarball(source_dir=source_tf_dir, dest_dir=dest_tf_dir)
-        print("Info: Created Terraform tarball: '{}'".format(tf_tarball))
+        print("[INFO] Created Terraform tarball: '{}'".format(tf_tarball))
         
         # 3. Upload tarball to CV
         with open(tf_tarball, 'rb') as tf_tarball_upload:
             self.upload(cv_upload_url=cv_upload_url, tf_tarball=tf_tarball_upload)
-        print("Info: Uploaded Terraform tarball: '{}'".format(tf_tarball))
+        print("[INFO] Uploaded Terraform tarball: '{}'".format(tf_tarball))
 
         # 4. Check Configuration Version status
         cv_status = self._get_cv_status(cv_id=cv_id)
-        print("Info: Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+        print("[INFO] Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
         while cv_status != 'uploaded':
             if self._get_cv_status(cv_id=cv_id) == 'uploaded':
                 break
             else:
                 cv_status = self._get_cv_status(cv_id=cv_id)
-                print("Info: Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+                print("[INFO] Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
                 time.sleep(2)
 
         # 5. Cleanup
         if kwargs.get('cleanup', 'true'):
-            print("Info: Deleting local Terraform tarball: '{}'".format(tf_tarball))
+            print("[INFO] Deleting local Terraform tarball: '{}'".format(tf_tarball))
             self._cleanup_tf_tarball(path=tf_tarball)
 
         return cv_id

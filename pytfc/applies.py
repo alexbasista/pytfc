@@ -33,7 +33,7 @@ class Applies(object):
             run_object = self.client.runs.show(run_id=run_id)
         
         if run_object.json()['data']['relationships']['apply']['data'] == []:
-            print("Warning: No Apply ID was found.")
+            print("[WARNING]: No Apply ID was found.")
             return None
         else:
             return run_object.json()['data']['relationships']['apply']['data']['id']

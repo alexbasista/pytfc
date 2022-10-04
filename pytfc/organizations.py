@@ -53,7 +53,7 @@ class Organizations(object):
             if key in self.org_attributes_list:
                 attributes[key] = value
             else:
-                print("WARNING: '{}' is an invalid key for Organizations API.".format(key))
+                print("[WARNING] '{}' is an invalid key for Organizations API.".format(key))
         data['attributes'] = attributes
         payload['data'] = data
         return self.client._requestor.post(url=self.organizations_endpoint, payload=payload)
@@ -77,7 +77,7 @@ class Organizations(object):
             if key in self.org_attributes_list:
                 attributes[key] = value
             else:
-                print("WARNING: '{}' is an invalid key for Organizations API.".format(key))
+                print("[WARNING] '{}' is an invalid key for Organizations API.".format(key))
         data['attributes'] = attributes
         payload['data'] = data
         
