@@ -26,7 +26,8 @@ class ConfigurationVersions(object):
                 raise MissingWorkspace
         
         self._ws_id = self.client.workspaces._get_ws_id(self.ws)
-        self._cv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces', self._ws_id, 'configuration-versions'])
+        self._cv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces',
+                                      self._ws_id, 'configuration-versions'])
 
 
     def list(self):
@@ -47,13 +48,16 @@ class ConfigurationVersions(object):
         """
         GET /configuration-versions/:configuration-id
         """
-        return self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id]))
+        return self.client._requestor.get(url="/".join([self.client._base_uri_v2,
+                                                        'configuration-versions', cv_id]))
 
     def show_commit(self, cv_id):
         """
         GET /configuration-versions/:configuration-id/ingress-attributes
         """
-        return self.client._requestor.get(url="/".join([self.client._base_uri_v2, 'configuration-versions', cv_id, 'ingress-attributes']))
+        return self.client._requestor.get(url="/".join([self.client._base_uri_v2,
+                                                        'configuration-versions',
+                                                        cv_id, 'ingress-attributes']))
 
     def _get_cv_status(self, cv_id):
         """

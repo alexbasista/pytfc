@@ -1,7 +1,7 @@
 """
 Module for TFC/E OAuth Tokens endpoint.
 """
-from pytfc.api.oauth_clients import OauthClients
+from pytfc.oauth_clients import OauthClients
 
 
 class OauthTokens(object):

@@ -1,22 +1,21 @@
 """
 Entry-point module to initialize and configure a client object 
-to interact with almost all TFC/E API endpoints and resources.
+to interface with the supported TFC/E API endpoints and resources.
 """
 import os
 #import sys
-from pytfc.exceptions import MissingHostname
 from pytfc.exceptions import MissingToken
 from pytfc.requestor import Requestor
-from pytfc.api.organizations import Organizations
-from pytfc.api.workspaces import Workspaces
-from pytfc.api.oauth_clients import OauthClients
-from pytfc.api.oauth_tokens import OauthTokens
-from pytfc.api.workspace_variables import WorkspaceVariables
-from pytfc.api.configuration_versions import ConfigurationVersions
-from pytfc.api.runs import Runs
-from pytfc.api.plan_exports import PlanExports
-from pytfc.api.plans import Plans
-from pytfc.api.applies import Applies
+from pytfc.organizations import Organizations
+from pytfc.workspaces import Workspaces
+from pytfc.oauth_clients import OauthClients
+from pytfc.oauth_tokens import OauthTokens
+from pytfc.workspace_variables import WorkspaceVariables
+from pytfc.configuration_versions import ConfigurationVersions
+from pytfc.runs import Runs
+from pytfc.plan_exports import PlanExports
+from pytfc.plans import Plans
+from pytfc.applies import Applies
 
 class Client(object):
     """
@@ -24,15 +23,12 @@ class Client(object):
     API endpoints and resources. Kind of behaves like a superclass.
     """
     def __init__(self, **kwargs):
-        if os.getenv('TFC_HOSTNAME'):
-            self.hostname = os.getenv('TFC_HOSTNAME')
-        elif os.getenv('TFE_HOSTNAME'):
+        if os.getenv('TFE_HOSTNAME'):
             self.hostname = os.getenv('TFE_HOSTNAME')
+        elif kwargs.get('hostname'):
+            self.hostname = kwargs.get('hostname')
         else:
-            if kwargs.get('hostname'):
-                self.hostname = kwargs.get('hostname')
-            else:
-                raise MissingHostname
+            self.hostname = 'app.terraform.io'
 
         if os.getenv('TFC_TOKEN'):
             self.token = os.getenv('TFC_TOKEN')
