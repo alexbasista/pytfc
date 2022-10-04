@@ -4,7 +4,7 @@ Module for TFC/E Runs endpoint.
 #import time
 from pytfc.exceptions import MissingWorkspace
 from pytfc.exceptions import MissingRunId
-#from pytfc.api.configuration_versions import ConfigurationVersions
+#from pytfc.configuration_versions import ConfigurationVersions
 
 
 class Runs(object):

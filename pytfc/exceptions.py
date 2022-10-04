@@ -8,11 +8,6 @@ class Error(Exception):
     pass
 
 
-class MissingHostname(Exception):
-    """TFC/E Hostname not specified."""
-    pass
-
-
 class MissingToken(Exception):
     """TFC/E Token not specified."""
     pass

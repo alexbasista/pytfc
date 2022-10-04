@@ -6,9 +6,9 @@ import json
 
 class Requestor(object):
     """
-    Construct HTTP verb methods to call TFC/E API. 
-    This class is initialized via the parent Client class,
-    and the header is inherited from the Client class.
+    Constructs HTTP verb methods to call TFC/E API. 
+    This class is initialized via the client.py module,
+    and the header is received from the Client class within.
     """
     def __init__(self, headers, **kwargs):
         self.headers = headers
@@ -23,7 +23,9 @@ class Requestor(object):
         r = None
         r = requests.get(url=url, headers=self.headers)
         r.raise_for_status()
+        results = json.loads(r.content)
         return r
+        #return results
 
     def patch(self, url, payload):
         r = None
@@ -37,13 +39,14 @@ class Requestor(object):
         r.raise_for_status()
         return r
 
-    # --- temp testing --- #
+    # --- experimenting --- #
     def post_data(self, url, payload):
         r = None
         r = requests.post(url=url, headers=self.headers, data=payload)
         r.raise_for_status()
         return r
     
+    # --- experimenting --- #
     def post_json(self, url, payload):
         r = None
         r = requests.post(url=url, headers=self.headers, json=payload)

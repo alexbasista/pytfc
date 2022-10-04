@@ -33,8 +33,8 @@ class Plans(object):
           # retrieve latest Run
           run_object = self.client.runs.show(run_id='latest')
 
-        print("Info: Getting Plan from RunID: {}".format(run_object.json()['data']['id']))
-        print("Info: Found PlanID: {}".format(run_object.json()['data']['relationships']['plan']['data']['id']))
+        print("[INFO] Getting Plan from RunID: {}".format(run_object.json()['data']['id']))
+        print("[INFO] Found PlanID: {}".format(run_object.json()['data']['relationships']['plan']['data']['id']))
         return run_object.json()['data']['relationships']['plan']['data']['id']
     
     def show(self, **kwargs):
