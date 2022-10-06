@@ -16,6 +16,7 @@ from pytfc.runs import Runs
 from pytfc.plan_exports import PlanExports
 from pytfc.plans import Plans
 from pytfc.applies import Applies
+from pytfc.state_versions import StateVersions
 
 class Client(object):
     """
@@ -60,6 +61,7 @@ class Client(object):
             self.plans = None
             self.plan_exports = None
             self.applies = None
+            self.state_versions = None
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self)
@@ -71,6 +73,7 @@ class Client(object):
             self.plans = Plans(client=self)
             self.plan_exports = PlanExports(client=self)
             self.applies = Applies(client=self)
+            self.state_versions = StateVersions(client=self)
         else:
             self.organizations = Organizations(client=self)
 
@@ -97,3 +100,4 @@ class Client(object):
         self.plans = Plans(client=self)
         self.plan_exports = PlanExports(client=self)
         self.applies = Applies(client=self)
+        self.state_versions = StateVersions(client=self)
