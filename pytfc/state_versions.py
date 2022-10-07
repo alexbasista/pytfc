@@ -1,5 +1,5 @@
 """
-Module for TFC/E State Versions endpoint.
+Module for TFC/E State Versions endpoints.
 """
 from urllib import request
 from pytfc.exceptions import MissingWorkspace
