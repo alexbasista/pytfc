@@ -17,6 +17,7 @@ from pytfc.plan_exports import PlanExports
 from pytfc.plans import Plans
 from pytfc.applies import Applies
 from pytfc.state_versions import StateVersions
+from pytfc.agent_pools import AgentPools
 
 class Client(object):
     """
@@ -62,6 +63,7 @@ class Client(object):
             self.plan_exports = None
             self.applies = None
             self.state_versions = None
+            self.agent_pools = AgentPools(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self)
@@ -74,6 +76,7 @@ class Client(object):
             self.plan_exports = PlanExports(client=self)
             self.applies = Applies(client=self)
             self.state_versions = StateVersions(client=self)
+            self.agent_pools = AgentPools(client=self)
         else:
             self.organizations = Organizations(client=self)
 
@@ -86,6 +89,7 @@ class Client(object):
         self.workspaces = Workspaces(client=self)
         self.oauth_clients = OauthClients(client=self)
         self.oauth_tokens = OauthTokens(client=self)
+        self.agent_pools = AgentPools(client=self)
 
     def set_ws(self, name):
         """

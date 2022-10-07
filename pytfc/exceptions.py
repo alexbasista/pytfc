@@ -41,3 +41,8 @@ class MissingRunId(Exception):
 class ConfigurationVersionUploadError(Exception):
     """Error uploading Terraform tar.gz to Configuration Version."""
     pass
+
+
+class InvalidQueryParam(Exception):
+    """Unsupported value for query parameter."""
+    pass
