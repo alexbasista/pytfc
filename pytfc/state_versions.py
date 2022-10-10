@@ -54,29 +54,16 @@ class StateVersions(object):
         """
         GET /state-versions
         """
-        base_endpoint = "/".join([self.client._base_uri_v2,'state-versions'])
-        filter_queries = "filter[workspace][name]=" + self.ws + "&filter[organization][name]="+ self.client.org
-        
-        page_queries = []
-        
-        if page_number is not None:
-            page_queries.append(f"page[number]={page_number}")
-        
-        if page_size is not None:
-            page_queries.append(f"page[size]={page_size}")
+        base_url = '/'.join([self.client._base_uri_v2,'state-versions'])
+        filters = [f'[workspace][name]={self.ws}', f'[organization][name]={self.client.org}'] 
 
-        if page_queries:
-            url = base_endpoint + "?" + filter_queries + "&" + "&".join(page_queries)
-        else:
-            url = base_endpoint + filter_queries
-
-        return self.client._requestor.get(url=url)
+        return self.client._requestor.get(url=base_url, filters=filters, page_number=page_number, page_size=page_size)
 
     def get_current(self):
         """
         GET /workspaces/:workspace_id/current-state-version
         """
-        return self.client._requestor.get(url="/".join([self.client._base_uri_v2,
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
                                                         'workspaces', self._ws_id,
                                                         'current-state-version']))
     
@@ -84,7 +71,7 @@ class StateVersions(object):
         """
         GET /state-versions/:state_version_id
         """
-        return self.client._requestor.get(url="/".join([self.client._base_uri_v2,
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
                                                         'state-versions', sv_id]))
 
     def _get_download_url(self, sv_id=None):
