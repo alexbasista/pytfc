@@ -3,7 +3,6 @@ Entry-point module to initialize and configure a client object
 to interface with the supported TFC/E API endpoints and resources.
 """
 import os
-#import sys
 from pytfc.exceptions import MissingToken
 from pytfc.requestor import Requestor
 from pytfc.organizations import Organizations
@@ -18,6 +17,7 @@ from pytfc.plans import Plans
 from pytfc.applies import Applies
 from pytfc.state_versions import StateVersions
 from pytfc.agent_pools import AgentPools
+from pytfc.ssh_keys import SSHKeys
 
 class Client(object):
     """
@@ -64,9 +64,11 @@ class Client(object):
             self.applies = None
             self.state_versions = None
             self.agent_pools = AgentPools(client=self)
+            self.ssh_keys = SSHKeys(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self)
+            self._ws_id = self.workspaces._get_ws_id(name=kwargs.get('ws'))
             self.oauth_clients = OauthClients(client=self)
             self.oauth_tokens = OauthTokens(client=self)
             self.workspace_variables = WorkspaceVariables(client=self)
@@ -77,6 +79,7 @@ class Client(object):
             self.applies = Applies(client=self)
             self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
+            self.ssh_keys = SSHKeys(client=self)
         else:
             self.organizations = Organizations(client=self)
 
@@ -90,6 +93,7 @@ class Client(object):
         self.oauth_clients = OauthClients(client=self)
         self.oauth_tokens = OauthTokens(client=self)
         self.agent_pools = AgentPools(client=self)
+        self.ssh_keys = SSHKeys(client=self)
 
     def set_ws(self, name):
         """
@@ -98,6 +102,7 @@ class Client(object):
         """
         self.ws = name
         self.workspaces = Workspaces(client=self)
+        self._ws_id = self.workspaces._get_ws_id(name=name)
         self.workspace_variables = WorkspaceVariables(client=self)
         self.configuration_versions = ConfigurationVersions(client=self)
         self.runs = Runs(client=self)

@@ -14,13 +14,13 @@ class PolicyChecks(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         else:
             if self.client.ws:
                 self.ws = self.client.ws
+                self._ws_id = self.client._ws_id
             else:
                 raise MissingWorkspace
-        
-        self._ws_id = self.client.workspaces._get_ws_id(self.ws)
 
     def list(self, **kwargs):
         """

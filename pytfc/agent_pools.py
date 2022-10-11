@@ -18,14 +18,10 @@ class AgentPools(object):
                                 self.client.org, 'agent-pools'])
 
         if include is not None:
-            if include != "workspaces":
+            if include != 'workspaces':
                 raise InvalidQueryParam
-            else:
-                url = base_url + "?include=" + include
-        else:
-            url = base_url                 
         
-        return self.client._requestor.get(url=url)
+        return self.client._requestor.get(url=base_url, include=include)
     
     def list_agents(self, agent_pool_id):
         """
@@ -40,14 +36,10 @@ class AgentPools(object):
         base_url = '/'.join([self.client._base_uri_v2, 'agent-pools', agent_pool_id])
 
         if include is not None:
-            if include != "workspaces":
-                raise InvalidQueryParam
-            else:
-                url = base_url + "?include=" + include
-        else:
-            url = base_url                 
+            if include != 'workspaces':
+                raise InvalidQueryParam            
         
-        return self.client._requestor.get(url=url)
+        return self.client._requestor.get(url=base_url, include=include)
 
     def show_agent(self, agent_id):
         """

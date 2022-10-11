@@ -19,16 +19,16 @@ class ConfigurationVersions(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         else:
             if self.client.ws:
                 self.ws = self.client.ws
+                self._ws_id = self.client._ws_id
             else:
                 raise MissingWorkspace
-        
-        self._ws_id = self.client.workspaces._get_ws_id(self.ws)
+
         self._cv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces',
                                       self._ws_id, 'configuration-versions'])
-
 
     def list(self):
         """
@@ -36,13 +36,11 @@ class ConfigurationVersions(object):
         """
         return self.client._requestor.get(url=self._cv_endpoint)
 
-    
     def _get_latest_cv_id(self):
         """
         Helper method that returns latest Configuration Version ID in Workspace.
         """
         return self.list().json()['data'][0]['id']
-
 
     def show(self, cv_id):
         """
@@ -73,7 +71,6 @@ class ConfigurationVersions(object):
         cv_object = self.show(cv_id=cv_id)
         return cv_object.json()['data']['attributes']['upload-url']
 
-
     def create(self, auto_queue_runs='true', speculative='false', **kwargs):
         """
         POST /workspaces/:workspace_id/configuration-versions
@@ -102,7 +99,6 @@ class ConfigurationVersions(object):
             cv_object = self.client._requestor.post(url=self._cv_endpoint, payload=payload)
         
         return cv_object
-
 
     def _create_tf_tarball(self, source_dir, dest_dir='./'):
         """

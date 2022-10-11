@@ -1,10 +1,8 @@
 """
 Module for TFC/E Runs endpoint.
 """
-#import time
 from pytfc.exceptions import MissingWorkspace
 from pytfc.exceptions import MissingRunId
-#from pytfc.configuration_versions import ConfigurationVersions
 
 
 class Runs(object):
@@ -16,13 +14,13 @@ class Runs(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         else:
             if self.client.ws:
                 self.ws = self.client.ws
+                self._ws_id = self.client._ws_id
             else:
                 raise MissingWorkspace
-        
-        self._ws_id = self.client.workspaces._get_ws_id(self.ws)
     
     def create(self, is_destroy='false', message='Queued via pytfc', cv_id=None, **kwargs):
         """
