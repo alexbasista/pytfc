@@ -14,13 +14,14 @@ class StateVersions(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         else:
             if self.client.ws:
                 self.ws = self.client.ws
+                self._ws_id = self.client._ws_id
             else:
                 raise MissingWorkspace
-        
-        self._ws_id = self.client.workspaces._get_ws_id(self.ws)
+
         self._sv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces',
                                       self._ws_id, 'state-versions'])
     

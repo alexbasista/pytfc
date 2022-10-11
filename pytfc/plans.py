@@ -13,13 +13,14 @@ class Plans(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         else:
             if self.client.ws:
                 self.ws = self.client.ws
+                self._ws_id = self.client._ws_id
             else:
                 raise MissingWorkspace
-        
-        self._ws_id = self.client.workspaces._get_ws_id(self.ws)
+
         self.plans_endpoint = '/'.join([self.client._base_uri_v2, 'plans'])
     
     def _get_plan_id(self, **kwargs):

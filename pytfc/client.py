@@ -68,6 +68,7 @@ class Client(object):
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self)
+            self._ws_id = self.workspaces._get_ws_id(name=kwargs.get('ws'))
             self.oauth_clients = OauthClients(client=self)
             self.oauth_tokens = OauthTokens(client=self)
             self.workspace_variables = WorkspaceVariables(client=self)
@@ -101,6 +102,7 @@ class Client(object):
         """
         self.ws = name
         self.workspaces = Workspaces(client=self)
+        self._ws_id = self.workspaces._get_ws_id(name=name)
         self.workspace_variables = WorkspaceVariables(client=self)
         self.configuration_versions = ConfigurationVersions(client=self)
         self.runs = Runs(client=self)
