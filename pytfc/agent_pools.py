@@ -1,7 +1,7 @@
 """
 Module for TFC/E Agent Pools endpoint.
 """
-from pytfc.exceptions import InvalidQueryParam
+from .exceptions import InvalidQueryParam
 
 class AgentPools(object):
     """

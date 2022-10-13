@@ -1,8 +1,8 @@
 """
 Module for TFC/E Runs endpoint.
 """
-from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import MissingRunId
+from .exceptions import MissingWorkspace
+from .exceptions import MissingRunId
 
 
 class Runs(object):
