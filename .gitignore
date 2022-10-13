@@ -110,3 +110,6 @@ venv.bak/
 # Sentinel files
 sentinel.hcl
 mock*.sentinel
+
+# VSCode
+.vscode/
