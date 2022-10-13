@@ -1,12 +1,10 @@
 """
 Module for TFC/E Workspace endpoints.
 """
-#import sys
-from pytfc.exceptions import MissingOrganization
-from pytfc.exceptions import MissingWorkspace
-#from pytfc.exceptions import MissingOauthClient
-from pytfc.exceptions import MissingVcsProvider
-from pytfc.oauth_clients import OauthClients
+from .exceptions import MissingOrganization
+from .exceptions import MissingWorkspace
+from .exceptions import MissingVcsProvider
+from .oauth_clients import OauthClients
 
 
 class Workspaces(object):
@@ -223,7 +221,7 @@ class Workspaces(object):
         ws_id = self._get_ws_id(name=name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
-                                          'workspaces', ws_id, 'actions', 'unlock']))
+                        'workspaces', ws_id, 'actions', 'unlock']), payload=None)
 
     def force_unlock(self, name=None):
         """
@@ -238,7 +236,7 @@ class Workspaces(object):
         ws_id = self._get_ws_id(name=name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
-                                          'workspaces', ws_id, 'actions', 'force-unlock']))
+                    'workspaces', ws_id, 'actions', 'force-unlock']), payload=None)
 
     def assign_ssh_key(self, ssh_key_id, name=None):
         """
