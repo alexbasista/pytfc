@@ -1,7 +1,7 @@
 """
 Module for TFC/E Applies API endpoint.
 """
-from pytfc.exceptions import MissingWorkspace
+from .exceptions import MissingWorkspace
 
 
 class Applies(object):
@@ -10,6 +10,7 @@ class Applies(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
@@ -34,7 +35,7 @@ class Applies(object):
             run_object = self.client.runs.show(run_id=run_id)
         
         if run_object.json()['data']['relationships']['apply']['data'] == []:
-            print("[WARNING]: No Apply ID was found.")
+            self._logger.warning("No Apply ID was found.")
             return None
         else:
             return run_object.json()['data']['relationships']['apply']['data']['id']

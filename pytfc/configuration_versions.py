@@ -6,8 +6,8 @@ import time
 import tarfile
 import requests
 from datetime import datetime
-from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import ConfigurationVersionUploadError
+from .exceptions import MissingWorkspace
+from .exceptions import ConfigurationVersionUploadError
 
 
 class ConfigurationVersions(object):
@@ -16,6 +16,7 @@ class ConfigurationVersions(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
@@ -118,7 +119,7 @@ class ConfigurationVersions(object):
             
             return(dest_dir + tf_tarfile_out)
         except Exception as e:
-            print(e)
+            self._logger.exception(e)
             raise
 
     def upload(self, cv_upload_url, tf_tarball):
@@ -136,7 +137,7 @@ class ConfigurationVersions(object):
         if os.path.exists(path):
             os.remove(path)
         else:
-            print("[WARNING] '{}' not found.".format(path))
+            self._logger.warning(f"`{path}` path not found.")
             pass
     
     def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
@@ -150,31 +151,31 @@ class ConfigurationVersions(object):
         cv_object = self.create(auto_queue_runs=auto_queue_runs, speculative=speculative)
         cv_id=cv_object.json()['data']['id']
         cv_upload_url = cv_object.json()['data']['attributes']['upload-url']
-        print("[INFO] Created Configuration Version: '{}'".format(cv_object.json()['data']['id']))
+        self._logger.info(f"Created Configuration Version `{cv_id}`")
         
         # 2. Create tarball of TF files
         tf_tarball = self._create_tf_tarball(source_dir=source_tf_dir, dest_dir=dest_tf_dir)
-        print("[INFO] Created Terraform tarball: '{}'".format(tf_tarball))
+        self._logger.info(f"Created Terraform tarball `{tf_tarball}`.")
         
         # 3. Upload tarball to CV
         with open(tf_tarball, 'rb') as tf_tarball_upload:
             self.upload(cv_upload_url=cv_upload_url, tf_tarball=tf_tarball_upload)
-        print("[INFO] Uploaded Terraform tarball: '{}'".format(tf_tarball))
+        self._logger.info(f"Uploaded Terraform tarball `{tf_tarball}`.")
 
         # 4. Check Configuration Version status
         cv_status = self._get_cv_status(cv_id=cv_id)
-        print("[INFO] Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+        self._logger.info(f"Checking for 'uploaded' Configuration Version status: `{cv_status}`.")
         while cv_status != 'uploaded':
             if self._get_cv_status(cv_id=cv_id) == 'uploaded':
                 break
             else:
                 cv_status = self._get_cv_status(cv_id=cv_id)
-                print("[INFO] Checking for 'uploaded' Configuration Version status: {}".format(cv_status))
+                self._logger.info(f"Checking for 'uploaded' Configuration Version status: {cv_status}")
                 time.sleep(2)
 
         # 5. Cleanup
         if kwargs.get('cleanup', 'true'):
-            print("[INFO] Deleting local Terraform tarball: '{}'".format(tf_tarball))
+            self._logger.info(f"Deleting local Terraform tarball `{tf_tarball}`.")
             self._cleanup_tf_tarball(path=tf_tarball)
 
         return cv_id

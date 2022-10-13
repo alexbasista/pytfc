@@ -1,7 +1,7 @@
 """
 Module for TFC/E Plans endpoint.
 """
-from pytfc.exceptions import MissingWorkspace
+from .exceptions import MissingWorkspace
 
 
 class Plans(object):
@@ -10,6 +10,7 @@ class Plans(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
@@ -34,9 +35,12 @@ class Plans(object):
           # retrieve latest Run
           run_object = self.client.runs.show(run_id='latest')
 
-        print("[INFO] Getting Plan from RunID: {}".format(run_object.json()['data']['id']))
-        print("[INFO] Found PlanID: {}".format(run_object.json()['data']['relationships']['plan']['data']['id']))
-        return run_object.json()['data']['relationships']['plan']['data']['id']
+        run_id = run_object.json()['data']['id']
+        plan_id = run_object.json()['data']['relationships']['plan']['data']['id']
+        self._logger.info(f"Getting Plan from Run ID `{run_id}`.")
+        self._logger.info(f"Found Plan `{plan_id}`.")
+        
+        return plan_id
     
     def show(self, **kwargs):
         """

@@ -3,8 +3,8 @@ Module for TFC/E Plan Exports endpoint.
 """
 import requests
 import tarfile
-from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import MissingRunId
+from .exceptions import MissingWorkspace
+from .exceptions import MissingRunId
 
 
 class PlanExports(object):
@@ -13,6 +13,7 @@ class PlanExports(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
@@ -69,7 +70,7 @@ class PlanExports(object):
         payload['data'] = data
 
         pe_object = self.client._requestor.post(url=self.plan_exports_endpoint, payload=payload)
-        print("[INFO] Plan Export has been created: {}".format(pe_object.json()['data']['id']))
+        self._logger.info(f"Plan Export `{pe_object.json()['data']['id']}` has been created.")
         return pe_object
 
     def show(self, **kwargs):
@@ -77,14 +78,16 @@ class PlanExports(object):
         GET /plan-exports/:id
         """
         if kwargs.get('plan_export_id'):
-            pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, kwargs.get('plan_export_id')]))
+            pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint,
+                                                    kwargs.get('plan_export_id')]))
         elif self._get_plan_export_id() is None:
-            print("[INFO] Plan Export ID not found in Plan.")
-            print("[INFO] Plan Export must be created for Plan first.")
+            self._logger.info("Plan Export ID not found in Plan.")
+            self._logger.info("Plan Export must be created for Plan first.")
             pe_object = None
         else:
-            print("[INFO] Found Plan Export ID: {}".format(self._get_plan_export_id()))
-            pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, self._get_plan_export_id()]))
+            self._logger.info(f"Found Plan Export ID `{self._get_plan_export_id()}`.")
+            pe_object = self.client._requestor.get(url='/'.join([self.plan_exports_endpoint,
+                                                                self._get_plan_export_id()]))
         
         return pe_object
     
@@ -119,12 +122,12 @@ class PlanExports(object):
         if plan_export_id is None:
             pe_object = self.create(plan_id=plan_id)
             pe_id = pe_object.json()['data']['id']
-            print("[INFO] Created Plan Export: {}".format(pe_id))
+            self._logger.info(f"Created Plan Export `{pe_id}`.")
         else:
             pe_id = plan_export_id
         
         data = requests.get(url=self._get_download_url(plan_export_id=pe_id))
-        print("[INFO] Downloaded Plan Export: {}".format(pe_id))
+        self._logger.info(f"Downloaded Plan Export `{pe_id}`.")
 
         run_id = self._get_run_id_from_pe(pe_id=pe_id)
 
@@ -136,10 +139,10 @@ class PlanExports(object):
 
         with open(destination_path, 'wb') as file:
             file.write(data.content)
-        print("[INFO] Created archive: '{}'".format(destination_path))
+        self._logger.info(f"Created archive `{destination_path}`.")
 
         self._extract_tarball(filepath=destination_path, destination_folder=destination_folder)
-        print("[INFO] Extracted archive '{}'".format(destination_path))
+        self._logger.info(f"Extracted archive `{destination_path}`.")
 
     
 

@@ -1,30 +1,39 @@
 """
-Entry-point module to initialize and configure a client object 
-to interface with the supported TFC/E API endpoints and resources.
+Entry-point module to instantiate an API client object to
+interface with the supported TFC/E API endpoints and resources.
 """
 import os
-from pytfc.exceptions import MissingToken
-from pytfc.requestor import Requestor
-from pytfc.organizations import Organizations
-from pytfc.workspaces import Workspaces
-from pytfc.oauth_clients import OauthClients
-from pytfc.oauth_tokens import OauthTokens
-from pytfc.workspace_variables import WorkspaceVariables
-from pytfc.configuration_versions import ConfigurationVersions
-from pytfc.runs import Runs
-from pytfc.plan_exports import PlanExports
-from pytfc.plans import Plans
-from pytfc.applies import Applies
-from pytfc.state_versions import StateVersions
-from pytfc.agent_pools import AgentPools
-from pytfc.ssh_keys import SSHKeys
+import logging
+import sys
+from .exceptions import MissingToken
+from .requestor import Requestor
+from .organizations import Organizations
+from .workspaces import Workspaces
+from .oauth_clients import OauthClients
+from .oauth_tokens import OauthTokens
+from .workspace_variables import WorkspaceVariables
+from .configuration_versions import ConfigurationVersions
+from .runs import Runs
+from .plan_exports import PlanExports
+from .plans import Plans
+from .applies import Applies
+from .state_versions import StateVersions
+from .agent_pools import AgentPools
+from .ssh_keys import SSHKeys
 
-class Client(object):
+
+class Client:
     """
     Initialize this parent class to access child classes for all TFC/E
     API endpoints and resources. Kind of behaves like a superclass.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, log_level='ERROR', **kwargs):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._log_level = getattr(logging, log_level.upper())
+        self._logger.setLevel(self._log_level)
+        self._logger.addHandler(logging.StreamHandler(sys.stdout))
+        self._logger.debug("Instantiating TFC/E API Client class.")
+
         if os.getenv('TFE_HOSTNAME'):
             self.hostname = os.getenv('TFE_HOSTNAME')
         elif kwargs.get('hostname'):
@@ -47,7 +56,7 @@ class Client(object):
             'Authorization': 'Bearer ' + self.token,
             'Content-Type': 'application/vnd.api+json'
         }
-        self._requestor = Requestor(headers=self._headers)
+        self._requestor = Requestor(client=self, headers=self._headers)
         self.org = kwargs.get('org')
         self.ws = kwargs.get('ws')
 

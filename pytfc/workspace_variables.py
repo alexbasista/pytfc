@@ -3,7 +3,7 @@ Module for TFC/E Workspace Variables endpoint.
 """
 import json
 import hcl as pyhcl
-from pytfc.exceptions import MissingWorkspace
+from .exceptions import MissingWorkspace
 
 
 class WorkspaceVariables(object):
@@ -12,6 +12,7 @@ class WorkspaceVariables(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
@@ -76,6 +77,6 @@ class WorkspaceVariables(object):
                 else:
                     self.create(key=key, value=value, hcl=False)
         except Exception as e:
-            print("[ERROR] Unknown exception occured: {}".format(e))
+            self._logger.error(f"Unknown exception occured: {e}")
 
 

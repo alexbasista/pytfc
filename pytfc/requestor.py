@@ -4,17 +4,20 @@ Module for HTTP verb functions against TFC/E API.
 import requests
 import json
 
+
 class Requestor(object):
     """
     Constructs HTTP verb methods to call TFC/E API. 
     This class is initialized via the client.py module,
     and the header is received from the Client class within.
     """
-    def __init__(self, headers, **kwargs):
+    def __init__(self, client, headers):
+        self._logger = client._logger
         self.headers = headers
 
     def post(self, url, payload):
         r = None
+        self._logger.debug(f"Sending HTTP POST to {url}.")
         r = requests.post(url=url, headers=self.headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
@@ -45,19 +48,21 @@ class Requestor(object):
         if query_params:
             url += '?' + '&'.join(query_params)
         
-        print(f'GET: {url}')
+        self._logger.debug(f"Sending HTTP GET to {url}")
         r = requests.get(url=url, headers=self.headers)
         r.raise_for_status()
         return r
 
     def patch(self, url, payload):
         r = None
+        self._logger.debug(f"Sending HTTP PATCH to {url}")
         r = requests.patch(url=url, headers=self.headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
 
     def delete(self, url):
         r = None
+        self._logger.debug(f"Sending HTTP DELETE to {url}")
         r = requests.delete(url=url, headers=self.headers)
         r.raise_for_status()
         return r
