@@ -1,7 +1,7 @@
 """
 Module for TFC/E Organization endpoints.
 """
-from pytfc.exceptions import MissingOrganization
+from .exceptions import MissingOrganization
 
 
 class Organizations(object):
@@ -10,6 +10,7 @@ class Organizations(object):
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         self.organizations_endpoint = '/'.join([self.client._base_uri_v2, 'organizations'])
         self.org_attributes_list = [
             'name',
@@ -53,9 +54,10 @@ class Organizations(object):
             if key in self.org_attributes_list:
                 attributes[key] = value
             else:
-                print("[WARNING] '{}' is an invalid key for Organizations API.".format(key))
+                self._logger.warning(f"`{key}` is an invalid key for Organizations API.")
         data['attributes'] = attributes
         payload['data'] = data
+        
         return self.client._requestor.post(url=self.organizations_endpoint, payload=payload)
 
     def update(self, name=None, **kwargs):
@@ -77,7 +79,7 @@ class Organizations(object):
             if key in self.org_attributes_list:
                 attributes[key] = value
             else:
-                print("[WARNING] '{}' is an invalid key for Organizations API.".format(key))
+                self._logger.warning(f"`{key}` is an invalid key for Organizations API.")
         data['attributes'] = attributes
         payload['data'] = data
         

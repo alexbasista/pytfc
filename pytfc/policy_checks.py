@@ -1,8 +1,7 @@
 """
 Module for TFC/E Policy Checks API endpoint.
 """
-from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import MissingRunId
+from .exceptions import MissingWorkspace
 
 
 class PolicyChecks(object):
