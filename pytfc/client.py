@@ -69,7 +69,7 @@ class Client:
             self.plans = None
             self.plan_exports = None
             self.applies = None
-            self.state_versions = None
+            self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
@@ -101,6 +101,7 @@ class Client:
         self.oauth_tokens = OauthTokens(client=self)
         self.agent_pools = AgentPools(client=self)
         self.ssh_keys = SSHKeys(client=self)
+        self.state_versions = StateVersions(client=self)
 
     def set_ws(self, name):
         """
