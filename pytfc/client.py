@@ -34,26 +34,24 @@ class Client:
         self._logger.addHandler(logging.StreamHandler(sys.stdout))
         self._logger.debug("Instantiating TFC/E API Client class.")
 
-        if os.getenv('TFE_HOSTNAME'):
-            self.hostname = os.getenv('TFE_HOSTNAME')
-        elif kwargs.get('hostname'):
+        if kwargs.get('hostname'):
             self.hostname = kwargs.get('hostname')
+        elif os.getenv('TFE_HOSTNAME'):
+            self.hostname = os.getenv('TFE_HOSTNAME')
         else:
             self.hostname = 'app.terraform.io'
+        self._logger.debug(f"Setting hostname to `{self.hostname}`.")
 
-        if os.getenv('TFC_TOKEN'):
-            self.token = os.getenv('TFC_TOKEN')
+        if kwargs.get('token'):
+            self._token = kwargs.get('token')
         elif os.getenv('TFE_TOKEN'):
-            self.token = os.getenv('TFE_TOKEN')
+            self._token = os.getenv('TFE_TOKEN')
         else:
-            if kwargs.get('token'):
-                self.token = kwargs.get('token')
-            else:
-                raise MissingToken
+            raise MissingToken
 
         self._base_uri_v2 = 'https://{}/api/v2'.format(self.hostname)
         self._headers = {
-            'Authorization': 'Bearer ' + self.token,
+            'Authorization': 'Bearer ' + self._token,
             'Content-Type': 'application/vnd.api+json'
         }
         self._requestor = Requestor(client=self, headers=self._headers)
@@ -71,7 +69,7 @@ class Client:
             self.plans = None
             self.plan_exports = None
             self.applies = None
-            self.state_versions = None
+            self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
@@ -103,6 +101,7 @@ class Client:
         self.oauth_tokens = OauthTokens(client=self)
         self.agent_pools = AgentPools(client=self)
         self.ssh_keys = SSHKeys(client=self)
+        self.state_versions = StateVersions(client=self)
 
     def set_ws(self, name):
         """

@@ -15,20 +15,28 @@ class StateVersions(object):
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
             self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
+        elif self.client.ws and self.client._ws_id:
+            self.ws = self.client.ws
+            self.ws_id = self.client._ws_id
         else:
-            if self.client.ws:
-                self.ws = self.client.ws
-                self._ws_id = self.client._ws_id
-            else:
-                raise MissingWorkspace
+            self.ws = None
+            self.ws_id = None
 
-        self._sv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces',
-                                      self._ws_id, 'state-versions'])
-    
-    def create(self, serial, md5, state, lineage=None, run_id=None):
+    def create(self, serial, md5, state, lineage=None, run_id=None, ws_id=None):
         """
         POST /workspaces/:workspace_id/state-versions
         """
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+        
+        url = '/'.join([
+            self.client._base_uri_v2, 'workspaces', ws_id, 'state-versions'
+        ])
+
         payload = {}
         data = {}
         data['type'] = 'state-versions'
@@ -49,31 +57,51 @@ class StateVersions(object):
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self.client._requestor.post(url=self._sv_endpoint, payload=payload)
+        return self.client._requestor.post(url=url, payload=payload)
 
-    def list(self, page_number=None, page_size=None):
+    def list(self, page_number=None, page_size=None, ws=None):
         """
         GET /state-versions
         """
+        if ws is not None:
+            ws = ws
+        elif self.ws:
+            ws = self.ws
+        else:
+            raise MissingWorkspace
+        
         base_url = '/'.join([self.client._base_uri_v2,'state-versions'])
-        filters = [f'[workspace][name]={self.ws}', f'[organization][name]={self.client.org}'] 
+        filters = [
+            f'[workspace][name]={ws}',
+            f'[organization][name]={self.client.org}'
+        ]
 
-        return self.client._requestor.get(url=base_url, filters=filters, page_number=page_number, page_size=page_size)
+        return self.client._requestor.get(url=base_url, filters=filters,
+            page_number=page_number, page_size=page_size)
 
-    def get_current(self):
+    def get_current(self, ws_id=None):
         """
         GET /workspaces/:workspace_id/current-state-version
         """
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
-                                                        'workspaces', self._ws_id,
-                                                        'current-state-version']))
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+        
+        url = '/'.join([
+            self.client._base_uri_v2, 'workspaces', ws_id, 'current-state-version'
+        ])
+        
+        return self.client._requestor.get(url=url)
     
     def show(self, sv_id):
         """
         GET /state-versions/:state_version_id
         """
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
-                                                        'state-versions', sv_id]))
+        return self.client._requestor.get(url='/'.join([
+            self.client._base_uri_v2, 'state-versions', sv_id]))
 
     def _get_download_url(self, sv_id=None):
         """
@@ -87,7 +115,8 @@ class StateVersions(object):
         else:
             sv = self.show(sv_id=sv_id)
         
-        return sv.json()['data']['attributes']['hosted-state-download-url']
+        return sv.json()\
+            ['data']['attributes']['hosted-state-download-url']
     
     def _get_json_download_url(self, sv_id=None):
         """
@@ -100,8 +129,9 @@ class StateVersions(object):
             sv = self.get_current()
         else:
             sv = self.show(sv_id=sv_id)
-        
-        return sv.json()['data']['attributes']['hosted-json-state-download-url']
+
+        return sv.json()\
+            ['data']['attributes']['hosted-json-state-download-url']
     
     def download(self, url):
         """
