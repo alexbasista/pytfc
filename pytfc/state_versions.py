@@ -133,23 +133,25 @@ class StateVersions(object):
         return sv.json()\
             ['data']['attributes']['hosted-json-state-download-url']
     
-    def download(self, url, context=None):
+    def download(self, url, context=None, headers={}):
         """
         Utility method to download a State Version
         based on the download URL that is specified.
         Returns raw state object in bytes.
         """
-        state_dl = request.urlopen(url=url, data=None, context=context)
+        state_dl_req = request.Request(url=url, headers=headers, data=None)
+        state_dl = request.urlopen(state_dl_req, context=context)
         state_obj = state_dl.read()
         return state_obj
     
-    def download_current(self, context=None):
+    def download_current(self, context=None, headers={}):
         """
         Utility method to download the current
         State Version of the Workspace.
         Returns raw state object in bytes.
         """
         url = self._get_download_url()
-        state_dl = request.urlopen(url=url, data=None, context=context)
+        state_dl_req = request.Request(url=url, headers=headers, data=None)
+        state_dl = request.urlopen(state_dl_req, context=context)
         state_obj = state_dl.read()
         return state_obj
