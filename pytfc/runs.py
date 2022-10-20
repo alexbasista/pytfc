@@ -15,23 +15,26 @@ class Runs(object):
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
             self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
+        elif self.client.ws and self.client._ws_id:
+            self.ws = self.client.ws
+            self.ws_id = self.client._ws_id
         else:
-            if self.client.ws:
-                self.ws = self.client.ws
-                self._ws_id = self.client._ws_id
-            else:
-                raise MissingWorkspace
+            self.ws = None
+            self.ws_id = None
     
-    def create(self, is_destroy='false', message='Queued via pytfc', cv_id=None, **kwargs):
+    def create(self, is_destroy='false', message='Queued via pytfc', cv_id=None, ws_id=None):
         """
         POST /runs
-        Defaults to using latest Configuration Version if 'cv_id' is not set.
+        
+        Defaults to using latest Configuration Version
+        in Workspace if 'cv_id' is passed in.
         """
-        # handle if Workspace (ws) argument is passsed
-        if kwargs.get('ws'):
-            ws_id = self.client.workspaces._get_ws_id(kwargs.get('ws'))
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
         else:
-            ws_id = self._ws_id
+            raise MissingWorkspace
         
         # handle if Configuration Versions ID is not specified by using the latest
         if cv_id is None:
@@ -62,11 +65,15 @@ class Runs(object):
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self.client._requestor.post(url='/'.join([self.client.base_url_v2, 'runs']), payload=payload)
+        return self.client._requestor.post(
+            url='/'.join([self.client.base_url_v2, 'runs']), payload=payload)
 
     def apply(self, run_id=None, commit_message=None, comment='Applied by pytfc'):
         """
         POST /runs/:run_id/actions/apply
+
+        Defaults to using latest Run in Workspace if
+        `run_id` or `commit_message` is not passed.
         """
         if run_id is None:
             if commit_message is None:
@@ -77,17 +84,21 @@ class Runs(object):
         payload = {}
         payload['comment'] = comment
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2, 'runs', run_id, 'actions', 'apply']), payload=payload)
+        return self.client._requestor.post(
+            url='/'.join([self.client._base_uri_v2, 'runs', run_id, 'actions', 'apply']),
+            payload=payload)
 
     def list(self):
         """
         GET /workspaces/:workspace_id/runs
         """
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2, 'workspaces', self._ws_id, 'runs']))
+        return self.client._requestor.get(
+            url='/'.join([self.client._base_uri_v2, 'workspaces', self.ws_id, 'runs']))
 
     def _get_run_id_by_commit(self, commit_message):
         """
-        Helper method that returns Run ID of Run in Workspace based on specified commit message.
+        Helper method that returns Run ID of Run in 
+        Workspace by `commit_message` that is passed in.
         """
         runs_list = self.list()
         for run in runs_list.json()['data']:

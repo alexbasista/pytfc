@@ -73,6 +73,7 @@ class Client:
             self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
+            self.applies = Applies(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -106,6 +107,7 @@ class Client:
         self.agent_pools = AgentPools(client=self)
         self.ssh_keys = SSHKeys(client=self)
         self.state_versions = StateVersions(client=self)
+        self.applies = Applies(client=self)
 
     def set_ws(self, name):
         """

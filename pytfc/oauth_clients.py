@@ -4,45 +4,49 @@ Module for TFC/E OAuth Clients endpoint.
 from .exceptions import MissingOrganization
 
 
-class OauthClients(object):
+class OauthClients:
     """
     TFC/E OAuth Clients methods.
     """
-    def __init__(self, client, **kwargs):
+    def __init__(self, client):
         self.client = client
-        self.oauth_clients_endpoint = '/'.join([self.client._base_uri_v2, 'organizations', self.client.org, 'oauth-clients'])
+        if not self.client.org:
+            raise MissingOrganization
+
+        self.oc_endpoint = '/'.join([self.client._base_uri_v2,
+            'organizations', self.client.org, 'oauth-clients'])
 
     def _get_oc_id(self, name):
         """
-        Helper method to retrieve the OAuth Client ID of an OAuth Client based on OAuth Client display name
+        Helper method to retrieve OAuth Client ID
+        based on OAuth Client (display) name passed.
         """
         oc_list = self.list()
-        oc_id = [ i['id'] for i in oc_list.json()['data'] if i['attributes']['name'] == name ]
+        oc_id = [ i['id'] for i in oc_list.json()['data']\
+            if i['attributes']['name'] == name ]
+        
         return oc_id[0]
 
     def list(self):
         """
         GET /organizations/:organization_name/oauth-clients
         """
-        if self.client.org is None:
-            raise MissingOrganization
-
-        return self.client._requestor.get(url='/'.join([self.oauth_clients_endpoint]))
+        return self.client._requestor.get(url='/'.join([
+            self.oc_endpoint]))
 
     def show(self, name):
         """
         GET /oauth-clients/:id
         """
         oc_id = self._get_oc_id(name=name)
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id]))
+        
+        return self.client._requestor.get(url='/'.join([
+            self.client._base_uri_v2, 'oauth-clients', oc_id]))
 
     def create(self, service_provider, name, http_url, api_url, oauth_token_string, **kwargs):
         """
         POST /organizations/:organization_name/oauth-clients
-        """
-        if self.client.org is None:
-            raise MissingOrganization
-        
+        """        
         payload = {}
         data = {}
         data['type'] = 'oauth-clients'
@@ -57,7 +61,8 @@ class OauthClients(object):
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url='/'.join([self.oauth_clients_endpoint]), payload=payload)
+        return self.client._requestor.post(url='/'.join([
+            self.oc_endpoint]), payload=payload)
 
 
     def update(self, name, **kwargs):
@@ -80,11 +85,14 @@ class OauthClients(object):
         data['attributes'] = attributes
         payload['data'] = data
 
-        return self.client._requestor.patch(url='/'.join([self.oauth_clients_endpoint]), payload=payload)
+        return self.client._requestor.patch(url='/'.join([
+            self.oc_endpoint]), payload=payload)
 
     def delete(self, name):
         """
         DELETE /oauth-clients/:id
         """
         oc_id = self._get_oc_id(name=name)
-        return self.client._requestor.delete(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id]))
+        
+        return self.client._requestor.delete(url='/'.join([
+            self.client._base_uri_v2, 'oauth-clients', oc_id]))

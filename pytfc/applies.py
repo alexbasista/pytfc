@@ -15,19 +15,18 @@ class Applies(object):
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
             self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
+        elif self.client.ws and self.client._ws_id:
+            self.ws = self.client.ws
+            self.ws_id = self.client._ws_id
         else:
-            if self.client.ws:
-                self.ws = self.client.ws
-                self._ws_id = self.client._ws_id
-            else:
-                raise MissingWorkspace
+            self.ws = None
+            self.ws_id = None
 
-        self.applies_endpoint = '/'.join([self.client._base_uri_v2, 'applies'])
 
     def _get_apply_id(self, run_id='latest', **kwargs):
         """
-        Helper method to return Apply ID.
-        Defaults to using latest Run ID.
+        Helper method to return Apply ID of a Run.
+        Defaults to using latest Run ID of Workspace.
         """
         if kwargs.get('commit_message'):
             run_object = self.client.runs.show(commit_message=kwargs.get('commit_message'))
@@ -55,4 +54,5 @@ class Applies(object):
         else:
             apply_id = self._get_apply_id(run_id='latest')
 
-        return self.client._requestor.get(url="/".join([self.applies_endpoint, apply_id]))
+        return self.client._requestor.get(
+            url='/'.join([self.client._base_uri_v2, 'applies', apply_id]))

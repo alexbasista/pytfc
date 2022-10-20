@@ -7,7 +7,7 @@ from .exceptions import MissingWorkspace
 from .exceptions import MissingRunId
 
 
-class PlanExports(object):
+class PlanExports:
     """
     TFC/E Plan Exports methods.
     """
@@ -17,11 +17,13 @@ class PlanExports(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
+            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
+        elif self.client.ws and self.client._ws_id:
+            self.ws = self.client.ws
+            self.ws_id = self.client._ws_id
         else:
-            if self.client.ws:
-                self.ws = self.client.ws
-            else:
-                raise MissingWorkspace
+            self.ws = None
+            self.ws_id = None
 
         self.plan_exports_endpoint = '/'.join([self.client._base_uri_v2, 'plan-exports'])
     
@@ -42,7 +44,8 @@ class PlanExports(object):
         """
         GET /plan-exports/:id/download
         """
-        return self.client._requestor.get(url='/'.join([self.plan_exports_endpoint, plan_export_id, 'download'])).url
+        return self.client._requestor.get(url='/'.join([
+            self.plan_exports_endpoint, plan_export_id, 'download'])).url
     
     def create(self, **kwargs):
         """
@@ -69,8 +72,12 @@ class PlanExports(object):
         data['relationships'] = relationships
         payload['data'] = data
 
-        pe_object = self.client._requestor.post(url=self.plan_exports_endpoint, payload=payload)
-        self._logger.info(f"Plan Export `{pe_object.json()['data']['id']}` has been created.")
+        pe_object = self.client._requestor.post(url=self.plan_exports_endpoint,
+            payload=payload)
+        
+        self._logger.info(\
+            f"Plan Export `{pe_object.json()['data']['id']}` has been created.")
+
         return pe_object
 
     def show(self, **kwargs):
