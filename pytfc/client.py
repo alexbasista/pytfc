@@ -27,7 +27,7 @@ class Client:
     Initialize this parent class to access child classes for all TFC/E
     API endpoints and resources. Kind of behaves like a superclass.
     """
-    def __init__(self, log_level='ERROR', **kwargs):
+    def __init__(self, log_level='WARNING', **kwargs):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._log_level = getattr(logging, log_level.upper())
         self._logger.setLevel(self._log_level)
@@ -57,6 +57,7 @@ class Client:
         self._requestor = Requestor(client=self, headers=self._headers)
         self.org = kwargs.get('org')
         self.ws = kwargs.get('ws')
+        self._ws_id = None
 
         if kwargs.get('org') and not kwargs.get('ws'):
             self.organizations = Organizations(client=self)
@@ -74,7 +75,7 @@ class Client:
             self.ssh_keys = SSHKeys(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
-            self.workspaces = Workspaces(client=self)
+            self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
             self._ws_id = self.workspaces._get_ws_id(name=kwargs.get('ws'))
             self.oauth_clients = OauthClients(client=self)
             self.oauth_tokens = OauthTokens(client=self)
@@ -87,6 +88,9 @@ class Client:
             self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
+        elif not kwargs.get('org') and kwargs.get('ws'):
+            self._logger.warning("An `org` has not been set.")
+            self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
         else:
             self.organizations = Organizations(client=self)
 
@@ -108,8 +112,11 @@ class Client:
         Method to set 'ws' attribute on Client object if it
         was not specified when Client object was instantiated.
         """
+        if not self.org:
+            self._logger.error("An `org` has not been set.")
+        
         self.ws = name
-        self.workspaces = Workspaces(client=self)
+        self.workspaces = Workspaces(client=self, ws=name)
         self._ws_id = self.workspaces._get_ws_id(name=name)
         self.workspace_variables = WorkspaceVariables(client=self)
         self.configuration_versions = ConfigurationVersions(client=self)
