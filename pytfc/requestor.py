@@ -22,7 +22,9 @@ class Requestor(object):
         r.raise_for_status()
         return r
 
-    def get(self, url, filters=None, page_number=None, page_size=None, include=None):
+    def get(self, url, filters=None, page_number=None, page_size=None,
+        include=None, search=None):
+        
         r = None
         
         query_params = []
@@ -44,6 +46,16 @@ class Requestor(object):
         if include is not None:
             include_str = f'include={include}'
             query_params.append(include_str)
+        
+        if search is not None:
+            if 'name' in search:
+                query_params.append(f"search[name]={search['name']}")
+            
+            if 'tags' in search:
+                query_params.append(f"search[tags]={search['tags']}")
+
+            if 'exclude-tags' in search:
+                query_params.append(f"search[exclude-tags]={search['exclude-tags']}")
         
         if query_params:
             url += '?' + '&'.join(query_params)

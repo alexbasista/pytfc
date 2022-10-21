@@ -22,8 +22,17 @@ class Workspaces(object):
                 self.org = self.client.org
             else:
                 raise MissingOrganization
-        
-        self.workspaces_endpoint = '/'.join([self.client._base_uri_v2, 'organizations', self.org, 'workspaces'])
+
+        self.workspaces_endpoint = '/'.join([self.client._base_uri_v2,
+            'organizations', self.org, 'workspaces'])
+
+        if kwargs.get('ws'):
+            self.ws_id = self._get_ws_id(name=kwargs.get('ws'))
+        elif self.client._ws_id:
+            self.ws_id = self.client._ws_id
+        else:
+            self.ws_id = None
+
         self.ws_attributes_list = [
             'name',
             'agent_pool_id',
@@ -169,11 +178,12 @@ class Workspaces(object):
         return self.client._requestor.patch(url='/'.join([self.workspaces_endpoint, name]),
                                             payload=payload)
 
-    def list(self):
+    def list(self, page_number=None, page_size=None, search=None):
         """
         GET /organizations/:organization_name/workspaces
         """
-        return self.client._requestor.get(url=self.workspaces_endpoint)
+        return self.client._requestor.get(url=self.workspaces_endpoint,
+            page_number=page_number, page_size=page_size, search=search)
 
     def show(self, name=None):
         """
@@ -291,3 +301,61 @@ class Workspaces(object):
         return self.client._requestor.patch(url='/'.join([self.client._base_uri_v2,
                                            'workspaces', ws_id, 'relationships',
                                            'ssh-key']), payload=payload)
+    
+    def get_remote_state_consumers(self, ws_id=None, ws_name=None,
+        page_number=None, page_size=None):
+        """
+        GET /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        if ws_id is not None:
+            ws_id = ws_id
+        elif ws_name is not None:
+            ws_id = self._get_ws_id(name=ws_name)
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+        
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id, 'relationships', 'remote-state-consumers']),
+            page_number=page_number, page_size=page_size)
+
+    def replace_remote_state_consumers(self):
+        """
+        PATCH /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        print('coming soon.')
+        # first check if `global-remote-state is false`
+    
+    def add_remote_state_consumers(self):
+        """
+        POST /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        # first check if `global-remote-state is false`
+        print('coming soon.')
+
+    def delete_remote_state_consumers(self):
+        """
+        DELETE /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        # first check if `global-remote-state is false`
+        print('coming soon.')
+
+    def get_tags(self):
+        """
+        GET /workspaces/:workspace_id/relationships/tags
+        """
+        # query parameters
+        print('coming soon.')
+
+    def add_tags(self):
+        """
+        POST /workspaces/:workspace_id/relationships/tags
+        """
+        print('coming soon.')
+
+    def remove_tags(self):
+        """
+        DELETE /workspaces/:workspace_id/relationships/tags
+        """
+        print('coming soon.')
