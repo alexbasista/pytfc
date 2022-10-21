@@ -7,7 +7,7 @@ from .exceptions import MissingVcsProvider
 from .oauth_clients import OauthClients
 
 
-class Workspaces(object):
+class Workspaces:
     """
     TFC/E Workspaces methods.
     """
@@ -22,9 +22,19 @@ class Workspaces(object):
         else:
             raise MissingOrganization
         
-        self.workspaces_endpoint = '/'.join([
+        self.ws_endpoint = '/'.join([
             self.client._base_uri_v2, 'organizations', self.org, 'workspaces'
         ])
+
+        if kwargs.get('ws'):
+            self.ws = kwargs.get('ws')
+            self.ws_id = self._get_ws_id(name=kwargs.get('ws'))
+        elif self.client._ws_id:
+            self.ws = self.client.ws
+            self.ws_id = self.client._ws_id
+        else:
+            self.ws = None
+            self.ws_id = None
 
         self.ws_attributes_list = [
             'name',
@@ -54,14 +64,15 @@ class Workspaces(object):
         """
         Helper method that returns Workspace ID based on Workspace name.
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws = self.client._requestor.get(
-            url='/'.join([self.workspaces_endpoint, name]))
+        ws = self.client._requestor.get(url='/'.join([self.ws_endpoint,
+            ws_name]))
 
         return ws.json()['data']['id']
 
@@ -69,18 +80,19 @@ class Workspaces(object):
         """
         POST /organizations/:organization_name/workspaces
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
         payload = {}
         data = {}
         data['type'] = 'workspaces'
         attributes = {}
         vcs_repo = {}
-        attributes['name'] = name
+        attributes['name'] = ws_name
         kwargs.pop('new_name', None)
         for key, value in kwargs.items():
             if key in self.ws_attributes_list:
@@ -144,18 +156,19 @@ class Workspaces(object):
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url=self.workspaces_endpoint,
+        return self.client._requestor.post(url=self.ws_endpoint,
             payload=payload)
 
     def update(self, name=None, **kwargs):
         """
         PATCH /organizations/:organization_name/workspaces/:name
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
         payload = {}
         data = {}
@@ -178,27 +191,28 @@ class Workspaces(object):
         payload['data'] = data
         
         return self.client._requestor.patch(url='/'.join([
-            self.workspaces_endpoint, name]), payload=payload)
+            self.ws_endpoint, ws_name]), payload=payload)
 
     def list(self, page_number=None, page_size=None, search=None):
         """
         GET /organizations/:organization_name/workspaces
         """
-        return self.client._requestor.get(url=self.workspaces_endpoint,
+        return self.client._requestor.get(url=self.ws_endpoint,
             page_number=page_number, page_size=page_size, search=search)
 
     def show(self, name=None):
         """
         GET /organizations/:organization_name/workspaces/:name
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
         return self.client._requestor.get(url='/'.join([
-            self.workspaces_endpoint, name]))
+            self.ws_endpoint, ws_name]))
 
     def delete(self, name=None):
         """
@@ -206,21 +220,24 @@ class Workspaces(object):
         """
         if name is None:
             raise MissingWorkspace
+        else:
+            ws_name = name
         
         return self.client._requestor.delete(url='/'.join([
-            self.workspaces_endpoint, name]))
+            self.ws_endpoint, ws_name]))
 
     def lock(self, name=None, **kwargs):
         """
         POST /workspaces/:workspace_id/actions/lock
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=name)
+        ws_id = self._get_ws_id(name=ws_name)
         reason = kwargs.pop('reason', 'Locked by pytfc')
         payload = { 'reason': reason }
         
@@ -231,13 +248,14 @@ class Workspaces(object):
         """
         POST /workspaces/:workspace_id/actions/unlock
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=name)
+        ws_id = self._get_ws_id(name=ws_name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'actions', 'unlock']), payload=None)
@@ -246,13 +264,14 @@ class Workspaces(object):
         """
         POST /workspaces/:workspace_id/actions/force-unlock
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=name)
+        ws_id = self._get_ws_id(name=ws_name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'actions', 'force-unlock']), payload=None)
@@ -261,13 +280,14 @@ class Workspaces(object):
         """
         PATCH /workspaces/:workspace_id/relationships/ssh-key
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=name)
+        ws_id = self._get_ws_id(name=ws_name)
         
         payload = {}
         data = {}
@@ -284,13 +304,14 @@ class Workspaces(object):
         """
         PATCH /workspaces/:workspace_id/relationships/ssh-key
         """
-        if name is None:
-            if self.client.ws:
-                name = self.client.ws
-            else:
-              raise MissingWorkspace
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=name)
+        ws_id = self._get_ws_id(name=ws_name)
         
         payload = {}
         data = {}
@@ -301,5 +322,110 @@ class Workspaces(object):
         payload['data'] = data
         
         return self.client._requestor.patch(url='/'.join([self.client._base_uri_v2,
-                                           'workspaces', ws_id, 'relationships',
-                                           'ssh-key']), payload=payload)
+            'workspaces', ws_id, 'relationships', 'ssh-key']), payload=payload)
+    
+    def get_remote_state_consumers(self, name=None, page_number=None,
+        page_size=None):
+        """
+        GET /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+        
+        ws_id = self._get_ws_id(name=ws_name)
+        
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id, 'relationships', 'remote-state-consumers']),
+            page_number=page_number, page_size=page_size)
+
+    def replace_remote_state_consumers(self, name=None):
+        """
+        PATCH /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        # first check if `global-remote-state is false`
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+        
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
+    
+    def add_remote_state_consumers(self, name=None):
+        """
+        POST /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        # first check if `global-remote-state is false`
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
+
+    def delete_remote_state_consumers(self, name=None):
+        """
+        DELETE /workspaces/:workspace_id/relationships/remote-state-consumers
+        """
+        # first check if `global-remote-state is false`
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
+
+    def get_tags(self, name=None):
+        """
+        GET /workspaces/:workspace_id/relationships/tags
+        """
+        # query parameters
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
+
+    def add_tags(self, name=None):
+        """
+        POST /workspaces/:workspace_id/relationships/tags
+        """
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
+
+    def remove_tags(self, name=None):
+        """
+        DELETE /workspaces/:workspace_id/relationships/tags
+        """
+        if name is not None:
+            ws_name = name
+        elif self.ws:
+            ws_name = self.ws
+        else:
+            raise MissingWorkspace
+
+        ws_id = self._get_ws_id(name=ws_name)
+        print('coming soon.')
