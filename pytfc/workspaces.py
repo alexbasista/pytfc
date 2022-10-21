@@ -11,6 +11,34 @@ class Workspaces:
     """
     TFC/E Workspaces methods.
     """
+    _ws_attr_list = [
+        'name',
+        'agent_pool_id',
+        'allow_destroy_plan',
+        'auto_apply',
+        'description',
+        'execution_mode',
+        'file_triggers_enabled',
+        'global-remote-state',
+        'queue_all_runs',
+        'source_name', # beta
+        'source_url', # beta
+        'speculative_enabled',
+        'terraform_version',
+        'trigger_prefixes',
+        'trigger_patterns',
+        'working_directory',
+        'assessments_enabled'
+    ]
+    _ws_vcs_attr_list = [
+        'oauth_token_id',
+        'branch',
+        'ingress_submodules',
+        'identifier',
+        'tags_regex',
+        'vcs_repo' # only used by `update()` to remove repo from Workspace
+    ]
+    
     def __init__(self, client, **kwargs):
         self.client = client
         self._logger = client._logger
@@ -35,30 +63,6 @@ class Workspaces:
         else:
             self.ws = None
             self.ws_id = None
-
-        self.ws_attributes_list = [
-            'name',
-            'agent_pool_id',
-            'allow_destroy_plan',
-            'auto_apply',
-            'description',
-            'execution_mode',
-            'file_triggers_enabled',
-            'source_name',
-            'source_url',
-            'queue_all_runs',
-            'speculative_enabled',
-            'terraform_version',
-            'trigger_prefixes',
-            'working_directory'
-        ]
-        self.ws_vcs_attributes_list = [
-            'oauth_token_id',
-            'branch',
-            'default_branch',
-            'ingress_submodules',
-            'identifier'
-        ]
     
     def _get_ws_id(self, name=None):
         """
@@ -95,29 +99,35 @@ class Workspaces:
         attributes['name'] = ws_name
         kwargs.pop('new_name', None)
         for key, value in kwargs.items():
-            if key in self.ws_attributes_list:
+            if key in self._ws_attr_list:
                 attributes[key] = value
-            elif key in self.ws_vcs_attributes_list:
+            elif key in self._ws_vcs_attr_list:
                 vcs_repo[key] = value
             else:
-                self._logger.warning(f"`{key}` is an invalid key for Workspaces API.")
+                self._logger.warning(\
+                    f"`{key}` is an invalid key for Workspaces API.")
         
         # handle multiple scenarios with obtaining the OAuth Token ID attribute
         if kwargs.get('identifier'):
-            self._logger.info(f"VCS repo identifier `{kwargs.get('identifier')}` was specified.")
+            self._logger.info(\
+                f"VCS repo identifier `{kwargs.get('identifier')}` was specified.")
             oc = OauthClients(client=self.client)
             # validate an OAuth Client (VCS Provider) actually exists in the Org
             try:
-                self._logger.info(f"Retrieving list of OAuth Clients (VCS Providers) in Org `{self.org}`.")
+                self._logger.info(\
+                    f"Retrieving list of OAuth Clients (VCS Providers) in Org `{self.org}`.")
                 oc_list = oc.list()
                 if len(oc_list.json()['data']) < 1:
-                    self._logger.error(f"No OAuth Client (VCS Provider) was found in Org `{self.org}`.")
+                    self._logger.error(\
+                        f"No OAuth Client (VCS Provider) was found in Org `{self.org}`.")
                     raise MissingVcsProvider
                 elif len(oc_list.json()['data']) >= 1:
                     oc_display_name = oc_list.json()['data'][0]['attributes']['name']
-                    ot_id = oc_list.json()['data'][0]['relationships']['oauth-tokens']['data'][0]['id']
+                    ot_id = oc_list.json()\
+                        ['data'][0]['relationships']['oauth-tokens']['data'][0]['id']
             except Exception as e:
-                self._logger.error(f"Unable to retrieve OAuth Clients (VCS Providers) list from Org `{self.org}`.")
+                self._logger.error(\
+                    f"Unable to retrieve OAuth Clients (VCS Providers) list from Org `{self.org}`.")
                 self._logger.error(e)
             
             # explicitly specifying an OAuth Token ID gets first priority
@@ -125,13 +135,16 @@ class Workspaces:
                 self._logger.info("An OAuth Token ID was specified directly.")
                 vcs_repo['oauth-token-id'] = kwargs.get('oauth_token_id')
             
-            # explicitly specifying an OAuth Client (VCS Provider) Display Name gets second priority
+            # explicitly specifying an OAuth Client (VCS Provider) Display Name
+            # (`oauth_client_name`) gets second priority
             elif kwargs.get('oauth_client_name'):
                 self._logger.info("An OAuth Client Display Name was specified directly.")
                 oauth_client = oc.show(name=kwargs.get('oauth_client_name'))
-                vcs_repo['oauth-token-id'] = oauth_client.json()['data']['relationships']['oauth-tokens']['data'][0]['id']
+                vcs_repo['oauth-token-id'] = oauth_client.json()\
+                    ['data']['relationships']['oauth-tokens']['data'][0]['id']
             
-            # if neither are specified and there's only one OAuth Client in the Org just default to using that
+            # if neither are specified and there is only one OAuth
+            # Oauth Client in the Org - default to using that one
             elif kwargs.get('oauth_token_id') is None\
                 and kwargs.get('oauth_client_name') is None\
                 and len(oc_list.json()['data']) == 1:
@@ -140,16 +153,21 @@ class Workspaces:
             
             # if neither are specified and there are multiple OAuth Clients in the Org,
             # then log a warning but default to the first OAuth Client returned in the list
-            elif kwargs.get('oauth_token_id') is None and kwargs.get('oauth_client_name') is None\
+            elif kwargs.get('oauth_token_id') is None\
+                and kwargs.get('oauth_client_name') is None\
                 and len(oc_list.json()['data']) > 1:
-                    self._logger.warning("Detected multiple OAuth Clients exist but a specific one was not specified.")
-                    self._logger.info(f"Proceeding with using `{oc_display_name}` OAuth Client because it was first in the list.")
+                    self._logger.warning(\
+                        "Detected multiple OAuth Clients exist but a specific one was not specified.")
+                    self._logger.info(\
+                        f"Proceeding with using `{oc_display_name}` because it was first in the list.")
                     vcs_repo['oauth-token-id'] = ot_id
             else:
-                self._logger.error("An unknown error occured determining which OAuth Client and/or OAuth Token ID to use.")
+                self._logger.error(\
+                    "An unknown error occured determining which OAuth Client and/or OAuth Token ID to use.")
                 exit
         else:
-            self._logger.debug("No VCS repo identifier specified. Creating Workspace without VCS.")
+            self._logger.debug(\
+                "No VCS repo identifier specified. Creating Workspace without VCS.")
         
         if len(vcs_repo) > 0:
             attributes['vcs-repo'] = vcs_repo
@@ -169,7 +187,7 @@ class Workspaces:
             ws_name = self.ws
         else:
             raise MissingWorkspace
-        
+
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -178,18 +196,27 @@ class Workspaces:
         if kwargs.get('new_name'):
             attributes['name'] = kwargs.get('new_name')
             kwargs.pop('new_name')
+        
         for key, value in kwargs.items():
-            if key in self.ws_attributes_list:
+            if key in self._ws_attr_list:
                 attributes[key] = value
-            elif key in self.ws_vcs_attributes_list:
-                vcs_repo[key] = value
+            elif key in self._ws_vcs_attr_list:
+                if key == 'vcs_repo':
+                    pass
+                else:
+                    vcs_repo[key] = value
             else:
-                self._logger.warning(f"`{key}` is an invalid key for Workspaces API.")
-        if len(vcs_repo) > 0:
+                self._logger.warning(\
+                    f"`{key}` is an invalid key for Workspaces API.")
+
+        if kwargs.get('vcs_repo') == 'null':
+            attributes['vcs-repo'] = None
+        elif len(vcs_repo) > 0:
             attributes['vcs-repo'] = vcs_repo
+
         data['attributes'] = attributes
         payload['data'] = data
-        
+
         return self.client._requestor.patch(url='/'.join([
             self.ws_endpoint, ws_name]), payload=payload)
 
