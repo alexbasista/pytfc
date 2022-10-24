@@ -14,7 +14,7 @@ class StateVersions(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
-            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
+            self.ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         elif self.client.ws and self.client._ws_id:
             self.ws = self.client.ws
             self.ws_id = self.client._ws_id
