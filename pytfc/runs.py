@@ -203,6 +203,13 @@ class Runs:
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'force-execute']))
     
+    def get_plan_json_output(self, run_id):
+        """
+        GET /runs/:id/plan/json-output
+        """
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'runs', run_id, 'plan', 'json-output']))
+    
     def _get_run_id_by_commit(self, commit_message, ws_id=None):
         """
         Helper method that returns Run ID of Run in 
