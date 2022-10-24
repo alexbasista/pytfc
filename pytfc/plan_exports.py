@@ -4,7 +4,7 @@ Module for TFC/E Plan Exports endpoint.
 import requests
 import tarfile
 from .exceptions import MissingWorkspace
-from .exceptions import MissingRunId
+from .exceptions import MissingRun
 
 
 class PlanExports:
@@ -106,7 +106,7 @@ class PlanExports:
             if run['type'] == "runs" and run['relationships']['plan']['data']['id'] == plan_id:
                 return run['id']
             else:
-                raise MissingRunId
+                raise MissingRun
     
     def _extract_tarball(self, filepath, destination_folder):
         tarball = tarfile.open(filepath, 'r:gz')

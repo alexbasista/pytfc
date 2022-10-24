@@ -104,7 +104,7 @@ class Runs:
             self.client._base_uri_v2, 'runs', run_id, 'actions', 'apply']),
             payload=payload)
 
-    def list(self, page_number=None, page_size=None, filter=None, search=None,
+    def list(self, page_number=None, page_size=None, filters=None, search=None,
             ws_id=None):
         """
         GET /workspaces/:workspace_id/runs
@@ -118,7 +118,7 @@ class Runs:
         
         return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'runs']), page_number=page_number,
-            page_size=page_size, filter=filter, search=search)
+            page_size=page_size, filters=filters, search=search)
 
     def show(self, run_id=None, commit_message=None):
         """
@@ -128,6 +128,7 @@ class Runs:
             run_id = run_id
         elif commit_message is not None:
             run_id = self._get_run_id_by_commit(commit_message=commit_message)
+            print(f"Found Run: {run_id}")
         else:
             raise MissingRun
         
@@ -151,7 +152,6 @@ class Runs:
 
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'discard']))
-
 
     def cancel(self, run_id=None, commit_message=None,
             comment='Cancelled by pytfc'):
