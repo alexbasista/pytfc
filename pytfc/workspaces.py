@@ -80,6 +80,19 @@ class Workspaces:
 
         return ws.json()['data']['id']
 
+    def _get_ws_name(self, ws_id=None):
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+
+        ws = self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id]))
+
+        return ws.json()['data']['attributes']['name']
+
     def create(self, name=None, **kwargs):
         """
         POST /organizations/:organization_name/workspaces
