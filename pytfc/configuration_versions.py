@@ -18,7 +18,10 @@ class ConfigurationVersions:
         self.client = client
         self._logger = client._logger
         
-        if kwargs.get('ws'):
+        if kwargs.get('ws_id'):
+            self.ws_id = kwargs.get('ws_id')
+            self.ws = self.client.workspaces._get_ws_name(ws_id=self.ws_id)
+        elif kwargs.get('ws'):
             self.ws = kwargs.get('ws')
             self.ws_id = self.client.workspaces._get_ws_id(name=self.ws)
         elif self.client.ws and self.client._ws_id:
