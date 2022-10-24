@@ -19,7 +19,7 @@ class MissingOrganization(Exception):
 
 
 class MissingWorkspace(Exception):
-    """TFC/E Workspace name not specified."""
+    """TFC/E Workspace name or ID not specified."""
     pass
 
 
@@ -33,8 +33,8 @@ class MissingVcsProvider(Exception):
     pass
 
 
-class MissingRunId(Exception):
-    """TFC/E Run ID not found based on specified commit message."""
+class MissingRun(Exception):
+    """TFC/E Run ID or commit message not specified."""
     pass
 
 
