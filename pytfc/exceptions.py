@@ -38,6 +38,11 @@ class MissingRun(Exception):
     pass
 
 
+class MissingPlan(Exception):
+    """TFC/E Plan not specified."""
+    pass
+
+
 class ConfigurationVersionUploadError(Exception):
     """Error uploading Terraform tar.gz to Configuration Version."""
     pass

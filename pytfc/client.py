@@ -66,9 +66,9 @@ class Client:
             self.oauth_tokens = OauthTokens(client=self)
             self.workspace_variables = None
             self.configuration_versions = None
-            self.runs = None
-            self.plans = None
-            self.plan_exports = None
+            self.runs = Runs(client=self)
+            self.plans = Plans(client=self)
+            self.plan_exports = PlanExports(client=self)
             self.applies = None
             self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
@@ -107,7 +107,10 @@ class Client:
         self.agent_pools = AgentPools(client=self)
         self.ssh_keys = SSHKeys(client=self)
         self.state_versions = StateVersions(client=self)
+        self.runs = Runs(client=self)
+        self.plans = Plans(client=self)
         self.applies = Applies(client=self)
+        self.plan_exports = PlanExports(client=self)
 
     def set_ws(self, name):
         """
