@@ -22,6 +22,7 @@ from .agent_pools import AgentPools
 from .ssh_keys import SSHKeys
 from .registry_modules import RegistryModules
 from .teams import Teams
+from .team_tokens import TeamTokens
 
 
 class Client:
@@ -78,6 +79,7 @@ class Client:
             self.applies = Applies(client=self)
             self.registry_modules = RegistryModules(client=self)
             self.teams = Teams(client=self)
+            self.team_tokens = TeamTokens(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -95,6 +97,7 @@ class Client:
             self.ssh_keys = SSHKeys(client=self)
             self.registry_modules = RegistryModules(client=self)
             self.teams = Teams(client=self)
+            self.team_tokens = TeamTokens(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -121,6 +124,7 @@ class Client:
         self.plan_exports = PlanExports(client=self)
         self.registry_modules = RegistryModules(client=self)
         self.teams = Teams(client=self)
+        self.team_tokens = TeamTokens(client=self)
 
     def set_ws(self, name):
         """
