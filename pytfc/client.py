@@ -21,6 +21,9 @@ from .state_versions import StateVersions
 from .agent_pools import AgentPools
 from .ssh_keys import SSHKeys
 from .registry_modules import RegistryModules
+from .teams import Teams
+from .team_tokens import TeamTokens
+from .team_access import TeamAccess
 
 
 class Client:
@@ -76,6 +79,9 @@ class Client:
             self.ssh_keys = SSHKeys(client=self)
             self.applies = Applies(client=self)
             self.registry_modules = RegistryModules(client=self)
+            self.teams = Teams(client=self)
+            self.team_tokens = TeamTokens(client=self)
+            self.team_access = TeamAccess(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -92,6 +98,9 @@ class Client:
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
             self.registry_modules = RegistryModules(client=self)
+            self.teams = Teams(client=self)
+            self.team_tokens = TeamTokens(client=self)
+            self.team_access = TeamAccess(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -117,6 +126,9 @@ class Client:
         self.applies = Applies(client=self)
         self.plan_exports = PlanExports(client=self)
         self.registry_modules = RegistryModules(client=self)
+        self.teams = Teams(client=self)
+        self.team_tokens = TeamTokens(client=self)
+        self.team_access = TeamAccess(client=self)
 
     def set_ws(self, name):
         """
@@ -136,3 +148,4 @@ class Client:
         self.plan_exports = PlanExports(client=self)
         self.applies = Applies(client=self)
         self.state_versions = StateVersions(client=self)
+        self.team_access = TeamAccess(client=self)
