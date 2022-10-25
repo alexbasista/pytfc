@@ -56,15 +56,15 @@ class Workspaces:
 
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
-            self.ws_id = self._get_ws_id(name=kwargs.get('ws'))
-        elif self.client._ws_id:
+            self.ws_id = self.get_ws_id(name=kwargs.get('ws'))
+        elif self.client.ws_id:
             self.ws = self.client.ws
-            self.ws_id = self.client._ws_id
+            self.ws_id = self.client.ws_id
         else:
             self.ws = None
             self.ws_id = None
     
-    def _get_ws_id(self, name=None):
+    def get_ws_id(self, name=None):
         """
         Helper method that returns Workspace ID based on Workspace name.
         """
@@ -80,7 +80,7 @@ class Workspaces:
 
         return ws.json()['data']['id']
 
-    def _get_ws_name(self, ws_id=None):
+    def get_ws_name(self, ws_id=None):
         if ws_id is not None:
             ws_id = ws_id
         elif self.ws_id:
@@ -277,7 +277,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         reason = kwargs.pop('reason', 'Locked by pytfc')
         payload = { 'reason': reason }
         
@@ -295,7 +295,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'actions', 'unlock']), payload=None)
@@ -311,7 +311,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         
         return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'actions', 'force-unlock']), payload=None)
@@ -327,7 +327,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         
         payload = {}
         data = {}
@@ -351,7 +351,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         
         payload = {}
         data = {}
@@ -376,7 +376,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         
         return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'relationships', 'remote-state-consumers']),
@@ -394,7 +394,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
     
     def add_remote_state_consumers(self, name=None):
@@ -409,7 +409,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
     def delete_remote_state_consumers(self, name=None):
@@ -424,7 +424,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
     def get_tags(self, name=None):
@@ -439,7 +439,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
     def add_tags(self, name=None):
@@ -453,7 +453,7 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
     def remove_tags(self, name=None):
@@ -467,5 +467,5 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws_id = self._get_ws_id(name=ws_name)
+        ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')

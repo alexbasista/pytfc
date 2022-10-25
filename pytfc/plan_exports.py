@@ -3,31 +3,16 @@ Module for TFC/E Plan Exports endpoint.
 """
 import requests
 import tarfile
-#from .exceptions import MissingRun
 from. exceptions import MissingPlan
-#from .plans import Plans
 
 
 class PlanExports:
     """
     TFC/E Plan Exports methods.
     """
-    def __init__(self, client, **kwargs):
+    def __init__(self, client):
         self.client = client
         self._logger = client._logger
-        
-        if kwargs.get('ws_id'):
-            self.ws_id = kwargs.get('ws_id')
-            self.ws = self.client.workspaces._get_ws_name(ws_id=self.ws_id)
-        elif kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
-        elif self.client.ws and self.client._ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client._ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
 
         self.pe_endpoint = '/'.join([self.client._base_uri_v2, 'plan-exports'])
 
@@ -87,18 +72,7 @@ class PlanExports:
         GET /plan-exports/:id
         """
         return self.client._requestor.get(url='/'.join([self.pe_endpoint, pe_id]))
-    
-    # def _get_run_id_from_pe(self, pe_id):
-    #     plan_id = self.show(pe_id=pe_id).json()\
-    #         ['data']['relationships']['plan']['data']['id']
 
-    #     runs_list = self.client.runs.list()
-    #     for run in runs_list.json()['data']:
-    #         if run['type'] == "runs" and run['relationships']['plan']['data']['id'] == plan_id:
-    #             return run['id']
-    #         else:
-    #             raise MissingRun
-    
     def _extract_tarball(self, filepath, dest_folder):
         tarball = tarfile.open(filepath, 'r:gz')
         tarball.extractall(dest_folder)
