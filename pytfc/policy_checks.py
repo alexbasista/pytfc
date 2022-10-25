@@ -1,7 +1,6 @@
 """
 Module for TFC/E Policy Checks API endpoint.
 """
-from .exceptions import MissingWorkspace
 
 
 class PolicyChecks:
