@@ -65,7 +65,7 @@ class Client:
             self.oauth_clients = OauthClients(client=self)
             self.oauth_tokens = OauthTokens(client=self)
             self.workspace_variables = WorkspaceVariables(client=self)
-            self.configuration_versions = None
+            self.configuration_versions = ConfigurationVersions(client=self)
             self.runs = Runs(client=self)
             self.plans = Plans(client=self)
             self.plan_exports = PlanExports(client=self)
@@ -106,6 +106,7 @@ class Client:
         self.oauth_tokens = OauthTokens(client=self)
         self.agent_pools = AgentPools(client=self)
         self.workspace_variables = WorkspaceVariables(client=self)
+        self.configuration_versions = ConfigurationVersions(client=self)
         self.ssh_keys = SSHKeys(client=self)
         self.state_versions = StateVersions(client=self)
         self.runs = Runs(client=self)

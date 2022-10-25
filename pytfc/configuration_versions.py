@@ -1,5 +1,5 @@
 """
-Module for TFC/E Configuration Versions endpoint.
+Module for TFC/E Configuration Versions API endpoint.
 """
 import os
 import time
@@ -31,10 +31,7 @@ class ConfigurationVersions:
             self.ws = None
             self.ws_id = None
 
-        self._cv_endpoint = '/'.join([self.client._base_uri_v2, 'workspaces',
-            self.ws_id, 'configuration-versions'])
-
-    def list(self, ws_id=None):
+    def list(self, page_number=None, page_size=None, ws_id=None):
         """
         GET /workspaces/:workspace_id/configuration-versions
         """
@@ -45,17 +42,23 @@ class ConfigurationVersions:
         else:
             raise MissingWorkspace
 
-        url = '/'.join([self.client._base_uri_v2, 'workspaces', ws_id,
-            'configuration-versions'])
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id, 'configuration-versions']),
+            page_number=page_number, page_size=page_size)
 
-        return self.client._requestor.get(url=url)
-
-    def _get_latest_cv_id(self):
+    def _get_latest_cv_id(self, ws_id=None):
         """
         Helper method that returns latest Configuration 
         Version ID in Workspace.
         """
-        return self.list().json()['data'][0]['id']
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+
+        return self.list(ws_id=ws_id).json()['data'][0]['id']
 
     def show(self, cv_id):
         """
@@ -64,11 +67,11 @@ class ConfigurationVersions:
         return self.client._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'configuration-versions', cv_id]))
 
-    def show_commit(self, cv_id):
+    def show_commit_info(self, cv_id):
         """
         GET /configuration-versions/:configuration-id/ingress-attributes
         """
-        return self.client._requestor.get(url="/".join([
+        return self.client._requestor.get(url='/'.join([
             self.client._base_uri_v2,'configuration-versions', cv_id,
             'ingress-attributes']))
 
@@ -86,11 +89,9 @@ class ConfigurationVersions:
         cv_object = self.show(cv_id=cv_id)
         return cv_object.json()['data']['attributes']['upload-url']
 
-    def create(self, auto_queue_runs='true', speculative='false', ws_id=None):
+    def create(self, auto_queue_runs=True, speculative=False, ws_id=None):
         """
         POST /workspaces/:workspace_id/configuration-versions
-        
-        Only returns Configuration Version `upload-url`.
         """
         if ws_id is not None:
             ws_id = ws_id
@@ -99,13 +100,15 @@ class ConfigurationVersions:
         else:
             raise MissingWorkspace
 
-        if auto_queue_runs not in ['true', 'false']:
-            raise ValueError(\
-                "[ERROR] Invalid argument for 'auto_queue_runs'. Valid arguments: 'true' or 'false'.")
+        if not isinstance(auto_queue_runs, bool):
+            self._logger.error(\
+                "Invalid value for `auto_queue_runs`. Must provide a boolean.")
+            raise ValueError
         
-        if speculative not in ['true', 'false']:
-            raise ValueError(\
-                "[ERROR] Invalid argument for 'speculative'. Valid arguments: 'true' or 'false'.")
+        if not isinstance(speculative, bool):
+            self._logger.error(\
+                "Invalid value for `speculative`. Must provide a boolean.")
+            raise ValueError
 
         payload = {}
         data = {}
@@ -116,12 +119,8 @@ class ConfigurationVersions:
         data['attributes'] = attributes
         payload['data'] = data
         
-        url = '/'.join([self.client._base_uri_v2, 'workspaces', ws_id,
-            'configuration-versions'])
-        
-        cv_object = self.client._requestor.post(url=url, payload=payload)
-        
-        return cv_object
+        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id, 'configuration-versions']), payload=payload)
 
     def _create_tf_tarball(self, source_dir, dest_dir='./'):
         """
@@ -153,7 +152,10 @@ class ConfigurationVersions:
             resp.raise_for_status()
             return resp.status_code
         except Exception as e:
-            raise ConfigurationVersionUploadError(f"[ERROR] Exception occurred uploading Terraform configuration bundle to archivist: {e}.")
+            self._logger.error(\
+                "Exception occurred uploading Terraform configuration bundle to archivist:")
+            self._logger.error(e)
+            raise ConfigurationVersionUploadError
     
     def _cleanup_tf_tarball(self, path):
         if os.path.exists(path):
@@ -162,17 +164,28 @@ class ConfigurationVersions:
             self._logger.warning(f"`{path}` path not found.")
             pass
     
-    def create_and_upload(self,  source_tf_dir, dest_tf_dir='./',
-            auto_queue_runs='true', speculative='false', cleanup=False):
+    def create_and_upload(self, source_tf_dir, dest_tf_dir='./',
+            auto_queue_runs=True, speculative=False, cleanup=False,
+            ws_id=None):
         """
         Method that wraps multiple other methods to more easily create
         and upload a Configuration Version in a Workspace in one call.
+        
         Returns newly created Configuration Version ID.
         """
-        # 1. Create CV and return upload-url
-        cv_object = self.create(auto_queue_runs=auto_queue_runs, speculative=speculative)
-        cv_id=cv_object.json()['data']['id']
-        cv_upload_url = cv_object.json()['data']['attributes']['upload-url']
+        # 0. Validate Workspace ID is present
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+        
+        # 1. Create CV and return `upload-url`
+        cv = self.create(auto_queue_runs=auto_queue_runs,
+            speculative=speculative, ws_id=ws_id)
+        cv_id=cv.json()['data']['id']
+        cv_upload_url = cv.json()['data']['attributes']['upload-url']
         self._logger.info(f"Created Configuration Version `{cv_id}`")
         
         # 2. Create tarball of TF files
@@ -184,20 +197,23 @@ class ConfigurationVersions:
             self.upload(cv_upload_url=cv_upload_url, tf_tarball=tf_tarball_upload)
         self._logger.info(f"Uploaded Terraform tarball `{tf_tarball}`.")
 
-        # 4. Check Configuration Version status
+        # 4. Check CV status
         cv_status = self._get_cv_status(cv_id=cv_id)
-        self._logger.info(f"Checking for 'uploaded' Configuration Version status: `{cv_status}`.")
+        self._logger.info(\
+            f"Checking for 'uploaded' Configuration Version status: `{cv_status}`.")
         while cv_status != 'uploaded':
             if self._get_cv_status(cv_id=cv_id) == 'uploaded':
                 break
             else:
                 cv_status = self._get_cv_status(cv_id=cv_id)
-                self._logger.info(f"Checking for 'uploaded' Configuration Version status: {cv_status}")
+                self._logger.info(\
+                    f"Checking for 'uploaded' Configuration Version status: {cv_status}")
                 time.sleep(2)
 
         # 5. Cleanup
         if cleanup:
-            self._logger.info(f"Deleting local Terraform tarball `{tf_tarball}`.")
+            self._logger.info(\
+                f"Deleting local Terraform tarball `{tf_tarball}`.")
             self._cleanup_tf_tarball(path=tf_tarball)
 
         return cv_id
