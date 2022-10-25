@@ -1,7 +1,6 @@
 """
 Module for TFC/E Team Tokens API endpoint.
 """
-from .exceptions import InvalidQueryParam
 
 
 class TeamTokens:
@@ -10,9 +9,6 @@ class TeamTokens:
     """
     def __init__(self, client):
         self.client = client
-        self._logger = client._logger
-        self._tt_ep = '/'.join([self.client._base_uri_v2,
-            'organizations', self.client.org, 'teams'])
     
     def generate_new(self, team_id):
         """
@@ -20,7 +16,7 @@ class TeamTokens:
         """
         return self.client._requestor.post(url='/'.join([
             self.client._base_uri_v2, 'teams', team_id,
-            'authentication-token']))
+            'authentication-token']), payload=None)
     
     def delete(self, team_id):
         """
