@@ -18,6 +18,7 @@ class Requestor(object):
     def post(self, url, payload):
         r = None
         self._logger.debug(f"Sending HTTP POST to {url}.")
+        self._logger.debug(json.dumps(payload, indent=2))
         r = requests.post(url=url, headers=self.headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
@@ -68,6 +69,7 @@ class Requestor(object):
     def patch(self, url, payload):
         r = None
         self._logger.debug(f"Sending HTTP PATCH to {url}")
+        self._logger.debug(json.dumps(payload, indent=2))
         r = requests.patch(url=url, headers=self.headers, data=json.dumps(payload))
         r.raise_for_status()
         return r

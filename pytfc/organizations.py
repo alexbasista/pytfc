@@ -1,26 +1,28 @@
 """
-Module for TFC/E Organization endpoints.
+Module for TFC/E Organization API endpoint.
 """
 from .exceptions import MissingOrganization
 
 
-class Organizations(object):
+class Organizations:
     """
     TFC/E Organizations methods.
     """
-    def __init__(self, client, **kwargs):
+    _org_attributes_list = [
+        'name',
+        'email',
+        'session_timeout',
+        'session_remember',
+        'collaborator_auth_policy',
+        'cost_estimation_enabled',
+        'owners_team_saml_role_id'
+    ]
+    
+    def __init__(self, client):
         self.client = client
         self._logger = client._logger
-        self.organizations_endpoint = '/'.join([self.client._base_uri_v2, 'organizations'])
-        self.org_attributes_list = [
-            'name',
-            'email',
-            'session_timeout',
-            'session_remember',
-            'collaborator_auth_policy',
-            'cost_estimation_enabled',
-            'owners_team_saml_role_id'
-        ]
+        self.organizations_endpoint = '/'.join([
+            self.client._base_uri_v2, 'organizations'])
 
     def list(self):
         """
@@ -38,7 +40,8 @@ class Organizations(object):
             else:
               raise MissingOrganization
         
-        return self.client._requestor.get(url='/'.join([self.organizations_endpoint, name]))
+        return self.client._requestor.get(url='/'.join([
+            self.organizations_endpoint, name]))
 
     def create(self, name, email, **kwargs):
         """
@@ -51,14 +54,15 @@ class Organizations(object):
         attributes['name'] = name
         attributes['email'] = email
         for key, value in kwargs.items():
-            if key in self.org_attributes_list:
+            if key in self._org_attributes_list:
                 attributes[key] = value
             else:
                 self._logger.warning(f"`{key}` is an invalid key for Organizations API.")
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url=self.organizations_endpoint, payload=payload)
+        return self.client._requestor.post(url=self.organizations_endpoint,
+            payload=payload)
 
     def update(self, name=None, **kwargs):
         """
@@ -83,13 +87,15 @@ class Organizations(object):
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.patch(url='/'.join([self.organizations_endpoint, name]), payload=payload)
+        return self.client._requestor.patch(url='/'.join([
+            self.organizations_endpoint, name]), payload=payload)
 
     def delete(self, name):
         """
         DELETE /organizations/:organization_name
         """
-        return self.client._requestor.delete(url='/'.join([self.organizations_endpoint, name]))
+        return self.client._requestor.delete(url='/'.join([
+            self.organizations_endpoint, name]))
 
     def show_entitlement_set(self, name=None):
         """
@@ -101,4 +107,5 @@ class Organizations(object):
             else:
               raise MissingOrganization
         
-        return self.client._requestor.get(url='/'.join([self.organizations_endpoint, name, 'entitlement-set']))
+        return self.client._requestor.get(url='/'.join([
+            self.organizations_endpoint, name, 'entitlement-set']))

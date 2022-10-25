@@ -1,11 +1,11 @@
 """
-Module for TFC/E State Versions endpoints.
+Module for TFC/E State Versions API endpoints.
 """
 from urllib import request
 from .exceptions import MissingWorkspace
 
 
-class StateVersions(object):
+class StateVersions:
     """
     TFC/E State Versions methods.
     """
@@ -14,10 +14,10 @@ class StateVersions(object):
         
         if kwargs.get('ws'):
             self.ws = kwargs.get('ws')
-            self._ws_id = self.client.workspaces._get_ws_id(name=self.ws)
-        elif self.client.ws and self.client._ws_id:
+            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
+        elif self.client.ws and self.client.ws_id:
             self.ws = self.client.ws
-            self.ws_id = self.client._ws_id
+            self.ws_id = self.client.ws_id
         else:
             self.ws = None
             self.ws_id = None

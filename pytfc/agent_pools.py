@@ -1,13 +1,14 @@
 """
-Module for TFC/E Agent Pools endpoint.
+Module for TFC/E Agent Pools API endpoint.
 """
 from .exceptions import InvalidQueryParam
 
-class AgentPools(object):
+
+class AgentPools:
     """
     TFC/E State Versions methods.
     """
-    def __init__(self, client, **kwargs):
+    def __init__(self, client):
         self.client = client
 
     def list(self, include=None):
@@ -15,7 +16,7 @@ class AgentPools(object):
         GET /organizations/:organization_name/agent-pools
         """
         base_url = '/'.join([self.client._base_uri_v2, 'organizations',
-                                self.client.org, 'agent-pools'])
+            self.client.org, 'agent-pools'])
 
         if include is not None:
             if include != 'workspaces':
@@ -33,7 +34,8 @@ class AgentPools(object):
         """
         GET /agent-pools/:id
         """
-        base_url = '/'.join([self.client._base_uri_v2, 'agent-pools', agent_pool_id])
+        base_url = '/'.join([self.client._base_uri_v2, 'agent-pools',
+            agent_pool_id])
 
         if include is not None:
             if include != 'workspaces':
@@ -76,7 +78,9 @@ class AgentPools(object):
         Utility method to list all Workspaces
         associated with an Agent Pool.
         """
-        url = '/'.join([self.client._base_uri_v2, 'agent-pools', agent_pool_id])
+        url = '/'.join([self.client._base_uri_v2, 'agent-pools',
+            agent_pool_id])
+        
         ap = self.client._requestor.get(url=url)
 
         ws_list = []

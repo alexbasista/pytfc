@@ -1,16 +1,18 @@
 """
-Module for TFC/E OAuth Tokens endpoint.
+Module for TFC/E OAuth Tokens API endpoint.
 """
 from .oauth_clients import OauthClients
 
 
-class OauthTokens(object):
+class OauthTokens:
     """
     TFC/E OAuth Tokens methods.
     """
-    def __init__(self, client, **kwargs):
+    def __init__(self, client):
         self.client = client
-        self.oauth_tokens_endpoint = '/'.join([self.client._base_uri_v2, 'oauth-tokens'])
+        self.oauth_tokens_endpoint = '/'.join([
+            self.client._base_uri_v2, 'oauth-tokens'])
+        
         self.oauth_clients = OauthClients(client=self.client)
 
     def list(self, oauth_client_name):
@@ -20,13 +22,16 @@ class OauthTokens(object):
         Must be listed within the confines of a specific OAuth Client.
         """
         oc_id = self.oauth_clients._get_oc_id(name=oauth_client_name)
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2, 'oauth-clients', oc_id, 'oauth-tokens']))
+        
+        return self.client._requestor.get(url='/'.join([
+            self.client._base_uri_v2, 'oauth-clients', oc_id, 'oauth-tokens']))
 
     def show(self, oauth_token_id):
         """
         GET /oauth-tokens/:id
         """
-        return self.client._requestor.get(url='/'.join([self.oauth_tokens_endpoint, oauth_token_id]))
+        return self.client._requestor.get(url='/'.join([
+            self.oauth_tokens_endpoint, oauth_token_id]))
 
     def update(self, oauth_token_id, **kwargs):
         """
@@ -42,12 +47,15 @@ class OauthTokens(object):
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.patch(url='/'.join([self.oauth_tokens_endpoint, oauth_token_id]), payload=payload)
+        return self.client._requestor.patch(url='/'.join([
+            self.oauth_tokens_endpoint, oauth_token_id]),
+            payload=payload)
 
     def delete(self, oauth_token_id):
         """
         DELETE /oauth-tokens/:id
 
-        Equivalent to revoking connection from TFC/E Organization to VCS Provider.
+        Equivalent to revoking connection from TFC/E Org to VCS Provider.
         """
-        return self.client._requestor.delete(url='/'.join([self.oauth_tokens_endpoint, oauth_token_id]))
+        return self.client._requestor.delete(url='/'.join([
+            self.oauth_tokens_endpoint, oauth_token_id]))
