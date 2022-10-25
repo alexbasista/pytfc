@@ -1,7 +1,7 @@
 """
 Module for TFC/E OAuth Clients API endpoint.
 """
-from .exceptions import MissingOrganization
+from .exceptions import MissingOauthClient, MissingOrganization
 
 
 class OauthClients:
@@ -10,6 +10,7 @@ class OauthClients:
     """
     def __init__(self, client):
         self.client = client
+
         if not self.client.org:
             raise MissingOrganization
 
@@ -34,11 +35,16 @@ class OauthClients:
         return self.client._requestor.get(url='/'.join([
             self.oc_endpoint]))
 
-    def show(self, name):
+    def show(self, oc_id=None, name=None):
         """
         GET /oauth-clients/:id
         """
-        oc_id = self._get_oc_id(name=name)
+        if oc_id is not None:
+            oc_id = oc_id
+        elif name is not None:
+            oc_id = self._get_oc_id(name=name)
+        else:
+            raise MissingOauthClient
         
         return self.client._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'oauth-clients', oc_id]))
