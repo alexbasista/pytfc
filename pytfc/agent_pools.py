@@ -1,5 +1,5 @@
 """
-Module for TFC/E Agent Pools endpoint.
+Module for TFC/E Agent Pools API endpoint.
 """
 from .exceptions import InvalidQueryParam
 

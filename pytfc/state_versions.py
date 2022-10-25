@@ -1,11 +1,11 @@
 """
-Module for TFC/E State Versions endpoints.
+Module for TFC/E State Versions API endpoints.
 """
 from urllib import request
 from .exceptions import MissingWorkspace
 
 
-class StateVersions(object):
+class StateVersions:
     """
     TFC/E State Versions methods.
     """

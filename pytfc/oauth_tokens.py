@@ -1,5 +1,5 @@
 """
-Module for TFC/E OAuth Tokens endpoint.
+Module for TFC/E OAuth Tokens API endpoint.
 """
 from .oauth_clients import OauthClients
 

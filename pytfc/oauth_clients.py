@@ -1,5 +1,5 @@
 """
-Module for TFC/E OAuth Clients endpoint.
+Module for TFC/E OAuth Clients API endpoint.
 """
 from .exceptions import MissingOrganization
 

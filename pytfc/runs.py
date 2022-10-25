@@ -1,5 +1,5 @@
 """
-Module for TFC/E Runs endpoint.
+Module for TFC/E Runs API endpoint.
 """
 from .configuration_versions import ConfigurationVersions
 from .exceptions import MissingWorkspace

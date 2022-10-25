@@ -1,5 +1,5 @@
 """
-Module for TFC/E Organization endpoints.
+Module for TFC/E Organization API endpoint.
 """
 from .exceptions import MissingOrganization
 

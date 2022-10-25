@@ -1,5 +1,5 @@
 """
-Module for TFC/E SSH Keys endpoint.
+Module for TFC/E SSH Keys API endpoint.
 """
 
 

@@ -1,5 +1,5 @@
 """
-Module for TFC/E Workspace endpoints.
+Module for TFC/E Workspace API endpoint.
 """
 from .exceptions import MissingOrganization
 from .exceptions import MissingWorkspace

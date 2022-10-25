@@ -1,5 +1,5 @@
 """
-Module for TFC/E Plan Exports endpoint.
+Module for TFC/E Plan Exports API endpoint.
 """
 import requests
 import tarfile

@@ -1,5 +1,5 @@
 """
-Module for TFC/E Plans endpoint.
+Module for TFC/E Plans API endpoint.
 """
 from .exceptions import MissingRun
 

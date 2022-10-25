@@ -1,5 +1,5 @@
 """
-Module for TFC/E Workspace Variables endpoint.
+Module for TFC/E Workspace Variables API  endpoint.
 """
 import json
 import hcl as pyhcl
