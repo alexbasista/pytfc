@@ -3,6 +3,7 @@ Module for TFC/E Agent Pools endpoint.
 """
 from .exceptions import InvalidQueryParam
 
+
 class AgentPools:
     """
     TFC/E State Versions methods.

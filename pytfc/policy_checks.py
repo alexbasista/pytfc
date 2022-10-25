@@ -1,27 +1,15 @@
 """
 Module for TFC/E Policy Checks API endpoint.
 """
+from .exceptions import InvalidQueryParam
 
 
 class PolicyChecks:
     """
     TFC/E Policy Checks methods.
     """
-    def __init__(self, client, **kwargs):
+    def __init__(self, client):
         self.client = client
-        
-        if kwargs.get('ws_id'):
-            self.ws_id = kwargs.get('ws_id')
-            self.ws = self.client.workspaces._get_ws_name(ws_id=self.ws_id)
-        elif kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces._get_ws_id(name=self.ws)
-        elif self.client.ws and self.client._ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client._ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
 
     def list(self, run_id, page_number=None, page_size=None):
         """
@@ -35,6 +23,10 @@ class PolicyChecks:
         """
         GET /policy-checks/:id
         """
+        if include is not None:
+            if include not in ['run', 'run.workspace']:
+                raise InvalidQueryParam
+        
         return self.client._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'policy-checks', polchk_id]),
             include=include)
