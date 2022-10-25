@@ -20,6 +20,7 @@ from .applies import Applies
 from .state_versions import StateVersions
 from .agent_pools import AgentPools
 from .ssh_keys import SSHKeys
+from .registry_modules import RegistryModules
 
 
 class Client:
@@ -74,6 +75,7 @@ class Client:
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
             self.applies = Applies(client=self)
+            self.registry_modules = RegistryModules(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -89,6 +91,7 @@ class Client:
             self.state_versions = StateVersions(client=self)
             self.agent_pools = AgentPools(client=self)
             self.ssh_keys = SSHKeys(client=self)
+            self.registry_modules = RegistryModules(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -113,6 +116,7 @@ class Client:
         self.plans = Plans(client=self)
         self.applies = Applies(client=self)
         self.plan_exports = PlanExports(client=self)
+        self.registry_modules = RegistryModules(client=self)
 
     def set_ws(self, name):
         """

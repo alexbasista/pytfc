@@ -24,7 +24,7 @@ class MissingWorkspace(Exception):
 
 
 class MissingOauthClient(Exception):
-    """TFC/E OAuth Client display name not specified."""
+    """TFC/E OAuth Client ID or name not specified."""
     pass
 
 
