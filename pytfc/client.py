@@ -25,6 +25,7 @@ from .teams import Teams
 from .team_tokens import TeamTokens
 from .team_access import TeamAccess
 from .notification_configurations import NotificationConfigurations
+from .run_triggers import RunTriggers
 
 
 class Client:
@@ -84,6 +85,7 @@ class Client:
             self.team_tokens = TeamTokens(client=self)
             self.team_access = TeamAccess(client=self)
             self.notification_configurations = NotificationConfigurations(client=self)
+            self.run_triggers = RunTriggers(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -104,6 +106,7 @@ class Client:
             self.team_tokens = TeamTokens(client=self)
             self.team_access = TeamAccess(client=self)
             self.notification_configurations = NotificationConfigurations(client=self)
+            self.run_triggers = RunTriggers(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -133,6 +136,7 @@ class Client:
         self.team_tokens = TeamTokens(client=self)
         self.team_access = TeamAccess(client=self)
         self.notification_configurations = NotificationConfigurations(client=self)
+        self.run_triggers = RunTriggers(client=self)
 
     def set_ws(self, name):
         """
@@ -154,3 +158,4 @@ class Client:
         self.state_versions = StateVersions(client=self)
         self.team_access = TeamAccess(client=self)
         self.notification_configurations = NotificationConfigurations(client=self)
+        self.run_triggers = RunTriggers(client=self)
