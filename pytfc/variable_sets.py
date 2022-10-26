@@ -42,20 +42,20 @@ class VariableSets:
         return self.client._requestor.delete(url='/'.join([self._base_api_url,
             'varsets', varset_id]))
     
-    def show(self, varset_id):
+    def show(self, varset_id, include=None):
         """
         GET varsets/:varset_id
         """
         return self.client._requestor.get(url='/'.join([self._base_api_url,
-            'varsets', varset_id]))
+            'varsets', varset_id]), include=include)
     
-    def list(self, page_number=None, page_size=None):
+    def list(self, page_number=None, page_size=None, include=None):
         """
         GET organizations/:organization_name/varsets
         """
         return self.client._requestor.get(url='/'.join([self._base_api_url,
             'organizations', self.client.org, 'varsets']),
-            page_number=page_number, page_size=page_size)
+            page_number=page_number, page_size=page_size, include=include)
 
     def add_variable(self, varset_id, **kwargs):
         """
@@ -75,12 +75,12 @@ class VariableSets:
         """
         print('coming soon')
 
-    def list_variables(self, varset_id):
+    def list_variables(self, varset_id, include=None):
         """
         GET varsets/:varset_id/relationships/vars
         """
         return self.client._requestor.get(url='/'.join([self._base_api_url,
-            'varsets', varset_id, 'relationships', 'vars']))
+            'varsets', varset_id, 'relationships', 'vars']), include=include)
 
     def apply_to_workspace(self, varset_id, ws_id=None):
         """
