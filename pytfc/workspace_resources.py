@@ -1,5 +1,5 @@
 """
-Module for TFC/E Workspace Resources API  endpoint.
+Module for TFC/E Workspace Resources API endpoint.
 """
 from .exceptions import MissingWorkspace
 
@@ -10,7 +10,6 @@ class WorkspaceResources:
     """
     def __init__(self, client, **kwargs):
         self.client = client
-        self._logger = client._logger
         self._base_api_url = client._base_uri_v2
         
         if kwargs.get('ws'):
