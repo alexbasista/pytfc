@@ -10,6 +10,7 @@ class RunTriggers:
     """
     def __init__(self, client, **kwargs):
         self.client = client
+        self._logger = client._logger
         self._base_api_url = client._base_uri_v2
 
         if kwargs.get('ws'):
@@ -39,8 +40,8 @@ class RunTriggers:
         
         print('coming soon')
 
-    def list(self, ws_id=None, filters=None, page_number=None, page_size=None,
-                include=None):
+    def list(self, rt_type, ws_id=None, page_number=None, page_size=None,
+            include=None):
         """
         GET /workspaces/:workspace_id/run-triggers
         """
@@ -51,8 +52,15 @@ class RunTriggers:
         else:
             raise MissingWorkspace
 
-        # TODO:
-        # validate filter[run-trigger][type] is either `inboud` or `outbound`
+        if rt_type not in ['inbound', 'outbound']:
+            self._logger.error(\
+                f"`{rt_type}` is invalid for `rt_type` arg. Valid values are `inbound` and `outbound`.")
+            raise ValueError
+
+        filters = [
+            f'[run-trigger][type]={rt_type}'
+        ]
+
         # TODO:
         # validate include is either `workspace` or `sourceable`
         return self.client._requestor.get(url='/'.join([self._base_api_url,
