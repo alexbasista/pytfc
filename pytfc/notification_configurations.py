@@ -40,6 +40,13 @@ class NotificationConfigurations:
         """
         GET /workspaces/:workspace_id/notification-configurations
         """
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+
         return self.client._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'notification-configurations']),
             page_number=page_number, page_size=page_size)
