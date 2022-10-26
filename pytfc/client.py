@@ -28,7 +28,7 @@ from .notification_configurations import NotificationConfigurations
 from .run_triggers import RunTriggers
 from .workspace_resources import WorkspaceResources
 from .run_tasks import RunTasks
-
+from .run_task_stages import RunTaskStages
 
 class Client:
     """
@@ -90,6 +90,7 @@ class Client:
             self.run_triggers = RunTriggers(client=self)
             self.workspace_resources = WorkspaceResources(client=self)
             self.run_tasks = RunTasks(client=self)
+            self.run_task_stages = RunTaskStages(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -113,6 +114,7 @@ class Client:
             self.run_triggers = RunTriggers(client=self)
             self.workspace_resources = WorkspaceResources(client=self)
             self.run_tasks = RunTasks(client=self)
+            self.run_task_stages = RunTaskStages(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -145,6 +147,7 @@ class Client:
         self.run_triggers = RunTriggers(client=self)
         self.workspace_resources = WorkspaceResources(client=self)
         self.run_tasks = RunTasks(client=self)
+        self.run_task_stages = RunTaskStages(client=self)
 
     def set_ws(self, name):
         """
@@ -169,3 +172,4 @@ class Client:
         self.run_triggers = RunTriggers(client=self)
         self.workspace_resources = WorkspaceResources(client=self)
         self.run_tasks = RunTasks(client=self)
+        self.run_task_stages = RunTaskStages(client=self)
