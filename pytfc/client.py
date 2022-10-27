@@ -24,7 +24,12 @@ from .registry_modules import RegistryModules
 from .teams import Teams
 from .team_tokens import TeamTokens
 from .team_access import TeamAccess
-
+from .notification_configurations import NotificationConfigurations
+from .run_triggers import RunTriggers
+from .workspace_resources import WorkspaceResources
+from .run_tasks import RunTasks
+from .run_task_stages import RunTaskStages
+from .variable_sets import VariableSets
 
 class Client:
     """
@@ -82,6 +87,12 @@ class Client:
             self.teams = Teams(client=self)
             self.team_tokens = TeamTokens(client=self)
             self.team_access = TeamAccess(client=self)
+            self.notification_configurations = NotificationConfigurations(client=self)
+            self.run_triggers = RunTriggers(client=self)
+            self.workspace_resources = WorkspaceResources(client=self)
+            self.run_tasks = RunTasks(client=self)
+            self.run_task_stages = RunTaskStages(client=self)
+            self.variable_sets = VariableSets(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -101,6 +112,12 @@ class Client:
             self.teams = Teams(client=self)
             self.team_tokens = TeamTokens(client=self)
             self.team_access = TeamAccess(client=self)
+            self.notification_configurations = NotificationConfigurations(client=self)
+            self.run_triggers = RunTriggers(client=self)
+            self.workspace_resources = WorkspaceResources(client=self)
+            self.run_tasks = RunTasks(client=self)
+            self.run_task_stages = RunTaskStages(client=self)
+            self.variable_sets = VariableSets(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
@@ -129,6 +146,12 @@ class Client:
         self.teams = Teams(client=self)
         self.team_tokens = TeamTokens(client=self)
         self.team_access = TeamAccess(client=self)
+        self.notification_configurations = NotificationConfigurations(client=self)
+        self.run_triggers = RunTriggers(client=self)
+        self.workspace_resources = WorkspaceResources(client=self)
+        self.run_tasks = RunTasks(client=self)
+        self.run_task_stages = RunTaskStages(client=self)
+        self.variable_sets = VariableSets(client=self)
 
     def set_ws(self, name):
         """
@@ -149,3 +172,9 @@ class Client:
         self.applies = Applies(client=self)
         self.state_versions = StateVersions(client=self)
         self.team_access = TeamAccess(client=self)
+        self.notification_configurations = NotificationConfigurations(client=self)
+        self.run_triggers = RunTriggers(client=self)
+        self.workspace_resources = WorkspaceResources(client=self)
+        self.run_tasks = RunTasks(client=self)
+        self.run_task_stages = RunTaskStages(client=self)
+        self.variable_sets = VariableSets(client=self)
