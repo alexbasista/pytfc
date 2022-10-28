@@ -4,6 +4,9 @@ Module for HTTP verb functions against TFC/E API.
 import requests
 import json
 
+# Constants
+MAX_PAGE_SIZE = 100
+
 
 class Requestor(object):
     """
@@ -24,7 +27,7 @@ class Requestor(object):
         return r
 
     def get(self, url, filters=None, page_number=None, page_size=None,
-        include=None, search=None):
+            include=None, search=None):
         
         r = None
         
@@ -81,16 +84,38 @@ class Requestor(object):
         r.raise_for_status()
         return r
 
-    # --- experimenting --- #
-    def post_data(self, url, payload):
-        r = None
-        r = requests.post(url=url, headers=self.headers, data=payload)
-        r.raise_for_status()
-        return r
-    
-    # --- experimenting --- #
-    def post_json(self, url, payload):
-        r = None
-        r = requests.post(url=url, headers=self.headers, json=payload)
-        r.raise_for_status()
-        return r
+    def _list_all(self, url, filters=None, include=None, search=None):
+        """
+        Utility method to enumerage pages in a response from a `get`
+        request to a list API endpoint and returns all of the results.
+        """
+        current_page_number = 1
+        list_resp = self.get(url=url, page_number=current_page_number,
+            page_size=MAX_PAGE_SIZE, filters=filters, include=include,
+            search=search).json()
+
+        if 'meta' in list_resp:
+            self._logger.debug("Found `meta` in list response.")
+            total_pages = list_resp['meta']['pagination']['total-pages']
+        elif 'pagination' in list_resp:
+            self._logger.debug("Found `pagination` in list response.")
+            total_pages = list_resp['pagination']['total-pages']
+
+        data = []
+        included = []
+        while current_page_number <= total_pages:
+            list_resp = self.get(url, page_number=current_page_number,
+                page_size=MAX_PAGE_SIZE, filters=filters, include=include,
+                search=search).json()
+            data += list_resp['data']
+
+            if 'included' in list_resp:
+                included += list_resp['included']
+                self._logger.debug("Found `included` in list response.")
+
+            current_page_number += 1
+
+        return {
+            'data': data,
+            'included': included
+        }
