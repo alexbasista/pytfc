@@ -233,12 +233,25 @@ class Workspaces:
         return self.client._requestor.patch(url='/'.join([
             self.ws_endpoint, ws_name]), payload=payload)
 
-    def list(self, page_number=None, page_size=None, search=None):
+    def list(self, page_number=None, page_size=None, search=None, include=None):
         """
         GET /organizations/:organization_name/workspaces
         """
         return self.client._requestor.get(url=self.ws_endpoint,
-            page_number=page_number, page_size=page_size, search=search)
+            page_number=page_number, page_size=page_size, search=search,
+            include=include)
+    
+    def list_all(self, search=None, include=None):
+        """
+        GET /organizations/:organization_name/workspaces
+
+        Built-in logic to enumerate all pages in list response
+        for cases where there are more than 100 Workspace.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+        """
+        return self.client._requestor._list_all(url=self.ws_endpoint, search=search,
+            include=include)
 
     def show(self, name=None):
         """

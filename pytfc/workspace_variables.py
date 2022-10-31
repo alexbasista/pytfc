@@ -66,9 +66,10 @@ class WorkspaceVariables:
         attributes['sensitive'] = sensitive
         data['attributes'] = attributes
         payload['data'] = data
-        
-        url = '/'.join([self.client._base_uri_v2, 'workspaces', ws_id, 'vars'])
-        return self.client._requestor.post(url=url, payload=payload)
+
+        return self.client._requestor.post(url = '/'.join([
+            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']),
+            payload=payload)
 
     def list(self, ws_id=None):
         """
@@ -80,9 +81,28 @@ class WorkspaceVariables:
             ws_id = self.ws_id
         else:
             raise MissingWorkspace
+
+        return self.client._requestor.get(url = '/'.join([
+            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
+    
+    def list_all(self, ws_id=None):
+        """
+        GET /workspaces/:workspace_id/vars
+
+        Built-in logic to enumerate all pages in list response for
+        cases where there are more than 100 Workspace Variables.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+        """
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
         
-        url = '/'.join([self.client._base_uri_v2, 'workspaces', ws_id, 'vars'])
-        return self.client._requestor.get(url=url)
+        return self.client._requestor._list_all(url='/'.join([
+            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
 
     def update(self, var_name=None, var_id=None, ws_id=None):
         """

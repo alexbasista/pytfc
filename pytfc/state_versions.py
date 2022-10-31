@@ -59,7 +59,7 @@ class StateVersions:
 
         return self.client._requestor.post(url=url, payload=payload)
 
-    def list(self, page_number=None, page_size=None, ws=None):
+    def list(self, page_number=None, page_size=None, include=None, ws=None):
         """
         GET /state-versions
         """
@@ -77,9 +77,34 @@ class StateVersions:
         ]
 
         return self.client._requestor.get(url=base_url, filters=filters,
-            page_number=page_number, page_size=page_size)
+            page_number=page_number, page_size=page_size, include=include)
 
-    def get_current(self, ws_id=None):
+    def list_all(self, include=None, ws=None):
+        """
+        GET /state-versions
+
+        Built-in logic to enumerate all pages in list response for
+        cases where there are more than 100 State Versions.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+        """
+        if ws is not None:
+            ws = ws
+        elif self.ws:
+            ws = self.ws
+        else:
+            raise MissingWorkspace
+        
+        base_url = '/'.join([self.client._base_uri_v2,'state-versions'])
+        filters = [
+            f'[workspace][name]={ws}',
+            f'[organization][name]={self.client.org}'
+        ]
+
+        return self.client._requestor._list_all(url=base_url, filters=filters,
+            include=include)
+
+    def get_current(self, include=None, ws_id=None):
         """
         GET /workspaces/:workspace_id/current-state-version
         """
@@ -89,20 +114,18 @@ class StateVersions:
             ws_id = self.ws_id
         else:
             raise MissingWorkspace
-        
-        url = '/'.join([
-            self.client._base_uri_v2, 'workspaces', ws_id, 'current-state-version'
-        ])
-        
-        return self.client._requestor.get(url=url)
+
+        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+            'workspaces', ws_id, 'current-state-version']), include=include)
     
-    def show(self, sv_id):
+    def show(self, sv_id, include=None):
         """
         GET /state-versions/:state_version_id
         """
         return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'state-versions', sv_id]))
-
+            self.client._base_uri_v2, 'state-versions', sv_id]),
+            include=include)
+    
     def _get_download_url(self, sv_id=None):
         """
         Helper method to return

@@ -20,6 +20,18 @@ class RegistryModules:
         return self.client._requestor.get(url=self._rm_endpoint,
             page_number=page_number, page_size=page_size, filters=filters)
 
+    def list_all(self, filters=None):
+        """
+        GET /organizations/:organization_name/registry-module
+
+        Built-in logic to enumerate all pages in list response for
+        cases where there are more than 100 Registry Modules.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+        """             
+        return self.client._requestor._list_all(url=self._rm_endpoint,
+            filters=filters)
+
     def publish_from_vcs(self):
         """
         POST /organizations/:organization_name/registry-modules/vcs
