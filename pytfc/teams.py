@@ -1,5 +1,5 @@
 """
-Module for TFC/E Teams API endpoint.
+Module for TFC/E Teams API endpoints.
 """
 from .exceptions import InvalidQueryParam
 
@@ -21,14 +21,43 @@ class Teams:
         filter example:
         client.teams.list(filters=['[names]=owners]'])
         """
-        if not any('[names]=' in f for f in filters):
-            self._logger.error(\
-                "`['[names]=<team name>]']` is the only valid filter.")
-            raise InvalidQueryParam
+        if filters is not None:
+            if not any('[names]=' in f for f in filters):
+                self._logger.error(\
+                    "`['[names]=<team name>']` is the only valid filter.")
+                raise InvalidQueryParam
+        
+        # TODO:
+        # validate `include` is either `users` or `organization-memberships`
         
         return self.client._requestor.get(url=self._teams_ep,
             page_number=page_number, page_size=page_size,
             filters=filters, include=include)
+    
+    def list_all(self, filters=None, include=None):
+        """
+        GET organizations/:organization_name/teams
+
+
+        Built-in logic to enumerate all pages in list response
+        for cases where there are more than 100 Teams.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+
+        filter example:
+        client.teams.list(filters=['[names]=owners]'])
+        """
+        if filters is not None:
+            if not any('[names]=' in f for f in filters):
+                self._logger.error(\
+                    "`['[names]=<team name>']` is the only valid filter.")
+                raise InvalidQueryParam
+        
+        # TODO:
+        # validate `include` is either `users` or `organization-memberships`
+
+        return self.client._requestor._list_all(url=self._teams_ep,
+             filters=filters, include=include)
 
     def create(self):
         """

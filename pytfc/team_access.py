@@ -43,6 +43,33 @@ class TeamAccess:
             self.client._base_uri_v2, 'team-workspaces']),
             filters=filters, page_number=page_number,
             page_size=page_size)
+    
+    def list_all(self, ws_id=None):
+        """
+        GET /team-workspaces
+
+        Built-in logic to enumerate all pages in list response for
+        cases where there are more than 100 Team Workspace Access items.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+
+        Required Query Parameters:
+        filter[workspace][id]
+        """
+        if ws_id is not None:
+            ws_id = ws_id
+        elif self.ws_id:
+            ws_id = self.ws_id
+        else:
+            raise MissingWorkspace
+        
+        filters = [
+            f'[workspace][id]={ws_id}'
+        ]
+
+        return self.client._requestor._list_all(url='/'.join([
+            self.client._base_uri_v2, 'team-workspaces']), filters=filters)
+            
 
     def show(self, tws_id):
         """
