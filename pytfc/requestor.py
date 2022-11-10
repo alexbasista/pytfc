@@ -61,6 +61,9 @@ class Requestor(object):
 
             if 'exclude-tags' in search:
                 query_params.append(f"search[exclude-tags]={search['exclude-tags']}")
+            
+            if 'version' in search:
+                query_params.append(f"search[version]={search['version']}")
         
         if query is not None:
             query_params.append(f'q{query}')
