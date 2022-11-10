@@ -27,7 +27,7 @@ class Requestor(object):
         return r
 
     def get(self, url, filters=None, page_number=None, page_size=None,
-            include=None, search=None):
+            include=None, search=None, query=None):
         
         r = None
         
@@ -39,7 +39,8 @@ class Requestor(object):
                     filter_str = 'filter' + i
                     query_params.append(filter_str)
             else:
-                raise TypeError("The `filters` query parameter must be of the type `list`.")
+                raise TypeError(\
+                    "The `filters` query parameter must be of the type `list`.")
         
         if page_number is not None:
             query_params.append(f'page[number]={page_number}')
@@ -61,6 +62,9 @@ class Requestor(object):
             if 'exclude-tags' in search:
                 query_params.append(f"search[exclude-tags]={search['exclude-tags']}")
         
+        if query is not None:
+            query_params.append(f'q{query}')
+
         if query_params:
             url += '?' + '&'.join(query_params)
         
