@@ -91,7 +91,7 @@ class Requestor(object):
         r.raise_for_status()
         return r
 
-    def _list_all(self, url, filters=None, include=None, search=None):
+    def _list_all(self, url, filters=None, include=None, search=None, query=None):
         """
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.
@@ -113,7 +113,7 @@ class Requestor(object):
         while current_page_number <= total_pages:
             list_resp = self.get(url, page_number=current_page_number,
                 page_size=MAX_PAGE_SIZE, filters=filters, include=include,
-                search=search).json()
+                search=search, query=query).json()
             data += list_resp['data']
 
             if 'included' in list_resp:
