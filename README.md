@@ -43,4 +43,7 @@ client.set_ws(name='my-existing-tfe-ws')
 
 \
 See the [docs](./docs/) for more details and examples on usage.
+<p>&nbsp;</p>
 
+---
+> Note: this is repository is not officially supported or mainted by HashiCorp.
