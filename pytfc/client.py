@@ -30,6 +30,13 @@ from .workspace_resources import WorkspaceResources
 from .run_tasks import RunTasks
 from .run_task_stages import RunTaskStages
 from .variable_sets import VariableSets
+from .admin_organizations import AdminOrganizations
+from .admin_terraform_versions import AdminTerraformVersions
+from .admin_settings import AdminSettings
+from .admin_runs import AdminRuns
+from .admin_users import AdminUsers
+from .admin_workspaces import AdminWorkspaces
+
 
 class Client:
     """
@@ -93,6 +100,12 @@ class Client:
             self.run_tasks = RunTasks(client=self)
             self.run_task_stages = RunTaskStages(client=self)
             self.variable_sets = VariableSets(client=self)
+            self.admin_organizations = AdminOrganizations(client=self)
+            self.admin_terraform_versions = AdminTerraformVersions(client=self)
+            self.admin_settings = AdminSettings(client=self)
+            self.admin_runs = AdminRuns(client=self)
+            self.admin_users = AdminUsers(client=self)
+            self.admin_workspaces = AdminWorkspaces(client=self)
         elif kwargs.get('org') and kwargs.get('ws'):
             self.organizations = Organizations(client=self)
             self.workspaces = Workspaces(client=self, ws=kwargs.get('ws'))
@@ -118,11 +131,23 @@ class Client:
             self.run_tasks = RunTasks(client=self)
             self.run_task_stages = RunTaskStages(client=self)
             self.variable_sets = VariableSets(client=self)
+            self.admin_organizations = AdminOrganizations(client=self)
+            self.admin_terraform_versions = AdminTerraformVersions(client=self)
+            self.admin_settings = AdminSettings(client=self)
+            self.admin_runs = AdminRuns(client=self)
+            self.admin_users = AdminUsers(client=self)
+            self.admin_workspaces = AdminWorkspaces(client=self)
         elif not kwargs.get('org') and kwargs.get('ws'):
             self._logger.warning("An `org` has not been set.")
             self._logger.warning("An `org` must be set before or at the same time as a `ws`.")
         else:
             self.organizations = Organizations(client=self)
+            self.admin_organizations = AdminOrganizations(client=self)
+            self.admin_terraform_versions = AdminTerraformVersions(client=self)
+            self.admin_settings = AdminSettings(client=self)
+            self.admin_runs = AdminRuns(client=self)
+            self.admin_users = AdminUsers(client=self)
+            self.admin_workspaces = AdminWorkspaces(client=self)
 
     def set_org(self, name):
         """
@@ -152,7 +177,13 @@ class Client:
         self.run_tasks = RunTasks(client=self)
         self.run_task_stages = RunTaskStages(client=self)
         self.variable_sets = VariableSets(client=self)
-
+        self.admin_organizations = AdminOrganizations(client=self)
+        self.admin_terraform_versions = AdminTerraformVersions(client=self)
+        self.admin_settings = AdminSettings(client=self)
+        self.admin_runs = AdminRuns(client=self)
+        self.admin_users = AdminUsers(client=self)
+        self.admin_workspaces = AdminWorkspaces(client=self)
+        
     def set_ws(self, name):
         """
         Method to set 'ws' attribute on Client object if it

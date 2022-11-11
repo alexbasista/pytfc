@@ -27,7 +27,7 @@ class Requestor(object):
         return r
 
     def get(self, url, filters=None, page_number=None, page_size=None,
-            include=None, search=None):
+            include=None, search=None, query=None):
         
         r = None
         
@@ -39,7 +39,8 @@ class Requestor(object):
                     filter_str = 'filter' + i
                     query_params.append(filter_str)
             else:
-                raise TypeError("The `filters` query parameter must be of the type `list`.")
+                raise TypeError(\
+                    "The `filters` query parameter must be of the type `list`.")
         
         if page_number is not None:
             query_params.append(f'page[number]={page_number}')
@@ -60,7 +61,13 @@ class Requestor(object):
 
             if 'exclude-tags' in search:
                 query_params.append(f"search[exclude-tags]={search['exclude-tags']}")
+            
+            if 'version' in search:
+                query_params.append(f"search[version]={search['version']}")
         
+        if query is not None:
+            query_params.append(f'q{query}')
+
         if query_params:
             url += '?' + '&'.join(query_params)
         
@@ -84,7 +91,7 @@ class Requestor(object):
         r.raise_for_status()
         return r
 
-    def _list_all(self, url, filters=None, include=None, search=None):
+    def _list_all(self, url, filters=None, include=None, search=None, query=None):
         """
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.
@@ -95,10 +102,10 @@ class Requestor(object):
             search=search).json()
 
         if 'meta' in list_resp:
-            self._logger.debug("Found `meta` in list response.")
+            self._logger.debug("Found `meta` block in list response.")
             total_pages = list_resp['meta']['pagination']['total-pages']
         elif 'pagination' in list_resp:
-            self._logger.debug("Found `pagination` in list response.")
+            self._logger.debug("Found `pagination` block in list response.")
             total_pages = list_resp['pagination']['total-pages']
 
         data = []
@@ -106,12 +113,12 @@ class Requestor(object):
         while current_page_number <= total_pages:
             list_resp = self.get(url, page_number=current_page_number,
                 page_size=MAX_PAGE_SIZE, filters=filters, include=include,
-                search=search).json()
+                search=search, query=query).json()
             data += list_resp['data']
 
             if 'included' in list_resp:
                 included += list_resp['included']
-                self._logger.debug("Found `included` in list response.")
+                self._logger.debug("Found `included` block in list response.")
 
             current_page_number += 1
 
