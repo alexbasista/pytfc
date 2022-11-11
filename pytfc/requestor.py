@@ -102,10 +102,10 @@ class Requestor(object):
             search=search).json()
 
         if 'meta' in list_resp:
-            self._logger.debug("Found `meta` in list response.")
+            self._logger.debug("Found `meta` block in list response.")
             total_pages = list_resp['meta']['pagination']['total-pages']
         elif 'pagination' in list_resp:
-            self._logger.debug("Found `pagination` in list response.")
+            self._logger.debug("Found `pagination` block in list response.")
             total_pages = list_resp['pagination']['total-pages']
 
         data = []
@@ -118,7 +118,7 @@ class Requestor(object):
 
             if 'included' in list_resp:
                 included += list_resp['included']
-                self._logger.debug("Found `included` in list response.")
+                self._logger.debug("Found `included` block in list response.")
 
             current_page_number += 1
 
