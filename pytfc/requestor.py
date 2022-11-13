@@ -3,32 +3,45 @@ Module for HTTP verb functions against TFC/E API.
 """
 import requests
 import json
+import logging
+from sys import stdout
+from abc import ABC
 
 # Constants
 MAX_PAGE_SIZE = 100
 
 
-class Requestor(object):
+class Requestor(ABC):
     """
     Constructs HTTP verb methods to call TFC/E API. 
-    This class is initialized via the client.py module,
-    and the header is received from the Client class within.
+    This class is initialized via the client.py module.
     """
-    def __init__(self, client, headers):
-        self._logger = client._logger
-        self.headers = headers
+    def __init__(self, headers, log_level, verify):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._logger.setLevel(log_level)
+        self._logger.addHandler(logging.StreamHandler(stdout))
+        self._logger.debug("Instantiating Requestor class.")
+        
+        self._headers = headers
+        self._verify = verify
 
     def post(self, url, payload):
+        """
+        Sends HTTP POST request to URL with specified params and payload.
+        """
         r = None
         self._logger.debug(f"Sending HTTP POST to {url}.")
         self._logger.debug(json.dumps(payload, indent=2))
-        r = requests.post(url=url, headers=self.headers, data=json.dumps(payload))
+        r = requests.post(url=url, headers=self._headers,
+            data=json.dumps(payload), verify=self._verify)
         r.raise_for_status()
         return r
 
     def get(self, url, filters=None, page_number=None, page_size=None,
             include=None, search=None, query=None):
-        
+        """
+        Sends HTTP GET request to URL with specified params.
+        """
         r = None
         
         query_params = []
@@ -72,29 +85,39 @@ class Requestor(object):
             url += '?' + '&'.join(query_params)
         
         self._logger.debug(f"Sending HTTP GET to {url}")
-        r = requests.get(url=url, headers=self.headers)
+        r = requests.get(url=url, headers=self._headers, verify=self._verify)
         r.raise_for_status()
         return r
 
     def patch(self, url, payload):
+        """
+        Sends HTTP PATCH request to URL with specified params and payload.
+        """
         r = None
         self._logger.debug(f"Sending HTTP PATCH to {url}")
         self._logger.debug(json.dumps(payload, indent=2))
-        r = requests.patch(url=url, headers=self.headers, data=json.dumps(payload))
+        r = requests.patch(url=url, headers=self._headers,
+            data=json.dumps(payload), verify=self._verify)
         r.raise_for_status()
         return r
 
     def delete(self, url):
+        """
+        Sends HTTP DELETE request to URL.
+        """
         r = None
         self._logger.debug(f"Sending HTTP DELETE to {url}")
-        r = requests.delete(url=url, headers=self.headers)
+        r = requests.delete(url=url, headers=self._headers,
+            verify=self._verify)
         r.raise_for_status()
         return r
 
-    def _list_all(self, url, filters=None, include=None, search=None, query=None):
+    def _list_all(self, url, filters=None, include=None, search=None,
+        query=None):
         """
-        Utility method to enumerage pages in a response from a `get`
-        request to a list API endpoint and returns all of the results.
+        Utility method to enumerate pages in a response from a GET
+        request against a list API endpoint and returns all of the
+        results in an object with two arrays: `data` and `included`.
         """
         current_page_number = 1
         list_resp = self.get(url=url, page_number=current_page_number,

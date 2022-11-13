@@ -2,33 +2,33 @@
 Module for TFE Admin Users API endpoints.
 For Terraform Enterprise only.
 """
+from .requestor import Requestor
 
 
-class AdminUsers:
+class AdminUsers(Requestor):
     """
     TFE Admin Users methods.
     """
-    def __init__(self, client):
-        self.client = client
-        self._logger = client._logger
-        self._au_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-            'users'])
+    def __init__(self, headers, base_uri, org, log_level, verify):
+        self.org = org
+        self._au_endpoint = '/'.join([base_uri, 'admin', 'users'])
+
+        super().__init__(headers, log_level, verify)
     
     def list(self, query=None, filters=None, page_number=None, page_size=None,
         include=None):
         """
         GET /api/v2/admin/users
         """
-        return self.client._requestor.get(url=self._au_endpoint, query=query,
-            filters=filters, page_number=page_number, page_size=page_size,
-            include=include)
+        return self.get(url=self._au_endpoint, query=query, filters=filters,
+            page_number=page_number, page_size=page_size, include=include)
 
     def list_all(self, query=None, filters=None, include=None):
         """
         GET /api/v2/admin/users
         """
-        return self.client._requestor._list_all(url=self._au_endpoint,
-            query=query, filters=filters, include=include)
+        return self._list_all(url=self._au_endpoint, query=query,
+            filters=filters, include=include)
         
     def delete(self, user_id):
         """

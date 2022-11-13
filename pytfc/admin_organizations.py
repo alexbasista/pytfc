@@ -1,19 +1,19 @@
 """
-Module for TFE Admin Organizations API endpoint.
+Module for TFE Admin Organizations API endpoints.
 For Terraform Enterprise only.
 """
-from .exceptions import MissingOrganization
+from .requestor import Requestor
 
 
-class AdminOrganizations:
+class AdminOrganizations(Requestor):
     """
     TFE Admin Organizations methods.
     """
-    def __init__(self, client):
-        self.client = client
-        self._logger = client._logger
-        self.ao_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-            'organizations'])
+    def __init__(self, headers, base_uri, org, log_level, verify):
+        self.org = org
+        self.ao_endpoint = '/'.join([base_uri, 'admin', 'organizations'])
+
+        super().__init__(headers, log_level, verify)
     
     def list(self, query=None, filters=None, page_number=None, page_size=None,
         include=None):
@@ -29,16 +29,15 @@ class AdminOrganizations:
         # TODO:
         # Add validation for `filters` param
         # filter[module_producer]
-        
+
         if include is not None:
             if include != 'owners':
                 self._logger.error("Invalid `include` query param."
                     " Valid values are: `owners`.")
                 raise ValueError
 
-        return self.client._requestor.get(url=self.ao_endpoint, query=query,
-            filters=filters, page_number=page_number, page_size=page_size,
-            include=include)
+        return self.get(url=self.ao_endpoint, query=query, filters=filters,
+            page_number=page_number, page_size=page_size, include=include)
 
     def show(self, org, include=None):
         """
@@ -50,8 +49,7 @@ class AdminOrganizations:
                     " Valid values are: `owners`.")
                 raise ValueError
         
-        return self.client._requestor.get(url='/'.join([self.ao_endpoint,
-            org]), include=include)
+        return self.get(url='/'.join([self.ao_endpoint, org]), include=include)
 
     def update(self, org, **kwargs):
         """
@@ -67,9 +65,8 @@ class AdminOrganizations:
         """
         GET /api/v2/admin/organizations/:name/relationships/module-consumers
         """
-        return self.client._requestor.get(url='/'.join([self.ao_endpoint, org,
-            'relationships', 'module-consumers']), page_number=page_number,
-            page_size=page_size)
+        return self.get(url='/'.join([self.ao_endpoint, org, 'relationships',
+            'module-consumers']), page_number=page_number, page_size=page_size)
 
     def update_consumers(self, org):
         """

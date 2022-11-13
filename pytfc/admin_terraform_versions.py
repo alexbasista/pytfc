@@ -2,18 +2,19 @@
 Module for TFE Admin Terraform Versions API endpoints.
 For Terraform Enterprise only.
 """
+from .requestor import Requestor
 
 
-class AdminTerraformVersions:
+class AdminTerraformVersions(Requestor):
     """
     TFE Admin Terraform Versions methods.
     """
-    def __init__(self, client):
-        self.client = client
-        self._logger = client._logger
-        self._atv_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-            'terraform-versions'])
-    
+    def __init__(self, headers, base_uri, org, log_level, verify):
+        self.org = org
+        self._atv_endpoint = '/'.join([base_uri, 'admin', 'terraform-versions'])
+
+        super().__init__(headers, log_level, verify)
+
     def list(self, filters=None, search=None, page_number=None, page_size=None):
         """
         GET /admin/terraform-versions
@@ -28,9 +29,8 @@ class AdminTerraformVersions:
         # Add validation for `filters` param
         # filter[version]
 
-        return self.client._requestor.get(url=self._atv_endpoint,
-            filters=filters, search=search, page_number=page_number,
-            page_size=page_size)
+        return self.get(url=self._atv_endpoint, filters=filters, search=search,
+            page_number=page_number, page_size=page_size)
         
     def list_all(self, filters=None, search=None):
         """
