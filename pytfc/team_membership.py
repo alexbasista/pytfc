@@ -1,14 +1,17 @@
 """
 Module for TFC/E Team Membership API endpoint.
 """
+from .requestor import Requestor
 
 
-class TeamMembership:
+class TeamMembership(Requestor):
     """
     TFC/E Team Membership methods.
     """
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, headers, base_uri, org, log_level, verify):
+        self.org = org
+
+        super().__init__(headers, log_level, verify)
     
     def add_user_with_user_id(self, team_id):
         """

@@ -2,22 +2,25 @@
 Module for TFC/E Policy Checks API endpoint.
 """
 from .exceptions import InvalidQueryParam
+from .requestor import Requestor
 
 
-class PolicyChecks:
+class PolicyChecks(Requestor):
     """
     TFC/E Policy Checks methods.
     """
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, headers, base_uri, org, log_level, verify):
+        self.org = org
+        self._base_endpoint = base_uri
+
+        super().__init__(headers, log_level, verify)
 
     def list(self, run_id, page_number=None, page_size=None):
         """
         GET /runs/:run_id/policy-checks
         """
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'runs', run_id, 'policy-checks']),
-            page_number=page_number, page_size=page_size)
+        return self.get(url='/'.join([self._base_endpoint, 'runs', run_id,
+            'policy-checks']), page_number=page_number, page_size=page_size)
     
     def show(self, polchk_id, include=None):
         """
@@ -27,17 +30,15 @@ class PolicyChecks:
             if include not in ['run', 'run.workspace']:
                 raise InvalidQueryParam
         
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'policy-checks', polchk_id]),
-            include=include)
+        return self.get(url='/'.join([self._base_endpoint, 'policy-checks',
+            polchk_id]), include=include)
     
     def override(self, polchk_id):
         """
         POST /policy-checks/:id/actions/override
         """
-        return self.client._requestor.post(url='/'.join([
-            self.client._base_uri_v2, 'policy-checks', polchk_id,
-            'actions', 'override']))
+        return self.post(url='/'.join([self._base_endpoint, 'policy-checks',
+            polchk_id, 'actions', 'override']))
 
     def show_outcome(self):
         """
@@ -63,5 +64,5 @@ class PolicyChecks:
         """
         GET /policy-set-outcomes/:policy_set_outcome_id
         """
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'policy-set-outcomes', pso_id]))
+        return self.get(url='/'.join([self._base_endpoint,
+            'policy-set-outcomes', pso_id]))

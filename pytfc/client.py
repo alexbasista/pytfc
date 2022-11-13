@@ -37,7 +37,7 @@ from .admin_settings import AdminSettings
 from .admin_runs import AdminRuns
 from .admin_users import AdminUsers
 from .admin_workspaces import AdminWorkspaces
-
+#from .requestor import Requestor
 
 # Constants
 DEFAULT_LOG_LEVEL='WARNING'
@@ -49,7 +49,7 @@ class Client:
     Initialize this parent class to access child classes for all TFC/E
     API endpoints and resources. Kind of behaves like a superclass.
     """
-    
+
     _no_org_required = {
         'admin_organizations': AdminOrganizations,
         'admin_runs': AdminRuns,
@@ -57,10 +57,10 @@ class Client:
         'admin_terraform_versions': AdminTerraformVersions,
         'admin_users': AdminUsers,
         'admin_workspaces': AdminWorkspaces,
-        #'policy_checks': PolicyChecks,
+        'policy_checks': PolicyChecks,
         'organizations': Organizations,
-        #'team_membership': TeamMembership,
-        #'team_tokens': TeamTokens,
+        #'team_membership': TeamMembership, # under construction
+        'team_tokens': TeamTokens
     }
 
     _org_required = {
@@ -91,7 +91,8 @@ class Client:
     }
     
     def __init__(self, hostname=None, token=None, org=None, ws=None,
-        log_level=DEFAULT_LOG_LEVEL, verify=DEFAULT_VERIFY):
+        log_level=DEFAULT_LOG_LEVEL, verify=True
+    ):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._log_level = getattr(logging, log_level.upper())
         self._logger.setLevel(self._log_level)
