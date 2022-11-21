@@ -72,7 +72,7 @@ class Client:
         #'teams': Teams,
     }
 
-    _org_and_workspace = {
+    _org_and_ws = {
         #'applies': Applies,
         #'configuration_versions': ConfigurationVersions,
         #'notification_configurations': NotificationConfigurations,
@@ -164,20 +164,20 @@ class Client:
         self.admin_workspaces = None
 
         self._logger.debug(f"Initializing child classes that do not require an `org`...")
-        self._init_child_classes(self._no_org_required, ws=False)
+        self._init_child_classes(self._no_org_required, org=self.org, ws=None)
         self._logger.debug(f"Initializing child classes that require an `org`...")
-        self._init_child_classes(self._org_required, ws=False)
+        self._init_child_classes(self._org_required, org=self.org, ws=None)
         self._logger.debug(f"Initializing child classes that require an `org` and `ws`...")
-        self._init_child_classes(self._org_and_workspace, ws=True)
+        self._init_child_classes(self._org_and_ws, org=self.org, ws=self.ws)
     
-    def _init_child_classes(self, classes_dict, ws=False):
+    def _init_child_classes(self, classes_dict, org, ws=None):
         """
         Method to initialize child classes for all
         TFC/E API endpoints.
         """
         for child_class_name in classes_dict:
             child_class = classes_dict[child_class_name]
-            if ws:
+            if ws is not None:
                 initialized_class = child_class(
                     self._headers,
                     self._base_uri_v2,
@@ -203,35 +203,7 @@ class Client:
         Method to set 'org' attribute on Client object if it
         was not specified when Client object was instantiated.
         """
-        self.org = name
-        self.workspaces = Workspaces(client=self)
-        self.oauth_clients = OauthClients(client=self)
-        self.oauth_tokens = OauthTokens(client=self)
-        self.agent_pools = AgentPools(client=self)
-        self.workspace_variables = WorkspaceVariables(client=self)
-        self.configuration_versions = ConfigurationVersions(client=self)
-        self.ssh_keys = SSHKeys(client=self)
-        self.state_versions = StateVersions(client=self)
-        self.runs = Runs(client=self)
-        self.plans = Plans(client=self)
-        self.applies = Applies(client=self)
-        self.plan_exports = PlanExports(client=self)
-        self.registry_modules = RegistryModules(client=self)
-        self.teams = Teams(client=self)
-        self.team_tokens = TeamTokens(client=self)
-        self.team_access = TeamAccess(client=self)
-        self.notification_configurations = NotificationConfigurations(client=self)
-        self.run_triggers = RunTriggers(client=self)
-        self.workspace_resources = WorkspaceResources(client=self)
-        self.run_tasks = RunTasks(client=self)
-        self.run_task_stages = RunTaskStages(client=self)
-        self.variable_sets = VariableSets(client=self)
-        self.admin_organizations = AdminOrganizations(client=self)
-        self.admin_terraform_versions = AdminTerraformVersions(client=self)
-        self.admin_settings = AdminSettings(client=self)
-        self.admin_runs = AdminRuns(client=self)
-        self.admin_users = AdminUsers(client=self)
-        self.admin_workspaces = AdminWorkspaces(client=self)
+        self._init_child_classes(org=name)
         
     def set_ws(self, name):
         """
