@@ -3,6 +3,8 @@ Module for HTTP verb functions against TFC/E API.
 """
 import requests
 import json
+import logging
+import sys
 from abc import ABCMeta, abstractmethod
 
 # Constants
@@ -18,10 +20,13 @@ class Requestor:
     
     __metaclass__ = ABCMeta
     
-    def __init__(self, headers, base_uri, logger, verify):
+    def __init__(self, headers, base_uri, verify, log_level):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._logger.setLevel(log_level)
+        self._logger.addHandler(logging.StreamHandler(sys.stdout))
+        
         self._headers = headers
         self._base_uri = base_uri
-        self._logger = logger
         self._verify = verify
         
 
@@ -36,7 +41,6 @@ class Requestor:
 
     def get(self, path, filters=None, page_number=None, page_size=None,
             include=None, search=None, query=None):
-        
         r = None
         url = self._base_uri + path
         
@@ -102,7 +106,7 @@ class Requestor:
         r.raise_for_status()
         return r
 
-    def _list_all(self, path, filters=None, include=None, search=None, query=None):
+    def list_all(self, path, filters=None, include=None, search=None, query=None):
         """
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.

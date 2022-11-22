@@ -1,6 +1,9 @@
 import functools
 from pytfc import exceptions
 
+# Constants
+DEFAULT_LOG_LEVEL = 'WARNING'
+
 def validate_ws_is_set(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):

@@ -2,26 +2,21 @@
 Module for TFE Admin Workspaces API endpoints.
 For Terraform Enterprise only.
 """
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class AdminWorkspaces:
+class AdminWorkspaces(TfcApiBase):
     """
     TFE Admin Workspaces methods.
     """
-    def __init__(self, client):
-        self.client = client
-        self._logger = client._logger
-        self._aw_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-            'workspaces'])
-    
-    def list(self, query=None, filters=None, page_number=None, page_size=None,
-        include=None):
+    def list(self, query=None, filters=None, page_number=None,
+             page_size=None, include=None):
         """
         GET /api/v2/admin/workspaces
         """
-        return self.client._requestor.get(url=self._aw_endpoint, query=query,
-            filters=filters, page_number=page_number, page_size=page_size,
-            include=include)
+        return self._requestor.get(path='/admin/workspaces', query=query,
+                                   filters=filters, page_number=page_number,
+                                   page_size=page_size, include=include)
 
     def list_all(self, query=None, filters=None, include=None):
         """
@@ -32,19 +27,19 @@ class AdminWorkspaces:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """
-        return self.client._requestor._list_all(url=self._aw_endpoint,
-             query=query, filters=filters, include=include)
+        return self._requestor.list_all(path='/admin/workspaces', query=query,
+                                        filters=filters, include=include)
     
     def show(self, ws_id, include=None):
         """
         GET /api/v2/admin/workspaces/:id
         """
-        return self.client._requestor.get(url='/'.join([self._aw_endpoint,
-            ws_id]), include=include)
+        path = f'/admin/workspaces/{ws_id}'
+        return self._requestor.get(path=path, include=include)
 
     def delete(self, ws_id):
         """
         DELETE /admin/workspaces/:id
         """
-        return self.client._requestor.delete(url='/'.join([
-            self._aw_endpoint, ws_id]))
+        path = f'/admin/workspaces/{ws_id}'
+        return self._requestor.delete(path=path)

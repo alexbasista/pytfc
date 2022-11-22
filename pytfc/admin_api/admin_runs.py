@@ -8,21 +8,15 @@ from pytfc.tfc_api_base import TfcApiBase
 class AdminRuns(TfcApiBase):
     """
     TFE Admin Runs methods.
-    """
-    # def __init__(self, client):
-    #     self.client = client
-    #     self._logger = client._logger
-    #     self._ar_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-    #         'runs'])
-    
+    """   
     def list(self, query=None, filters=None, page_number=None, page_size=None,
-        include=None):
+             include=None):
         """
         GET /api/v2/admin/runs
         """
         return self._requestor.get(path='/admin/runs', query=query,
-            filters=filters, page_number=page_number, page_size=page_size,
-            include=include)
+                                   filters=filters, page_number=page_number,
+                                   page_size=page_size, include=include)
 
     def list_all(self, query=None, filters=None, include=None):
         """
@@ -33,8 +27,8 @@ class AdminRuns(TfcApiBase):
 
         Returns object (dict) with two arrays: `data` and `included`.
         """
-        return self._requestor._list_all(path='/admin/runs',
-            query=query, filters=filters, include=include)
+        return self._requestor.list_all(path='/admin/runs', query=query,
+                                        filters=filters, include=include)
     
     def force_cancel(self, run_id, comment=None):
         """

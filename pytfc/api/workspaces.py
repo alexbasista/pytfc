@@ -15,6 +15,8 @@ class Workspaces(TfcApiBase):
     """
     TFC/E Workspaces methods.
     """
+    _logger = logging.getLogger(__name__)
+    
     _ws_attr_list = [
         'name',
         'agent_pool_id',
@@ -42,8 +44,6 @@ class Workspaces(TfcApiBase):
         'tags_regex',
         'vcs_repo' # only used by `update()` to remove repo from Workspace
     ]
-
-    _logger = logging.getLogger(__name__)
     
     # def __init__(self, client, **kwargs):
     #     self.client = client

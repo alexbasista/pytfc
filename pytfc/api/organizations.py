@@ -1,8 +1,8 @@
 """
 Module for TFC/E Organization API endpoint.
 """
-from pytfc.exceptions import MissingOrganization
 from pytfc.tfc_api_base import TfcApiBase
+
 
 class Organizations(TfcApiBase):
     """
@@ -45,7 +45,8 @@ class Organizations(TfcApiBase):
             if key in self._org_attr_list:
                 attributes[key] = value
             else:
-                self._logger.warning(f"`{key}` is an invalid key for Organizations API.")
+                self._logger.warning(\
+                    f"`{key}` is an invalid key for Organizations API.")
         data['attributes'] = attributes
         payload['data'] = data
         
@@ -67,7 +68,8 @@ class Organizations(TfcApiBase):
             if key in self._org_attr_list:
                 attributes[key] = value
             else:
-                self._logger.warning(f"`{key}` is an invalid key for Organizations API.")
+                self._logger.warning(\
+                    f"`{key}` is an invalid key for Organizations API.")
         data['attributes'] = attributes
         payload['data'] = data
         

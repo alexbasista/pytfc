@@ -2,7 +2,6 @@
 Module for TFE Admin Organizations API endpoint.
 For Terraform Enterprise only.
 """
-from pytfc.exceptions import MissingOrganization
 from pytfc.tfc_api_base import TfcApiBase
 
 
@@ -16,8 +15,8 @@ class AdminOrganizations(TfcApiBase):
     #     self.ao_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
     #         'organizations'])
     
-    def list(self, query=None, filters=None, page_number=None, page_size=None,
-        include=None):
+    def list(self, query=None, filters=None, page_number=None,
+             page_size=None, include=None):
         """
         GET /api/v2/admin/organizations
         """
@@ -37,11 +36,9 @@ class AdminOrganizations(TfcApiBase):
                     " Valid values are: `owners`.")
                 raise ValueError
 
-        ao_endpoint = self._base_url + '/admin/organizations'
-        
-        return self._requestor.get(url=ao_endpoint, query=query,
-            filters=filters, page_number=page_number, page_size=page_size,
-            include=include)
+        return self._requestor.get(path='/admin/organizations', query=query,
+                                   filters=filters, page_number=page_number,
+                                   page_size=page_size, include=include)
 
     def show(self, org, include=None):
         """
@@ -53,29 +50,32 @@ class AdminOrganizations(TfcApiBase):
                     " Valid values are: `owners`.")
                 raise ValueError
         
-        return self.client._requestor.get(url='/'.join([self.ao_endpoint,
-            org]), include=include)
+        path = f'/admin/organizations/{org}'
+        return self._requestor.get(path=path, include=include)
 
     def update(self, org, **kwargs):
         """
         PATCH /admin/organizations/:name
         """
+        print('coming soon')
 
     def delete(self, org):
         """
         DELETE /admin/organizations/:name
         """
-    
+        print('coming soon')
+
     def list_consumers(self, org, page_number=None, page_size=None):
         """
         GET /api/v2/admin/organizations/:name/relationships/module-consumers
         """
-        return self.client._requestor.get(url='/'.join([self.ao_endpoint, org,
-            'relationships', 'module-consumers']), page_number=page_number,
-            page_size=page_size)
+        path = f'/admin/organizations/{org}/relationships/module-consumers'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size)
 
     def update_consumers(self, org):
         """
         PATCH /admin/organizations/:name/relationships/module-consumers
         """
+        print('coming soon')
 

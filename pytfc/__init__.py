@@ -8,6 +8,7 @@ from os import getenv
 import logging
 import sys
 from pytfc.requestor import Requestor
+from pytfc.utils import DEFAULT_LOG_LEVEL
 from pytfc.exceptions import MissingToken
 from pytfc import api
 from pytfc import admin_api
@@ -21,10 +22,10 @@ class Client:
     _no_org_required_classes = {
         'admin_organizations': admin_api.AdminOrganizations,
         'admin_runs': admin_api.AdminRuns,
-        # 'admin_settings': AdminSettings,
-        # 'admin_terraform_versions': AdminTerraformVersions,
-        # 'admin_users': AdminUsers,
-        # 'admin_workspaces': AdminWorkspaces,
+        'admin_settings': admin_api.AdminSettings,
+        'admin_terraform_versions': admin_api.AdminTerraformVersions,
+        'admin_users': admin_api.AdminUsers,
+        'admin_workspaces': admin_api.AdminWorkspaces,
         # 'policy_checks': PolicyChecks,
          'organizations': api.Organizations,
         # #'team_membership': TeamMembership, # under construction
@@ -41,7 +42,7 @@ class Client:
         token=None,
         org=None,
         ws=None,
-        log_level='WARNING',
+        log_level=DEFAULT_LOG_LEVEL,
         verify=True,
         requestor=Requestor
     ):
@@ -50,7 +51,7 @@ class Client:
         self._log_level = getattr(logging, log_level.upper())
         self._logger.setLevel(self._log_level)
         self._logger.addHandler(logging.StreamHandler(sys.stdout))
-        self._logger.debug("Instantiating TFC/E API Client class.")
+        self._logger.debug("Instantiating TFC/E API Client.")
 
         if hostname is not None:
             self.hostname = hostname
@@ -81,31 +82,33 @@ class Client:
         self._requestor = requestor(
             headers=_headers,
             base_uri=_base_uri_v2,
-            logger=self._logger,
-            verify=verify
+            verify=verify,
+            log_level=self._log_level
         )
         
         self.org = org
-        self.ws = ws
-        self.ws_id = (self._get_ws_id(self.ws)) if self.org and self.ws else None
+        #self.ws = ws
+        #self.ws_id = (self._get_ws_id(self.ws)) if self.org and self.ws else None
+
+        ws_id = (self._get_ws_id(ws)) if org and ws else None
 
         self._logger.debug("Initializing API classes that do not"
                            " require an `org` to be set...")
         self._init_api_classes(
             self._no_org_required_classes,
-            self.org,
-            self.ws,
-            self.ws_id
+            org,
+            ws,
+            ws_id
         )
         
         self._logger.debug("Initializing API classes that"
                            " require an `org` to be set...")
-        if self.org is not None:
+        if org is not None:
             self._init_api_classes(
                 self._org_required_classes,
-                self.org,
-                self.ws,
-                self.ws_id
+                org,
+                ws,
+                ws_id
             )
 
     # @property
@@ -130,7 +133,8 @@ class Client:
                 requestor=self._requestor,
                 org=org,
                 ws=ws,
-                ws_id=ws_id
+                ws_id=ws_id,
+                log_level=self._log_level
             )
 
             self._logger.debug(f"Initializing {cls.__name__}.")
@@ -138,8 +142,8 @@ class Client:
 
     def set_org(self, name):
         """
-        Sets Organization on Client object and
-        re-initializes all API endpoint classes
+        Sets Organization (as `org`) on Client object
+        and re-initializes all API endpoint classes
         that require an `org` to be set.
         """
         self._logger.debug(f"Setting `org` on client to {name}.")
