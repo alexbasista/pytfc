@@ -4,7 +4,6 @@ Module for TFC/E Organization API endpoint.
 from pytfc.exceptions import MissingOrganization
 from pytfc.tfc_api_base import TfcApiBase
 
-
 class Organizations(TfcApiBase):
     """
     TFC/E Organizations methods.
@@ -25,18 +24,11 @@ class Organizations(TfcApiBase):
         """
         return self._requestor.get(path='/organizations')
 
-    def show(self, name=None):
+    def show(self, name):
         """
         GET /organizations/:organization_name
         """
-        if name is not None:
-            org = name
-        elif self.org:
-            org = self.org
-        else:
-            raise MissingOrganization
-        
-        path = f'/organizations/{org}'
+        path = f'/organizations/{name}'
         return self._requestor.get(path=path)
 
     def create(self, name, email, **kwargs):
@@ -59,17 +51,10 @@ class Organizations(TfcApiBase):
         
         return self._requestor.post(path='/organizations', payload=payload)
 
-    def update(self, name=None, **kwargs):
+    def update(self, name, **kwargs):
         """
         PATCH /organizations/:organization_name
         """
-        if name is not None:
-            org = name
-        elif self.org:
-            org = self.org
-        else:
-            raise MissingOrganization
-        
         payload = {}
         data = {}
         data['type'] = 'organizations'
@@ -86,7 +71,7 @@ class Organizations(TfcApiBase):
         data['attributes'] = attributes
         payload['data'] = data
         
-        path = f'/organizations/{org}'
+        path = f'/organizations/{name}'
         return self._requestor.patch(path=path, payload=payload)
 
     def delete(self, name):
@@ -96,16 +81,9 @@ class Organizations(TfcApiBase):
         path = f'/organizations/{name}'
         return self._requestor.delete(path=path)
 
-    def show_entitlement_set(self, name=None):
+    def show_entitlement_set(self, name):
         """
         GET /organizations/:organization_name/entitlement-set
         """
-        if name is not None:
-            org = name
-        elif self.org:
-            org = self.org
-        else:
-            raise MissingOrganization
-        
-        path = f'/organizations/{org}/entitlement-set'
+        path = f'/organizations/{name}/entitlement-set'
         return self._requestor.get(path=path)

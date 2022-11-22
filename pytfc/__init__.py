@@ -15,9 +15,26 @@ from pytfc import admin_api
 
 class Client:
     """
-    Initialize this parent class to access child classes for all TFC/E
-    API endpoints and resources. Kind of behaves like a superclass.
+    Initialize this class to access sub-classes
+    for all TFC/E API endpoints and resources.
     """
+    _no_org_required_classes = {
+        'admin_organizations': admin_api.AdminOrganizations,
+        'admin_runs': admin_api.AdminRuns,
+        # 'admin_settings': AdminSettings,
+        # 'admin_terraform_versions': AdminTerraformVersions,
+        # 'admin_users': AdminUsers,
+        # 'admin_workspaces': AdminWorkspaces,
+        # 'policy_checks': PolicyChecks,
+         'organizations': api.Organizations,
+        # #'team_membership': TeamMembership, # under construction
+        # 'team_tokens': TeamTokens
+    }
+
+    _org_required_classes = {
+        'workspaces': api.Workspaces,
+    }
+
     def __init__(
         self,
         hostname=None,
@@ -28,7 +45,7 @@ class Client:
         verify=True,
         requestor=Requestor
     ):
-        
+
         self._logger = logging.getLogger(self.__class__.__name__)
         self._log_level = getattr(logging, log_level.upper())
         self._logger.setLevel(self._log_level)
@@ -70,20 +87,81 @@ class Client:
         
         self.org = org
         self.ws = ws
-        self.ws_id = None
+        self.ws_id = (self._get_ws_id(self.ws)) if self.org and self.ws else None
 
-        # Admin API
-        self.admin_organizations = admin_api.AdminOrganizations(requestor=self._requestor, org=self.org, ws=self.ws)
-        self.admin_runs = admin_api.AdminRuns(requestor=self._requestor, org=self.org, ws=self.ws)
+        self._logger.debug("Initializing API classes that do not"
+                           " require an `org` to be set...")
+        self._init_api_classes(
+            self._no_org_required_classes,
+            self.org,
+            self.ws,
+            self.ws_id
+        )
         
-        # Regular API
-        self.organizations = api.Organizations(requestor=self._requestor, org=self.org, ws=self.ws)
-        self.workspaces = api.Workspaces(requestor=self._requestor, org=self.org, ws=self.ws)
+        self._logger.debug("Initializing API classes that"
+                           " require an `org` to be set...")
+        if self.org is not None:
+            self._init_api_classes(
+                self._org_required_classes,
+                self.org,
+                self.ws,
+                self.ws_id
+            )
 
-    @property
-    def requestor(self):
-        return self._requestor
+    # @property
+    # def requestor(self):
+    #     return self._requestor
         
-    @requestor.setter
-    def requestor(self, requestor):
-        self._requestor = requestor
+    # @requestor.setter
+    # def requestor(self, requestor):
+    #     self._requestor = requestor
+    
+    def _get_ws_id(self, ws_name):
+        path = f'/organizations/{self.org}/workspaces/{ws_name}'
+        return self._requestor.get(path=path).json()['data']['id']
+    
+    def _init_api_classes(self, classes_dict, org=None, ws=None, ws_id=None):
+        """
+        Initialize all supported API endpoint classes.
+        """
+        for cls_name in classes_dict:
+            cls = classes_dict[cls_name]
+            initialized_cls = cls(
+                requestor=self._requestor,
+                org=org,
+                ws=ws,
+                ws_id=ws_id
+            )
+
+            self._logger.debug(f"Initializing {cls.__name__}.")
+            setattr(self, cls_name, initialized_cls)
+
+    def set_org(self, name):
+        """
+        Sets Organization on Client object and
+        re-initializes all API endpoint classes
+        that require an `org` to be set.
+        """
+        self._logger.debug(f"Setting `org` on client to {name}.")
+        self.__setattr__('org', name)
+        self._init_api_classes(
+            classes_dict=self._org_required_classes,
+            org=name
+        )
+    
+    def set_ws(self, name):
+        """
+        Sets Workspace (as `ws`) on Client object and
+        re-initializes all API endpoint classes that
+        require an `org` to be set.
+        """
+        self._logger.debug(f"Setting `ws` on client to {name}.")
+        ws_id = self._get_ws_id(name)
+        self._logger.debug(f"Setting `ws_id` on client to {ws_id}.")
+        self.__setattr__('ws', name)
+        self.__setattr__('ws_id', ws_id)
+        self._init_api_classes(
+            classes_dict=self._org_required_classes,
+            ws=name,
+            ws_id=ws_id
+        )

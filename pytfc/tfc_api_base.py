@@ -12,10 +12,11 @@ class TfcApiBase:
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, requestor, org, ws):
+    def __init__(self, requestor, org, ws, ws_id):
         """
         TFC/E API 'child' class constructor.
         """
         self._requestor = requestor
         self.org = org
         self.ws = ws
+        self.ws_id = ws_id

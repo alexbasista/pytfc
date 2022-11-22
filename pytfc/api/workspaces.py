@@ -7,7 +7,8 @@ from pytfc.exceptions import MissingVcsProvider
 from .oauth_clients import OauthClients
 from pytfc.tfc_api_base import TfcApiBase
 import logging
-
+#from pytfc.utils import validate_ws_is_set, validate_ws_id_is_set
+from pytfc import utils
 
 
 class Workspaces(TfcApiBase):
@@ -69,45 +70,45 @@ class Workspaces(TfcApiBase):
     #         self.ws = None
     #         self.ws_id = None
     
+    
+    # def validate_ws_is_set(func):
+    #     @functools.wraps(func)
+    #     def wrapper(*args, **kwargs):
+    #         print("Before function call.")
+    #         if not kwargs.get('name') and not args[0].ws:
+    #             raise MissingWorkspace
+    #         return func(*args, **kwargs)
+    #         print("Something is happening after the fuction is called")
+    #     return wrapper
+
+    @utils.validate_ws_is_set
     def get_ws_id(self, name=None):
         """
         Helper method that returns Workspace ID based on Workspace name.
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+        ws_name = name if name else self.ws
         path = f'/organizations/{self.org}/workspaces/{ws_name}'
         ws = self._requestor.get(path=path)
 
         return ws.json()['data']['id']
 
+    @utils.validate_ws_id_is_set
     def get_ws_name(self, ws_id=None):
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-
+        """
+        Helper method that returns Workspace name based on Workspace ID.
+        """
+        ws_id = ws_id if ws_id else self.ws_id
         path = f'/workspaces/{ws_id}'
         ws = self._requestor.get(path=path)
 
         return ws.json()['data']['attributes']['name']
 
+    @utils.validate_ws_is_set
     def create(self, name=None, **kwargs):
         """
         POST /organizations/:organization_name/workspaces
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
+        ws_name = name if name else self.ws
         
         payload = {}
         data = {}
@@ -195,16 +196,12 @@ class Workspaces(TfcApiBase):
         path = f'/organizations/{self.org}/workspaces/'
         return self._requestor.post(path=path, payload=payload)
 
+    @utils.validate_ws_is_set
     def update(self, name=None, **kwargs):
         """
         PATCH /organizations/:organization_name/workspaces/:name
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
+        ws_name = name if name else self.ws
 
         payload = {}
         data = {}
@@ -260,43 +257,29 @@ class Workspaces(TfcApiBase):
         return self._requestor._list_all(path=path, search=search,
                                          include=include)
 
+    @utils.validate_ws_is_set
     def show(self, name=None):
         """
         GET /organizations/:organization_name/workspaces/:name
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+        ws_name = name if name else self.ws
         path = f'/organizations/{self.org}/workspaces/{ws_name}'
         return self._requestor.get(path=path)
 
-    def delete(self, name=None):
+    def delete(self, name):
         """
         DELETE /organizations/:organization_name/workspaces/:name
         """
-        if name is None:
-            raise MissingWorkspace
-        else:
-            ws_name = name
-        
+        ws_name = name
         path = f'/organizations/{self.org}/workspaces/{ws_name}'
         return self._requestor.delete(path=path)
 
+    @utils.validate_ws_is_set
     def lock(self, name=None, **kwargs):
         """
         POST /workspaces/:workspace_id/actions/lock
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         reason = kwargs.pop('reason', 'Locked by pytfc')
         payload = { 'reason': reason }
@@ -304,49 +287,31 @@ class Workspaces(TfcApiBase):
         path = f'/workspaces/{ws_id}/actions/lock'
         return self._requestor.post(path=path, payload=payload)
 
+    @utils.validate_ws_is_set
     def unlock(self, name=None):
         """
         POST /workspaces/:workspace_id/actions/unlock
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
-        
         path = f'/workspaces/{ws_id}/actions/unlock'
         return self._requestor.post(path=path, payload=None)
 
+    @utils.validate_ws_is_set
     def force_unlock(self, name=None):
         """
         POST /workspaces/:workspace_id/actions/force-unlock
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
-        
         path = f'/workspaces/{ws_id}/actions/force-unlock'
         return self._requestor.post(path=path, payload=None)
 
+    @utils.validate_ws_is_set
     def assign_ssh_key(self, ssh_key_id, name=None):
         """
         PATCH /workspaces/:workspace_id/relationships/ssh-key
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -355,22 +320,16 @@ class Workspaces(TfcApiBase):
         data['attributes'] = attributes
         payload['data'] = data
         
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
-        
         path = f'/workspaces/{ws_id}/relationships/ssh-key'
         return self._requestor.patch(path=path, payload=payload)
 
+    @utils.validate_ws_is_set
     def unassign_ssh_key(self, name=None):
         """
         PATCH /workspaces/:workspace_id/relationships/ssh-key
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -379,113 +338,82 @@ class Workspaces(TfcApiBase):
         data['attributes'] = attributes
         payload['data'] = data
         
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
-
         path = f'/workspaces/{ws_id}/relationships/ssh-key'
         return self._requestor.patch(path=path, payload=payload)
     
+    @utils.validate_ws_is_set
     def get_remote_state_consumers(self, name=None, page_number=None,
                                    page_size=None):
         """
         GET /workspaces/:workspace_id/relationships/remote-state-consumers
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
-        
         path = f'/workspaces/{ws_id}/relationships/remote-state-consumers'
         return self._requestor.get(path=path, page_number=page_number,
                                    page_size=page_size)
 
+    @utils.validate_ws_is_set
     def replace_remote_state_consumers(self, name=None):
         """
         PATCH /workspaces/:workspace_id/relationships/remote-state-consumers
         """
         # first check if `global-remote-state is false`
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-        
+
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
     
+    @utils.validate_ws_is_set
     def add_remote_state_consumers(self, name=None):
         """
         POST /workspaces/:workspace_id/relationships/remote-state-consumers
         """
         # first check if `global-remote-state is false`
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-
+        
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
+    @utils.validate_ws_is_set
     def delete_remote_state_consumers(self, name=None):
         """
         DELETE /workspaces/:workspace_id/relationships/remote-state-consumers
         """
         # first check if `global-remote-state is false`
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
 
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
+    @utils.validate_ws_is_set
     def get_tags(self, name=None):
         """
         GET /workspaces/:workspace_id/relationships/tags
         """
         # query parameters
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
 
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
+    @utils.validate_ws_is_set
     def add_tags(self, name=None):
         """
         POST /workspaces/:workspace_id/relationships/tags
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
 
+    @utils.validate_ws_is_set
     def remove_tags(self, name=None):
         """
         DELETE /workspaces/:workspace_id/relationships/tags
         """
-        if name is not None:
-            ws_name = name
-        elif self.ws:
-            ws_name = self.ws
-        else:
-            raise MissingWorkspace
-
+        ws_name = name if name else self.ws
         ws_id = self.get_ws_id(name=ws_name)
         print('coming soon.')
