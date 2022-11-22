@@ -1,7 +1,7 @@
 """
 Module for TFC/E Variable Sets API endpoints.
 """
-from .exceptions import MissingWorkspace
+from pytfc.exceptions import MissingWorkspace
 
 
 class VariableSets:

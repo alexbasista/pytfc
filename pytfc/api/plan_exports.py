@@ -3,7 +3,7 @@ Module for TFC/E Plan Exports API endpoint.
 """
 import requests
 import tarfile
-from. exceptions import MissingPlan
+from pytfc.exceptions import MissingPlan
 
 
 class PlanExports:

@@ -1,7 +1,7 @@
 """
 Module for TFC/E Workspace Resources API endpoint.
 """
-from .exceptions import MissingWorkspace
+from pytfc.exceptions import MissingWorkspace
 
 
 class WorkspaceResources:

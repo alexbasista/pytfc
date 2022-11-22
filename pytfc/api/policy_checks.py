@@ -1,7 +1,7 @@
 """
 Module for TFC/E Policy Checks API endpoint.
 """
-from .exceptions import InvalidQueryParam
+from pytfc.exceptions import InvalidQueryParam
 
 
 class PolicyChecks:

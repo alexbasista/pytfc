@@ -1,7 +1,7 @@
 """
 Module for TFC/E Plans API endpoint.
 """
-from .exceptions import MissingRun
+from pytfc.exceptions import MissingRun
 
 
 class Plans:

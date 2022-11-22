@@ -2,7 +2,7 @@
 Module for TFC/E State Versions API endpoints.
 """
 from urllib import request
-from .exceptions import MissingWorkspace
+from pytfc.exceptions import MissingWorkspace
 
 
 class StateVersions:

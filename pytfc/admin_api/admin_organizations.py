@@ -2,18 +2,19 @@
 Module for TFE Admin Organizations API endpoint.
 For Terraform Enterprise only.
 """
-from .exceptions import MissingOrganization
+from pytfc.exceptions import MissingOrganization
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class AdminOrganizations:
+class AdminOrganizations(TfcApiBase):
     """
     TFE Admin Organizations methods.
     """
-    def __init__(self, client):
-        self.client = client
-        self._logger = client._logger
-        self.ao_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-            'organizations'])
+    # def __init__(self, client):
+    #     self.client = client
+    #     self._logger = client._logger
+    #     self.ao_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
+    #         'organizations'])
     
     def list(self, query=None, filters=None, page_number=None, page_size=None,
         include=None):
@@ -36,7 +37,9 @@ class AdminOrganizations:
                     " Valid values are: `owners`.")
                 raise ValueError
 
-        return self.client._requestor.get(url=self.ao_endpoint, query=query,
+        ao_endpoint = self._base_url + '/admin/organizations'
+        
+        return self._requestor.get(url=ao_endpoint, query=query,
             filters=filters, page_number=page_number, page_size=page_size,
             include=include)
 

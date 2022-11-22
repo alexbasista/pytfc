@@ -1,13 +1,16 @@
 """
 Module for TFC/E Workspace API endpoint.
 """
-from .exceptions import MissingOrganization
-from .exceptions import MissingWorkspace
-from .exceptions import MissingVcsProvider
+from pytfc.exceptions import MissingOrganization
+from pytfc.exceptions import MissingWorkspace
+from pytfc.exceptions import MissingVcsProvider
 from .oauth_clients import OauthClients
+from pytfc.tfc_api_base import TfcApiBase
+import logging
 
 
-class Workspaces:
+
+class Workspaces(TfcApiBase):
     """
     TFC/E Workspaces methods.
     """
@@ -38,31 +41,33 @@ class Workspaces:
         'tags_regex',
         'vcs_repo' # only used by `update()` to remove repo from Workspace
     ]
+
+    _logger = logging.getLogger(__name__)
     
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._logger = client._logger
+    # def __init__(self, client, **kwargs):
+    #     self.client = client
+    #     self._logger = client._logger
 
-        if kwargs.get('org'):
-            self.org = kwargs.get('org')
-        elif self.client.org:
-            self.org = self.client.org                
-        else:
-            raise MissingOrganization
+    #     if kwargs.get('org'):
+    #         self.org = kwargs.get('org')
+    #     elif self.client.org:
+    #         self.org = self.client.org                
+    #     else:
+    #         raise MissingOrganization
         
-        self.ws_endpoint = '/'.join([
-            self.client._base_uri_v2, 'organizations', self.org, 'workspaces'
-        ])
+    #     self.ws_endpoint = '/'.join([
+    #         self.client._base_uri_v2, 'organizations', self.org, 'workspaces'
+    #     ])
 
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.get_ws_id(name=kwargs.get('ws'))
-        elif self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
+    #     if kwargs.get('ws'):
+    #         self.ws = kwargs.get('ws')
+    #         self.ws_id = self.get_ws_id(name=kwargs.get('ws'))
+    #     elif self.client.ws_id:
+    #         self.ws = self.client.ws
+    #         self.ws_id = self.client.ws_id
+    #     else:
+    #         self.ws = None
+    #         self.ws_id = None
     
     def get_ws_id(self, name=None):
         """
@@ -75,8 +80,8 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws = self.client._requestor.get(url='/'.join([self.ws_endpoint,
-            ws_name]))
+        path = f'/organizations/{self.org}/workspaces/{ws_name}'
+        ws = self._requestor.get(path=path)
 
         return ws.json()['data']['id']
 
@@ -88,8 +93,8 @@ class Workspaces:
         else:
             raise MissingWorkspace
 
-        ws = self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id]))
+        path = f'/workspaces/{ws_id}'
+        ws = self._requestor.get(path=path)
 
         return ws.json()['data']['attributes']['name']
 
@@ -187,8 +192,8 @@ class Workspaces:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url=self.ws_endpoint,
-            payload=payload)
+        path = f'/organizations/{self.org}/workspaces/'
+        return self._requestor.post(path=path, payload=payload)
 
     def update(self, name=None, **kwargs):
         """
@@ -230,17 +235,18 @@ class Workspaces:
         data['attributes'] = attributes
         payload['data'] = data
 
-        return self.client._requestor.patch(url='/'.join([
-            self.ws_endpoint, ws_name]), payload=payload)
+        path = f'/organizations/{self.org}/workspaces/{ws_name}'
+        return self._requestor.patch(path=path, payload=payload)
 
     def list(self, page_number=None, page_size=None, search=None, include=None):
         """
         GET /organizations/:organization_name/workspaces
         """
-        return self.client._requestor.get(url=self.ws_endpoint,
-            page_number=page_number, page_size=page_size, search=search,
-            include=include)
-    
+        path = f'/organizations/{self.org}/workspaces/'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size, search=search,
+                                   include=include)
+
     def list_all(self, search=None, include=None):
         """
         GET /organizations/:organization_name/workspaces
@@ -250,8 +256,9 @@ class Workspaces:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """
-        return self.client._requestor._list_all(url=self.ws_endpoint, search=search,
-            include=include)
+        path = f'/organizations/{self.org}/workspaces/'
+        return self._requestor._list_all(path=path, search=search,
+                                         include=include)
 
     def show(self, name=None):
         """
@@ -264,8 +271,8 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        return self.client._requestor.get(url='/'.join([
-            self.ws_endpoint, ws_name]))
+        path = f'/organizations/{self.org}/workspaces/{ws_name}'
+        return self._requestor.get(path=path)
 
     def delete(self, name=None):
         """
@@ -276,8 +283,8 @@ class Workspaces:
         else:
             ws_name = name
         
-        return self.client._requestor.delete(url='/'.join([
-            self.ws_endpoint, ws_name]))
+        path = f'/organizations/{self.org}/workspaces/{ws_name}'
+        return self._requestor.delete(path=path)
 
     def lock(self, name=None, **kwargs):
         """
@@ -294,8 +301,8 @@ class Workspaces:
         reason = kwargs.pop('reason', 'Locked by pytfc')
         payload = { 'reason': reason }
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'actions', 'lock']), payload=payload)
+        path = f'/workspaces/{ws_id}/actions/lock'
+        return self._requestor.post(path=path, payload=payload)
 
     def unlock(self, name=None):
         """
@@ -310,8 +317,8 @@ class Workspaces:
         
         ws_id = self.get_ws_id(name=ws_name)
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'actions', 'unlock']), payload=None)
+        path = f'/workspaces/{ws_id}/actions/unlock'
+        return self._requestor.post(path=path, payload=None)
 
     def force_unlock(self, name=None):
         """
@@ -326,8 +333,8 @@ class Workspaces:
         
         ws_id = self.get_ws_id(name=ws_name)
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'actions', 'force-unlock']), payload=None)
+        path = f'/workspaces/{ws_id}/actions/force-unlock'
+        return self._requestor.post(path=path, payload=None)
 
     def assign_ssh_key(self, ssh_key_id, name=None):
         """
@@ -340,8 +347,6 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self.get_ws_id(name=ws_name)
-        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -350,8 +355,10 @@ class Workspaces:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.patch(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'relationships', 'ssh-key']), payload=payload)
+        ws_id = self.get_ws_id(name=ws_name)
+        
+        path = f'/workspaces/{ws_id}/relationships/ssh-key'
+        return self._requestor.patch(path=path, payload=payload)
 
     def unassign_ssh_key(self, name=None):
         """
@@ -364,8 +371,6 @@ class Workspaces:
         else:
             raise MissingWorkspace
         
-        ws_id = self.get_ws_id(name=ws_name)
-        
         payload = {}
         data = {}
         data['type'] = 'workspaces'
@@ -374,11 +379,13 @@ class Workspaces:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.patch(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'relationships', 'ssh-key']), payload=payload)
+        ws_id = self.get_ws_id(name=ws_name)
+
+        path = f'/workspaces/{ws_id}/relationships/ssh-key'
+        return self._requestor.patch(path=path, payload=payload)
     
     def get_remote_state_consumers(self, name=None, page_number=None,
-        page_size=None):
+                                   page_size=None):
         """
         GET /workspaces/:workspace_id/relationships/remote-state-consumers
         """
@@ -391,9 +398,9 @@ class Workspaces:
         
         ws_id = self.get_ws_id(name=ws_name)
         
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'relationships', 'remote-state-consumers']),
-            page_number=page_number, page_size=page_size)
+        path = f'/workspaces/{ws_id}/relationships/remote-state-consumers'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size)
 
     def replace_remote_state_consumers(self, name=None):
         """

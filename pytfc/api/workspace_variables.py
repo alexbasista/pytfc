@@ -3,7 +3,7 @@ Module for TFC/E Workspace Variables API  endpoint.
 """
 import json
 import hcl as pyhcl
-from .exceptions import MissingWorkspace
+from pytfc.exceptions import MissingWorkspace
 
 
 class WorkspaceVariables:

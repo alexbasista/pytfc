@@ -1,7 +1,7 @@
 """
 Module for TFC/E Run Tasks API endpoints.
 """
-from .exceptions import MissingWorkspace
+from pytfc.exceptions import MissingWorkspace
 
 
 class RunTasks:

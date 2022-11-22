@@ -1,7 +1,7 @@
 """
 Module for TFC/E OAuth Clients API endpoint.
 """
-from .exceptions import MissingOauthClient, MissingOrganization
+from pytfc.exceptions import MissingOauthClient, MissingOrganization
 
 
 class OauthClients:

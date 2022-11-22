@@ -1,7 +1,7 @@
 """
 Module for TFC/E Teams API endpoints.
 """
-from .exceptions import InvalidQueryParam
+from pytfc.exceptions import InvalidQueryParam
 
 
 class Teams:

@@ -3,33 +3,42 @@ Module for HTTP verb functions against TFC/E API.
 """
 import requests
 import json
+from abc import ABCMeta, abstractmethod
 
 # Constants
 MAX_PAGE_SIZE = 100
 
 
-class Requestor(object):
+class Requestor:
     """
     Constructs HTTP verb methods to call TFC/E API. 
     This class is initialized via the client.py module,
     and the header is received from the Client class within.
     """
-    def __init__(self, client, headers):
-        self._logger = client._logger
-        self.headers = headers
+    
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, headers, base_uri, logger, verify):
+        self._headers = headers
+        self._base_uri = base_uri
+        self._logger = logger
+        self._verify = verify
+        
 
-    def post(self, url, payload):
+    def post(self, path, payload):
         r = None
+        url = self._base_uri + path
         self._logger.debug(f"Sending HTTP POST to {url}.")
         self._logger.debug(json.dumps(payload, indent=2))
-        r = requests.post(url=url, headers=self.headers, data=json.dumps(payload))
+        r = requests.post(url=url, headers=self._headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
 
-    def get(self, url, filters=None, page_number=None, page_size=None,
+    def get(self, path, filters=None, page_number=None, page_size=None,
             include=None, search=None, query=None):
         
         r = None
+        url = self._base_uri + path
         
         query_params = []
 
@@ -72,32 +81,36 @@ class Requestor(object):
             url += '?' + '&'.join(query_params)
         
         self._logger.debug(f"Sending HTTP GET to {url}")
-        r = requests.get(url=url, headers=self.headers)
+        r = requests.get(url=url, headers=self._headers)
         r.raise_for_status()
         return r
 
-    def patch(self, url, payload):
+    def patch(self, path, payload):
         r = None
+        url = self._base_uri + path
         self._logger.debug(f"Sending HTTP PATCH to {url}")
         self._logger.debug(json.dumps(payload, indent=2))
-        r = requests.patch(url=url, headers=self.headers, data=json.dumps(payload))
+        r = requests.patch(url=url, headers=self._headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
 
-    def delete(self, url):
+    def delete(self, path):
         r = None
+        url = self._base_uri + path
         self._logger.debug(f"Sending HTTP DELETE to {url}")
-        r = requests.delete(url=url, headers=self.headers)
+        r = requests.delete(url=url, headers=self._headers)
         r.raise_for_status()
         return r
 
-    def _list_all(self, url, filters=None, include=None, search=None, query=None):
+    def _list_all(self, path, filters=None, include=None, search=None, query=None):
         """
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.
         """
+        #url = self._base_uri + path
+        
         current_page_number = 1
-        list_resp = self.get(url=url, page_number=current_page_number,
+        list_resp = self.get(path=path, page_number=current_page_number,
             page_size=MAX_PAGE_SIZE, filters=filters, include=include,
             search=search).json()
 
@@ -111,7 +124,7 @@ class Requestor(object):
         data = []
         included = []
         while current_page_number <= total_pages:
-            list_resp = self.get(url, page_number=current_page_number,
+            list_resp = self.get(path=path, page_number=current_page_number,
                 page_size=MAX_PAGE_SIZE, filters=filters, include=include,
                 search=search, query=query).json()
             data += list_resp['data']

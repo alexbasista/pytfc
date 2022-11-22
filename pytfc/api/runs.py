@@ -2,8 +2,8 @@
 Module for TFC/E Runs API endpoint.
 """
 from .configuration_versions import ConfigurationVersions
-from .exceptions import MissingWorkspace
-from .exceptions import MissingRun
+from pytfc.exceptions import MissingWorkspace
+from pytfc.exceptions import MissingRun
 
 
 class Runs:

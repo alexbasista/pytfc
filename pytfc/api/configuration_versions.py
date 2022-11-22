@@ -6,8 +6,8 @@ import time
 import tarfile
 import requests
 from datetime import datetime
-from .exceptions import MissingWorkspace
-from .exceptions import ConfigurationVersionUploadError
+from pytfc.exceptions import MissingWorkspace
+from pytfc.exceptions import ConfigurationVersionUploadError
 
 
 class ConfigurationVersions:
