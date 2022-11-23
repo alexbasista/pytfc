@@ -1,6 +1,8 @@
 from .agent_pools import AgentPools
 from .applies import Applies
 from .configuration_versions import ConfigurationVersions
+from .notification_configurations import NotificationConfigurations
+from .oauth_clients import OauthClients
 
 from .organizations import Organizations
 from .policy_checks import PolicyChecks

@@ -37,6 +37,8 @@ class Client:
         'agent_pools': api.AgentPools,
         'applies': api.Applies,
         'configuration_versions': api.ConfigurationVersions,
+        'notification_configurations': api.NotificationConfigurations,
+        'oauth_clients': api.OauthClients,
         'workspaces': api.Workspaces,
     }
 
@@ -152,7 +154,7 @@ class Client:
                 log_level=self._log_level
             )
 
-            self._logger.debug(f"Initializing {cls.__name__}.")
+            #self._logger.debug(f"Initializing {cls.__name__}.")
             setattr(self, cls_name, initialized_cls)
 
     def set_org(self, name):

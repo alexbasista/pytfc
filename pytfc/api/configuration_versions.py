@@ -1,13 +1,11 @@
-"""
-Module for TFC/E Configuration Versions API endpoints.
-"""
+"""TFC/E Configuration Versions API endpoints module."""
 import os
 import time
 import tarfile
 import requests
 from datetime import datetime
 from pytfc.tfc_api_base import TfcApiBase
-from pytfc import utils
+from pytfc.utils import validate_ws_id_is_set
 from pytfc.exceptions import ConfigurationVersionUploadError
 
 
@@ -15,7 +13,7 @@ class ConfigurationVersions(TfcApiBase):
     """
     TFC/E Configuration Version methods.
     """
-    @utils.validate_ws_id_is_set
+    @validate_ws_id_is_set
     def list(self, ws_id=None, page_number=None, page_size=None):
         """
         GET /workspaces/:workspace_id/configuration-versions
@@ -25,7 +23,7 @@ class ConfigurationVersions(TfcApiBase):
         return self._requestor.get(path=path, page_number=page_number,
                                    page_size=page_size)
 
-    @utils.validate_ws_id_is_set
+    @validate_ws_id_is_set
     def _get_latest_cv_id(self, ws_id=None):
         """
         Helper method that returns latest Configuration 
@@ -69,7 +67,7 @@ class ConfigurationVersions(TfcApiBase):
         
         return cv_upload_url
 
-    @utils.validate_ws_id_is_set
+    @validate_ws_id_is_set
     def create(self, ws_id=None, auto_queue_runs=True, speculative=False):
         """
         POST /workspaces/:workspace_id/configuration-versions
@@ -143,7 +141,7 @@ class ConfigurationVersions(TfcApiBase):
             self._logger.warning(f"Path `{path}` not found.")
             pass
     
-    @utils.validate_ws_id_is_set
+    @validate_ws_id_is_set
     def create_and_upload(self, source_tf_dir, dest_tf_dir='./',
                           auto_queue_runs=True, speculative=False,
                           cleanup=False, ws_id=None):

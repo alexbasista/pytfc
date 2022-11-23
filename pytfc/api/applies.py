@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Applies API endpoint.
-"""
+"""TFC/E Applies API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 
 

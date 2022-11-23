@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Agent Pools API endpoint.
-"""
+"""TFC/E Agent Pools API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 from pytfc.exceptions import InvalidQueryParam
 
