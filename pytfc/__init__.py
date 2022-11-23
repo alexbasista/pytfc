@@ -34,6 +34,9 @@ class Client:
     }
 
     _org_required_classes = {
+        'agent_pools': api.AgentPools,
+        'applies': api.Applies,
+        'configuration_versions': api.ConfigurationVersions,
         'workspaces': api.Workspaces,
     }
 

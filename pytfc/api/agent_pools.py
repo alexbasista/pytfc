@@ -1,28 +1,24 @@
 """
 Module for TFC/E Agent Pools API endpoint.
 """
+from pytfc.tfc_api_base import TfcApiBase
 from pytfc.exceptions import InvalidQueryParam
 
 
-class AgentPools:
+class AgentPools(TfcApiBase):
     """
     TFC/E State Versions methods.
     """
-    def __init__(self, client):
-        self.client = client
-
     def list(self, include=None):
         """
         GET /organizations/:organization_name/agent-pools
         """
-        base_url = '/'.join([self.client._base_uri_v2, 'organizations',
-            self.client.org, 'agent-pools'])
-
         if include is not None:
             if include != 'workspaces':
                 raise InvalidQueryParam
         
-        return self._requestor.get(url=base_url, include=include)
+        path = f'/organizations/{self.org}/agent-pools'
+        return self._requestor.get(path=path, include=include)
     
     def list_agents(self, agent_pool_id):
         """
@@ -34,14 +30,12 @@ class AgentPools:
         """
         GET /agent-pools/:id
         """
-        base_url = '/'.join([self.client._base_uri_v2, 'agent-pools',
-            agent_pool_id])
-
         if include is not None:
             if include != 'workspaces':
                 raise InvalidQueryParam            
         
-        return self._requestor.get(url=base_url, include=include)
+        path = f'/agent-pools/{agent_pool_id}'
+        return self._requestor.get(path=path, include=include)
 
     def show_agent(self, agent_id):
         """
@@ -81,7 +75,8 @@ class AgentPools:
         url = '/'.join([self.client._base_uri_v2, 'agent-pools',
             agent_pool_id])
         
-        ap = self._requestor.get(url=url)
+        path = f'/agent-pools/{agent_pool_id}'
+        ap = self._requestor.get(path=path)
 
         ws_list = []
         for ws in ap.json()['data']['relationships']['workspaces']['data']:

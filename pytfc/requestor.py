@@ -33,7 +33,7 @@ class Requestor:
     def post(self, path, payload):
         r = None
         url = self._base_uri + path
-        self._logger.debug(f"Sending HTTP POST to {url}.")
+        self._logger.debug(f"Sending HTTP POST to {url}")
         self._logger.debug(json.dumps(payload, indent=2))
         r = requests.post(url=url, headers=self._headers, data=json.dumps(payload))
         r.raise_for_status()
@@ -111,8 +111,6 @@ class Requestor:
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.
         """
-        #url = self._base_uri + path
-        
         current_page_number = 1
         list_resp = self.get(path=path, page_number=current_page_number,
             page_size=MAX_PAGE_SIZE, filters=filters, include=include,

@@ -69,17 +69,6 @@ class Workspaces(TfcApiBase):
     #     else:
     #         self.ws = None
     #         self.ws_id = None
-    
-    
-    # def validate_ws_is_set(func):
-    #     @functools.wraps(func)
-    #     def wrapper(*args, **kwargs):
-    #         print("Before function call.")
-    #         if not kwargs.get('name') and not args[0].ws:
-    #             raise MissingWorkspace
-    #         return func(*args, **kwargs)
-    #         print("Something is happening after the fuction is called")
-    #     return wrapper
 
     @utils.validate_ws_is_set
     def get_ws_id(self, name=None):

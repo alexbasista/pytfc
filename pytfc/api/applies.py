@@ -1,19 +1,16 @@
 """
 Module for TFC/E Applies API endpoint.
 """
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class Applies:
+class Applies(TfcApiBase):
     """
     TFC/E Applies methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._logger = client._logger
-    
     def show(self, apply_id):
         """
         GET /applies/:id
         """
-        return self._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'applies', apply_id]))
+        path = f'/applies/{apply_id}'
+        return self._requestor.get(path=path)
