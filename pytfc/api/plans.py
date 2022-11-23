@@ -39,12 +39,12 @@ class Plans:
         else:
           raise MissingRun
         
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
           self.plans_endpoint, plan_id]))
     
     def get_json_output(self, plan_id):
         """
         GET /plans/:id/json-output
         """
-        return self.client._requestor.get(url='/'.join([self.plans_endpoint,
+        return self._requestor.get(url='/'.join([self.plans_endpoint,
           plan_id, 'json-output'])).json()

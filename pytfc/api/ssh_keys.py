@@ -17,14 +17,14 @@ class SSHKeys:
         base_url = '/'.join([self.client._base_uri_v2, 'organizations',
             self.client.org, 'ssh-keys'])
 
-        return self.client._requestor.get(url=base_url,
+        return self._requestor.get(url=base_url,
             page_number=page_number, page_size=page_size)
 
     def show(self, id):
         """
         GET /ssh-keys/:ssh_key_id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'ssh-keys', id]))
 
     def create(self, name, value):

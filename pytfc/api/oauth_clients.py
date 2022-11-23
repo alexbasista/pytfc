@@ -32,7 +32,7 @@ class OauthClients:
         """
         GET /organizations/:organization_name/oauth-clients
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.oc_endpoint]))
 
     def show(self, oc_id=None, name=None):
@@ -46,7 +46,7 @@ class OauthClients:
         else:
             raise MissingOauthClient
         
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'oauth-clients', oc_id]))
 
     def create(self, service_provider, name, http_url, api_url, oauth_token_string, **kwargs):
@@ -67,7 +67,7 @@ class OauthClients:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url='/'.join([
+        return self._requestor.post(url='/'.join([
             self.oc_endpoint]), payload=payload)
 
 
@@ -91,7 +91,7 @@ class OauthClients:
         data['attributes'] = attributes
         payload['data'] = data
 
-        return self.client._requestor.patch(url='/'.join([
+        return self._requestor.patch(url='/'.join([
             self.oc_endpoint]), payload=payload)
 
     def delete(self, name):
@@ -100,5 +100,5 @@ class OauthClients:
         """
         oc_id = self._get_oc_id(name=name)
         
-        return self.client._requestor.delete(url='/'.join([
+        return self._requestor.delete(url='/'.join([
             self.client._base_uri_v2, 'oauth-clients', oc_id]))

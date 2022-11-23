@@ -39,7 +39,7 @@ class RunTasks:
         """
         # TODO:
         # validate filters is `workspace_tasks` or `workspace_tasks.workspace`
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'organizations', self.client.org, 'tasks']), include=include,
             page_number=page_number, page_size=page_size)
     
@@ -54,7 +54,7 @@ class RunTasks:
         """
         # TODO:
         # validate filters is `workspace_tasks` or `workspace_tasks.workspace`
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'tasks', task_id]), include=include)
         
     def update(self, task_id, **kwargs):
@@ -67,7 +67,7 @@ class RunTasks:
         """
         DELETE /tasks/:id
         """
-        return self.client._requestor.delete(url='/'.join([self._base_api_url,
+        return self._requestor.delete(url='/'.join([self._base_api_url,
             'tasks', task_id]))
         
     def associate_to_ws(self, task_id, ws_id=None):
@@ -92,7 +92,7 @@ class RunTasks:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'tasks']), page_number=page_number,
             page_size=page_size)
 
@@ -107,7 +107,7 @@ class RunTasks:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'tasks', task_id]))
 
     def update_for_ws(self, ws_id=None):
@@ -134,5 +134,5 @@ class RunTasks:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.delete(url='/'.join([self._base_api_url,
+        return self._requestor.delete(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'tasks', task_id]))

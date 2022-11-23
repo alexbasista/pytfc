@@ -42,7 +42,7 @@ class ConfigurationVersions:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'configuration-versions']),
             page_number=page_number, page_size=page_size)
 
@@ -64,14 +64,14 @@ class ConfigurationVersions:
         """
         GET /configuration-versions/:configuration-id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'configuration-versions', cv_id]))
 
     def show_commit_info(self, cv_id):
         """
         GET /configuration-versions/:configuration-id/ingress-attributes
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2,'configuration-versions', cv_id,
             'ingress-attributes']))
 
@@ -119,7 +119,7 @@ class ConfigurationVersions:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'configuration-versions']), payload=payload)
 
     def _create_tf_tarball(self, source_dir, dest_dir='./'):

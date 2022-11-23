@@ -67,7 +67,7 @@ class WorkspaceVariables:
         data['attributes'] = attributes
         payload['data'] = data
 
-        return self.client._requestor.post(url = '/'.join([
+        return self._requestor.post(url = '/'.join([
             self.client._base_uri_v2, 'workspaces', ws_id, 'vars']),
             payload=payload)
 
@@ -82,7 +82,7 @@ class WorkspaceVariables:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url = '/'.join([
+        return self._requestor.get(url = '/'.join([
             self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
     
     def list_all(self, ws_id=None):
@@ -101,7 +101,7 @@ class WorkspaceVariables:
         else:
             raise MissingWorkspace
         
-        return self.client._requestor._list_all(url='/'.join([
+        return self._requestor._list_all(url='/'.join([
             self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
 
     def update(self, var_name=None, var_id=None, ws_id=None):

@@ -39,7 +39,7 @@ class TeamAccess:
             f'[workspace][id]={ws_id}'
         ]
 
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'team-workspaces']),
             filters=filters, page_number=page_number,
             page_size=page_size)
@@ -67,7 +67,7 @@ class TeamAccess:
             f'[workspace][id]={ws_id}'
         ]
 
-        return self.client._requestor._list_all(url='/'.join([
+        return self._requestor._list_all(url='/'.join([
             self.client._base_uri_v2, 'team-workspaces']), filters=filters)
             
 
@@ -75,7 +75,7 @@ class TeamAccess:
         """
         GET /team-workspaces/:id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'team-workspaces', tws_id]))
 
     def add(self, access, runs=None, variables=None, state_versions=None,
@@ -113,5 +113,5 @@ class TeamAccess:
         """
         DELETE /team-workspaces/:id
         """
-        return self.client._requestor.delete(url='/'.join([
+        return self._requestor.delete(url='/'.join([
             self.client._base_uri_v2, 'team-workspaces', tws_id]))

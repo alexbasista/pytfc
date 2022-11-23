@@ -17,7 +17,7 @@ class RegistryModules:
         """
         GET /organizations/:organization_name/registry-module
         """             
-        return self.client._requestor.get(url=self._rm_endpoint,
+        return self._requestor.get(url=self._rm_endpoint,
             page_number=page_number, page_size=page_size, filters=filters)
 
     def list_all(self, filters=None):
@@ -29,7 +29,7 @@ class RegistryModules:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """             
-        return self.client._requestor._list_all(url=self._rm_endpoint,
+        return self._requestor._list_all(url=self._rm_endpoint,
             filters=filters)
 
     def publish_from_vcs(self):
@@ -68,7 +68,7 @@ class RegistryModules:
             provider
         ])
 
-        return self.client._requestor.get(url=url)
+        return self._requestor.get(url=url)
 
     def delete(self, name, namespace, provider, registry_name='private', version=None):
         """

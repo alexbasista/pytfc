@@ -30,7 +30,7 @@ class Teams:
         # TODO:
         # validate `include` is either `users` or `organization-memberships`
         
-        return self.client._requestor.get(url=self._teams_ep,
+        return self._requestor.get(url=self._teams_ep,
             page_number=page_number, page_size=page_size,
             filters=filters, include=include)
     
@@ -56,7 +56,7 @@ class Teams:
         # TODO:
         # validate `include` is either `users` or `organization-memberships`
 
-        return self.client._requestor._list_all(url=self._teams_ep,
+        return self._requestor._list_all(url=self._teams_ep,
              filters=filters, include=include)
 
     def create(self):
@@ -69,7 +69,7 @@ class Teams:
         """
         GET /teams/:team_id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'teams', team_id]), include=include)
     
     def update(self, team_id):

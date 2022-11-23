@@ -33,7 +33,7 @@ class WorkspaceResources:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'resources']), page_number=page_number,
             page_size=page_size)
 
@@ -53,5 +53,5 @@ class WorkspaceResources:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor._list_all(url='/'.join([self._base_api_url,
+        return self._requestor._list_all(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'resources']))

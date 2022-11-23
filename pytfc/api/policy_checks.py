@@ -1,23 +1,21 @@
 """
 Module for TFC/E Policy Checks API endpoint.
 """
+from pytfc.tfc_api_base import TfcApiBase
 from pytfc.exceptions import InvalidQueryParam
 
 
-class PolicyChecks:
+class PolicyChecks(TfcApiBase):
     """
     TFC/E Policy Checks methods.
     """
-    def __init__(self, client):
-        self.client = client
-
     def list(self, run_id, page_number=None, page_size=None):
         """
         GET /runs/:run_id/policy-checks
         """
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'runs', run_id, 'policy-checks']),
-            page_number=page_number, page_size=page_size)
+        path = f'/runs/{run_id}/policy-checks'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size)
     
     def show(self, polchk_id, include=None):
         """
@@ -26,18 +24,16 @@ class PolicyChecks:
         if include is not None:
             if include not in ['run', 'run.workspace']:
                 raise InvalidQueryParam
-        
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'policy-checks', polchk_id]),
-            include=include)
+
+        path = f'/policy-checks/{polchk_id}'
+        return self._requestor.get(path=path, include=include)
     
     def override(self, polchk_id):
         """
         POST /policy-checks/:id/actions/override
         """
-        return self.client._requestor.post(url='/'.join([
-            self.client._base_uri_v2, 'policy-checks', polchk_id,
-            'actions', 'override']))
+        path = f'/policy-checks/{polchk_id}/actions/override'
+        return self._requestor.post(path=path, payload=None)
 
     def show_outcome(self):
         """
@@ -63,5 +59,5 @@ class PolicyChecks:
         """
         GET /policy-set-outcomes/:policy_set_outcome_id
         """
-        return self.client._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'policy-set-outcomes', pso_id]))
+        path = f'/policy-set-outcomes/{pso_id}'
+        return self._requestor.get(path=path)

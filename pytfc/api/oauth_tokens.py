@@ -23,14 +23,14 @@ class OauthTokens:
         """
         oc_id = self.oauth_clients._get_oc_id(name=oauth_client_name)
         
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'oauth-clients', oc_id, 'oauth-tokens']))
 
     def show(self, oauth_token_id):
         """
         GET /oauth-tokens/:id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.oauth_tokens_endpoint, oauth_token_id]))
 
     def update(self, oauth_token_id, **kwargs):
@@ -47,7 +47,7 @@ class OauthTokens:
         data['attributes'] = attributes
         payload['data'] = data
         
-        return self.client._requestor.patch(url='/'.join([
+        return self._requestor.patch(url='/'.join([
             self.oauth_tokens_endpoint, oauth_token_id]),
             payload=payload)
 
@@ -57,5 +57,5 @@ class OauthTokens:
 
         Equivalent to revoking connection from TFC/E Org to VCS Provider.
         """
-        return self.client._requestor.delete(url='/'.join([
+        return self._requestor.delete(url='/'.join([
             self.oauth_tokens_endpoint, oauth_token_id]))

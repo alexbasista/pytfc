@@ -57,7 +57,7 @@ class StateVersions:
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self.client._requestor.post(url=url, payload=payload)
+        return self._requestor.post(url=url, payload=payload)
 
     def list(self, page_number=None, page_size=None, include=None, ws=None):
         """
@@ -76,7 +76,7 @@ class StateVersions:
             f'[organization][name]={self.client.org}'
         ]
 
-        return self.client._requestor.get(url=base_url, filters=filters,
+        return self._requestor.get(url=base_url, filters=filters,
             page_number=page_number, page_size=page_size, include=include)
 
     def list_all(self, include=None, ws=None):
@@ -101,7 +101,7 @@ class StateVersions:
             f'[organization][name]={self.client.org}'
         ]
 
-        return self.client._requestor._list_all(url=base_url, filters=filters,
+        return self._requestor._list_all(url=base_url, filters=filters,
             include=include)
 
     def get_current(self, include=None, ws_id=None):
@@ -115,14 +115,14 @@ class StateVersions:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'current-state-version']), include=include)
     
     def show(self, sv_id, include=None):
         """
         GET /state-versions/:state_version_id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'state-versions', sv_id]),
             include=include)
     

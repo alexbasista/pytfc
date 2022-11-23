@@ -47,7 +47,7 @@ class NotificationConfigurations:
         else:
             raise MissingWorkspace
 
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'notification-configurations']),
             page_number=page_number, page_size=page_size)
     
@@ -55,7 +55,7 @@ class NotificationConfigurations:
         """
         GET /notification-configurations/:notification-configuration-id
         """
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'notification-configurations', nc_id]))
     
     def update(self, nc_id):
@@ -74,5 +74,5 @@ class NotificationConfigurations:
         """
         DELETE /notification-configurations/:notification-configuration-id
         """
-        return self.client._requestor.delete(url='/'.join([self._base_api_url,
+        return self._requestor.delete(url='/'.join([self._base_api_url,
             'notification-configurations', nc_id]))

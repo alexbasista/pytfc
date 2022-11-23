@@ -10,6 +10,7 @@ import sys
 from pytfc.requestor import Requestor
 from pytfc.utils import DEFAULT_LOG_LEVEL
 from pytfc.exceptions import MissingToken
+from pytfc.exceptions import MissingOrganization
 from pytfc import api
 from pytfc import admin_api
 
@@ -26,10 +27,10 @@ class Client:
         'admin_terraform_versions': admin_api.AdminTerraformVersions,
         'admin_users': admin_api.AdminUsers,
         'admin_workspaces': admin_api.AdminWorkspaces,
-        # 'policy_checks': PolicyChecks,
-         'organizations': api.Organizations,
-        # #'team_membership': TeamMembership, # under construction
-        # 'team_tokens': TeamTokens
+        'organizations': api.Organizations,
+        'policy_checks': api.PolicyChecks,
+        'team_membership': api.TeamMembership,
+        'team_tokens': api.TeamTokens
     }
 
     _org_required_classes = {
@@ -87,28 +88,26 @@ class Client:
         )
         
         self.org = org
-        #self.ws = ws
-        #self.ws_id = (self._get_ws_id(self.ws)) if self.org and self.ws else None
-
-        ws_id = (self._get_ws_id(ws)) if org and ws else None
+        self.ws = ws
+        self.ws_id = (self._get_ws_id(ws)) if org and ws else None
 
         self._logger.debug("Initializing API classes that do not"
                            " require an `org` to be set...")
         self._init_api_classes(
-            self._no_org_required_classes,
-            org,
-            ws,
-            ws_id
+            classes_dict=self._no_org_required_classes,
+            org=org,
+            ws=ws,
+            ws_id=self.ws_id
         )
         
         self._logger.debug("Initializing API classes that"
                            " require an `org` to be set...")
         if org is not None:
             self._init_api_classes(
-                self._org_required_classes,
-                org,
-                ws,
-                ws_id
+                classes_dict=self._org_required_classes,
+                org=org,
+                ws=ws,
+                ws_id=self.ws_id
             )
 
     # @property
@@ -127,6 +126,19 @@ class Client:
         """
         Initialize all supported API endpoint classes.
         """
+        if org is None:
+            org = self.org
+
+        # Leaving these lines commented means any pre-existing Workspace
+        # attributes (`ws` and `ws_id` will be unset when set_org() is called.
+        # TODO:
+        # Remove these lines
+        # if ws is None:
+        #     ws = self.ws
+        
+        # if ws_id is None:
+        #     ws_id = self.ws_id
+
         for cls_name in classes_dict:
             cls = classes_dict[cls_name]
             initialized_cls = cls(
@@ -145,8 +157,11 @@ class Client:
         Sets Organization (as `org`) on Client object
         and re-initializes all API endpoint classes
         that require an `org` to be set.
+
+        Using this method will unset any pre-existing
+        Workspace attributes on the Client object.
         """
-        self._logger.debug(f"Setting `org` on client to {name}.")
+        self._logger.debug(f"Setting `org` attribute on client to `{name}`.")
         self.__setattr__('org', name)
         self._init_api_classes(
             classes_dict=self._org_required_classes,
@@ -159,13 +174,19 @@ class Client:
         re-initializes all API endpoint classes that
         require an `org` to be set.
         """
-        self._logger.debug(f"Setting `ws` on client to {name}.")
+        if not self.org:
+            self._logger.error("Cannot set a Workspace on client without an"
+                               " Organization (`org`) having already been set.")
+            raise MissingOrganization
+
+        self._logger.debug(f"Setting `ws` attribute on client to `{name}`.")
         ws_id = self._get_ws_id(name)
-        self._logger.debug(f"Setting `ws_id` on client to {ws_id}.")
+        self._logger.debug(f"Setting `ws_id` attribute on client to `{ws_id}`.")
         self.__setattr__('ws', name)
         self.__setattr__('ws_id', ws_id)
         self._init_api_classes(
             classes_dict=self._org_required_classes,
+            org=self.org,
             ws=name,
             ws_id=ws_id
         )

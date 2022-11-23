@@ -81,7 +81,7 @@ class Runs:
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self.client._requestor.post(url='/'.join([
+        return self._requestor.post(url='/'.join([
             self.client._base_uri_v2, 'runs']), payload=payload)
 
     def apply(self, run_id=None, commit_message=None, comment='Applied by pytfc'):
@@ -100,7 +100,7 @@ class Runs:
         payload = {}
         payload['comment'] = comment
         
-        return self.client._requestor.post(url='/'.join([
+        return self._requestor.post(url='/'.join([
             self.client._base_uri_v2, 'runs', run_id, 'actions', 'apply']),
             payload=payload)
 
@@ -116,7 +116,7 @@ class Runs:
         else:
             raise MissingWorkspace
         
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
             'workspaces', ws_id, 'runs']), page_number=page_number,
             page_size=page_size, filters=filters, search=search)
 
@@ -132,7 +132,7 @@ class Runs:
         else:
             raise MissingRun
         
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
             'runs', run_id]))
 
     def discard(self, run_id=None, commit_message=None,
@@ -150,7 +150,7 @@ class Runs:
         payload = {}
         payload['comment'] = comment
 
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'discard']))
 
     def cancel(self, run_id=None, commit_message=None,
@@ -168,7 +168,7 @@ class Runs:
         payload = {}
         payload['comment'] = comment
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'cancel']))
 
     def force_cancel(self, run_id=None, commit_message=None,
@@ -186,7 +186,7 @@ class Runs:
         payload = {}
         payload['comment'] = comment
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'force-cancel']))
 
     def force_execute(self, run_id=None, commit_message=None):
@@ -200,14 +200,14 @@ class Runs:
         else:
             raise MissingRun
         
-        return self.client._requestor.post(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'actions', 'force-execute']))
     
     def get_plan_json_output(self, run_id):
         """
         GET /runs/:id/plan/json-output
         """
-        return self.client._requestor.get(url='/'.join([self.client._base_uri_v2,
+        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
             'runs', run_id, 'plan', 'json-output']))
     
     def _get_run_id_by_commit(self, commit_message, ws_id=None):

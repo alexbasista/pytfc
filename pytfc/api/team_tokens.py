@@ -1,27 +1,23 @@
 """
 Module for TFC/E Team Tokens API endpoint.
 """
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class TeamTokens:
+class TeamTokens(TfcApiBase):
     """
     TFC/E Team Tokens methods.
     """
-    def __init__(self, client):
-        self.client = client
-    
     def generate_new(self, team_id):
         """
         POST /teams/:team_id/authentication-token
         """
-        return self.client._requestor.post(url='/'.join([
-            self.client._base_uri_v2, 'teams', team_id,
-            'authentication-token']), payload=None)
+        path = f'/teams/{team_id}/authentication-token'
+        return self._requestor.post(path=path, payload=None)
     
     def delete(self, team_id):
         """
         DELETE /teams/:team_id/authentication-token
         """
-        return self.client._requestor.delete(url='/'.join([
-            self.client._base_uri_v2, 'teams', team_id,
-            'authentication-token']))
+        path = f'/teams/{team_id}/authentication-token'
+        return self._requestor.delete(path=path)

@@ -27,7 +27,7 @@ class RunTaskStages:
         """
         GET /runs/:run_id/task-stages
         """
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'runs', run_id, 'task-stages']), page_number=page_number,
             page_size=page_size, include=include)
 
@@ -35,12 +35,12 @@ class RunTaskStages:
         """
         GET /task-stages/:task_stage_id
         """
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'task-stages', task_stage_id]), include=include)
     
     def show_result(self, task_result_id, include=None):
         """
         GET /task-results/:task_result_id
         """
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'task-results', task_result_id]), include=include)

@@ -1,15 +1,13 @@
 """
 Module for TFC/E Team Membership API endpoint.
 """
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class TeamMembership:
+class TeamMembership(TfcApiBase):
     """
     TFC/E Team Membership methods.
     """
-    def __init__(self, client):
-        self.client = client
-    
     def add_user_with_user_id(self, team_id):
         """
         POST /teams/:team_id/relationships/users

@@ -15,5 +15,5 @@ class Applies:
         """
         GET /applies/:id
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.client._base_uri_v2, 'applies', apply_id]))

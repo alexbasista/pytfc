@@ -63,7 +63,7 @@ class RunTriggers:
 
         # TODO:
         # validate include is either `workspace` or `sourceable`
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'workspaces', ws_id, 'run-triggers']), filters=filters,
             page_number=page_number, page_size=page_size, include=include)
         
@@ -71,12 +71,12 @@ class RunTriggers:
         """
         GET /run-triggers/:run_trigger_id
         """
-        return self.client._requestor.get(url='/'.join([self._base_api_url,
+        return self._requestor.get(url='/'.join([self._base_api_url,
             'run-triggers', rt_id]), include=include)
     
     def delete(self, rt_id):
         """
         DELETE /run-triggers/:run_trigger_id
         """
-        return self.client._requestor.delete(url='/'.join([self._base_api_url,
+        return self._requestor.delete(url='/'.join([self._base_api_url,
             'run-triggers', rt_id]))

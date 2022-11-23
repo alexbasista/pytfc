@@ -22,7 +22,7 @@ class AgentPools:
             if include != 'workspaces':
                 raise InvalidQueryParam
         
-        return self.client._requestor.get(url=base_url, include=include)
+        return self._requestor.get(url=base_url, include=include)
     
     def list_agents(self, agent_pool_id):
         """
@@ -41,7 +41,7 @@ class AgentPools:
             if include != 'workspaces':
                 raise InvalidQueryParam            
         
-        return self.client._requestor.get(url=base_url, include=include)
+        return self._requestor.get(url=base_url, include=include)
 
     def show_agent(self, agent_id):
         """
@@ -81,7 +81,7 @@ class AgentPools:
         url = '/'.join([self.client._base_uri_v2, 'agent-pools',
             agent_pool_id])
         
-        ap = self.client._requestor.get(url=url)
+        ap = self._requestor.get(url=url)
 
         ws_list = []
         for ws in ap.json()['data']['relationships']['workspaces']['data']:

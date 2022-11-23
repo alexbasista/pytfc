@@ -38,7 +38,7 @@ class PlanExports:
         """
         GET /plan-exports/:id/download
         """
-        return self.client._requestor.get(url='/'.join([
+        return self._requestor.get(url='/'.join([
             self.pe_endpoint, pe_id, 'download'])).url
     
     def create(self, plan_id):
@@ -61,7 +61,7 @@ class PlanExports:
         data['relationships'] = relationships
         payload['data'] = data
 
-        pe = self.client._requestor.post(url=self.pe_endpoint, payload=payload)
+        pe = self._requestor.post(url=self.pe_endpoint, payload=payload)
         self._logger.info(\
             f"Plan Export `{pe.json()['data']['id']}` has been created.")
 
@@ -71,7 +71,7 @@ class PlanExports:
         """
         GET /plan-exports/:id
         """
-        return self.client._requestor.get(url='/'.join([self.pe_endpoint, pe_id]))
+        return self._requestor.get(url='/'.join([self.pe_endpoint, pe_id]))
 
     def _extract_tarball(self, filepath, dest_folder):
         tarball = tarfile.open(filepath, 'r:gz')
@@ -131,7 +131,7 @@ class PlanExports:
         """
         DELETE /plan-exports/:id
         """
-        return self.client._requestor.delete(url='/'.join([
+        return self._requestor.delete(url='/'.join([
             self.pe_endpoint, pe_id]))
     
 

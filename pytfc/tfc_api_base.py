@@ -20,7 +20,7 @@ class TfcApiBase:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._logger.setLevel(log_level)
         self._logger.addHandler(logging.StreamHandler(sys.stdout))
-        
+
         self._requestor = requestor
         self.org = org
         self.ws = ws
