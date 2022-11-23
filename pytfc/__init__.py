@@ -39,6 +39,7 @@ class Client:
         'configuration_versions': api.ConfigurationVersions,
         'notification_configurations': api.NotificationConfigurations,
         'oauth_clients': api.OauthClients,
+        'oauth_tokens': api.OauthTokens,
         'workspaces': api.Workspaces,
     }
 

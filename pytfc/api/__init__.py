@@ -3,6 +3,7 @@ from .applies import Applies
 from .configuration_versions import ConfigurationVersions
 from .notification_configurations import NotificationConfigurations
 from .oauth_clients import OauthClients
+from .oauth_tokens import OauthTokens
 
 from .organizations import Organizations
 from .policy_checks import PolicyChecks
