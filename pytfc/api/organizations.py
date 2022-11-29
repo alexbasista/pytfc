@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Organization API endpoint.
-"""
+"""TFC/E Organization API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 
 

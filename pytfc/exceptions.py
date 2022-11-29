@@ -1,6 +1,4 @@
-"""
-Module for custom pytfc exceptions.
-"""
+"""Module for custom pytfc exceptions."""
 
 
 class Error(Exception):
@@ -50,4 +48,9 @@ class ConfigurationVersionUploadError(Exception):
 
 class InvalidQueryParam(Exception):
     """Unsupported value for query parameter."""
+    pass
+
+
+class PlanExportDownloadError(Exception):
+    """Error downloading Plan Export"""
     pass

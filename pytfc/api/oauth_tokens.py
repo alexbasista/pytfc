@@ -1,6 +1,5 @@
 """TFC/E OAuth Tokens API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
-from .oauth_clients import OauthClients
 
 
 class OauthTokens(TfcApiBase):

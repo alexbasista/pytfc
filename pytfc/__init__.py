@@ -40,6 +40,9 @@ class Client:
         'notification_configurations': api.NotificationConfigurations,
         'oauth_clients': api.OauthClients,
         'oauth_tokens': api.OauthTokens,
+        'plan_exports': api.PlanExports,
+        'plans': api.Plans,
+        'runs': api.Runs,
         'workspaces': api.Workspaces,
     }
 

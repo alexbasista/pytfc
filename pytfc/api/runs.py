@@ -1,31 +1,30 @@
-"""
-Module for TFC/E Runs API endpoint.
-"""
+"""TFC/E Runs API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
 from .configuration_versions import ConfigurationVersions
 from pytfc.exceptions import MissingWorkspace
 from pytfc.exceptions import MissingRun
 
 
-class Runs:
+class Runs(TfcApiBase):
     """
     TFC/E Runs methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._logger = client._logger
+    # def __init__(self, client, **kwargs):
+    #     self.client = client
+    #     self._logger = client._logger
         
-        if kwargs.get('ws_id'):
-            self.ws_id = kwargs.get('ws_id')
-            self.ws = self.client.workspaces.get_ws_name(ws_id=self.ws_id)
-        elif kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
+    #     if kwargs.get('ws_id'):
+    #         self.ws_id = kwargs.get('ws_id')
+    #         self.ws = self.client.workspaces.get_ws_name(ws_id=self.ws_id)
+    #     elif kwargs.get('ws'):
+    #         self.ws = kwargs.get('ws')
+    #         self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
+    #     elif self.client.ws and self.client.ws_id:
+    #         self.ws = self.client.ws
+    #         self.ws_id = self.client.ws_id
+    #     else:
+    #         self.ws = None
+    #         self.ws_id = None
     
     def create(self, auto_apply=None, is_destroy=False, message='Queued by pytfc',
                 refresh=True, refresh_only=False, replace_addrs=None,
@@ -132,8 +131,8 @@ class Runs:
         else:
             raise MissingRun
         
-        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id]))
+        path = f'/runs/{run_id}'
+        return self._requestor.get(path=path)
 
     def discard(self, run_id=None, commit_message=None,
             comment='Discarded by pytfc'):

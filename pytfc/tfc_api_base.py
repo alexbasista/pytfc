@@ -1,7 +1,7 @@
 """Base module used by all pytfc api 'child' modules."""
 import logging
 import sys
-from abc import ABCMeta, ABC
+from abc import ABCMeta
 
 #logger = logging.getLogger(__name__)
 
@@ -25,3 +25,4 @@ class TfcApiBase:
         self.org = org
         self.ws = ws
         self.ws_id = ws_id
+        self.log_level = log_level
