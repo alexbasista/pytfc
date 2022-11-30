@@ -1,5 +1,5 @@
 """
-Module for TFE Admin Organizations API endpoint.
+TFE Admin Organizations API endpoints module.
 For Terraform Enterprise only.
 """
 from pytfc.tfc_api_base import TfcApiBase

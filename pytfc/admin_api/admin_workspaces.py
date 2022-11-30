@@ -1,5 +1,5 @@
 """
-Module for TFE Admin Workspaces API endpoints.
+TFE Admin Workspaces API endpoints module.
 For Terraform Enterprise only.
 """
 from pytfc.tfc_api_base import TfcApiBase

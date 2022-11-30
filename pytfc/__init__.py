@@ -1,4 +1,3 @@
-#from .client import Client
 """
 Entry-point module to instantiate an API client object to
 interface with the supported TFC/E API endpoints and resources.

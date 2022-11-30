@@ -1,5 +1,5 @@
 """
-Module for TFE Admin Settings API endpoints.
+TFE Admin Settings API endpoints module.
 For Terraform Enterprise only.
 """
 from pytfc.tfc_api_base import TfcApiBase
