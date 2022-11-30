@@ -19,4 +19,5 @@ from .team_access import TeamAccess
 from .team_membership import TeamMembership
 from .team_tokens import TeamTokens
 from .teams import Teams
+from .variable_sets import VariableSets
 from .workspaces import Workspaces

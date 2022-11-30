@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Team Membership API endpoint.
-"""
+"""TFC/E Team Membership API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 
 

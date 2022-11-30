@@ -1,8 +1,5 @@
-"""
-Module for TFC/E Run Tasks API endpoints.
-"""
+"""TFC/E Run Tasks API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
-from pytfc.exceptions import MissingWorkspace
 from pytfc.utils import validate_ws_id_is_set
 
 

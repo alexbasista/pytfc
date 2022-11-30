@@ -51,6 +51,7 @@ class Client:
         'state_versions': api.StateVersions,
         'team_access': api.TeamAccess,
         'teams': api.Teams,
+        'variable_sets': api.VariableSets,
         'workspaces': api.Workspaces,
     }
 

@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Policy Checks API endpoint.
-"""
+"""TFC/E Policy Checks API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 from pytfc.exceptions import InvalidQueryParam
 
