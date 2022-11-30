@@ -1,24 +1,18 @@
-"""
-Module for TFC/E Registry Modules API endpoint.
-"""
+"""TFC/E Registry Modules API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
 
 
-class RegistryModules:
+class RegistryModules(TfcApiBase):
     """
     TFC/E Registry Modules methods.
     """
-    def __init__(self, client):
-        self.client = client
-
-        self._rm_endpoint = '/'.join([self.client._base_uri_v2,
-            'organizations', self.client.org, 'registry-modules'])
-
     def list(self, page_number=None, page_size=None, filters=None):
         """
         GET /organizations/:organization_name/registry-module
         """             
-        return self._requestor.get(url=self._rm_endpoint,
-            page_number=page_number, page_size=page_size, filters=filters)
+        path = f'/organizations/{self.org}/registry-modules'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size, filters=filters)
 
     def list_all(self, filters=None):
         """
@@ -29,8 +23,8 @@ class RegistryModules:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """             
-        return self._requestor._list_all(url=self._rm_endpoint,
-            filters=filters)
+        path = f'/organizations/{self.org}/registry-modules'
+        return self._requestor._list_all(path=path, filters=filters)
 
     def publish_from_vcs(self):
         """
@@ -60,17 +54,19 @@ class RegistryModules:
         """
         GET /organizations/:organization_name/registry-modules/:registry_name/:namespace/:name/:provider
         """
-        url = '/'.join([
-            self._rm_endpoint,
+        path = '/'.join([
+            '/organizations',
+            self.org,
+            'registry-modules',
             registry_name,
             namespace,
             name,
             provider
         ])
+        return self._requestor.get(path=path)
 
-        return self._requestor.get(url=url)
-
-    def delete(self, name, namespace, provider, registry_name='private', version=None):
+    def delete(self, name, namespace, provider,
+               registry_name='private', version=None):
         """
         DELETE /organizations/:organization_name/registry-modules/:registry_name/:namespace/:name
         DELETE /organizations/:organization_name/registry-modules/:registry_name/:namespace/:name/:provider
