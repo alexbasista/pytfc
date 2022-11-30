@@ -70,9 +70,6 @@ class AgentPools(TfcApiBase):
         Utility method to list all Workspaces
         associated with an Agent Pool.
         """
-        url = '/'.join([self.client._base_uri_v2, 'agent-pools',
-            agent_pool_id])
-        
         path = f'/agent-pools/{agent_pool_id}'
         ap = self._requestor.get(path=path)
 

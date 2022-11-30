@@ -8,13 +8,7 @@ from pytfc.tfc_api_base import TfcApiBase
 class AdminOrganizations(TfcApiBase):
     """
     TFE Admin Organizations methods.
-    """
-    # def __init__(self, client):
-    #     self.client = client
-    #     self._logger = client._logger
-    #     self.ao_endpoint = '/'.join([self.client._base_uri_v2, 'admin',
-    #         'organizations'])
-    
+    """    
     def list(self, query=None, filters=None, page_number=None,
              page_size=None, include=None):
         """

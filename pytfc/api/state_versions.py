@@ -47,7 +47,7 @@ class StateVersions(TfcApiBase):
 
         filters = [
             f'[workspace][name]={ws}',
-            f'[organization][name]={self.client.org}'
+            f'[organization][name]={self.org}'
         ]
 
         return self._requestor.get(path='/state-versions', filters=filters,
@@ -68,7 +68,7 @@ class StateVersions(TfcApiBase):
         
         filters = [
             f'[workspace][name]={ws}',
-            f'[organization][name]={self.client.org}'
+            f'[organization][name]={self.org}'
         ]
 
         return self._requestor.list_all(path='/state-versions',
