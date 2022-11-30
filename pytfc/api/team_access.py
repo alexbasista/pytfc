@@ -1,26 +1,13 @@
-"""
-Module for TFC/E Team Access API endpoint.
-"""
-from pytfc.exceptions import MissingWorkspace
+"""TFC/E Team Access API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
+from pytfc.utils import validate_ws_id_is_set
 
 
-class TeamAccess:
+class TeamAccess(TfcApiBase):
     """
     TFC/E Team Access methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
-    
+    @validate_ws_id_is_set
     def list(self, ws_id=None, page_number=None, page_size=None):
         """
         GET /team-workspaces
@@ -28,22 +15,16 @@ class TeamAccess:
         Required Query Parameters:
         filter[workspace][id]
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
         filters = [
             f'[workspace][id]={ws_id}'
         ]
 
-        return self._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'team-workspaces']),
-            filters=filters, page_number=page_number,
-            page_size=page_size)
-    
+        return self._requestor.get(path='team-workspaces', filters=filters,
+                                   page_number=page_number, page_size=page_size)
+
+    @validate_ws_id_is_set
     def list_all(self, ws_id=None):
         """
         GET /team-workspaces
@@ -56,39 +37,29 @@ class TeamAccess:
         Required Query Parameters:
         filter[workspace][id]
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-        
+        ws_id = ws_id if ws_id else self.ws_id
+
         filters = [
             f'[workspace][id]={ws_id}'
         ]
 
-        return self._requestor._list_all(url='/'.join([
-            self.client._base_uri_v2, 'team-workspaces']), filters=filters)
-            
+        return self._requestor._list_all(path='team-workspaces', filters=filters)
 
     def show(self, tws_id):
         """
         GET /team-workspaces/:id
         """
-        return self._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'team-workspaces', tws_id]))
+        path = f'/team-workspaces/{tws_id}'
+        return self._requestor.get(path=path)
 
+    @validate_ws_id_is_set
     def add(self, access, runs=None, variables=None, state_versions=None,
-            sentinel_mocks=None, workspace_locking=None, run_taks=None, ws_id=None):
+            sentinel_mocks=None, workspace_locking=None, run_taks=None,
+            ws_id=None):
         """
         POST /team-workspaces
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
         valid_access = [
             'read',
@@ -101,17 +72,17 @@ class TeamAccess:
         if access not in valid_access:
             raise ValueError
         
-        print('the rest coming soon')
-        
+        print('coming soon')
+
     def update(self):
         """
         PATCH /team-workspaces/:id
         """
         print('coming soon')
-    
+
     def delete(self, tws_id):
         """
         DELETE /team-workspaces/:id
         """
-        return self._requestor.delete(url='/'.join([
-            self.client._base_uri_v2, 'team-workspaces', tws_id]))
+        path = f'/team-workspaces/{tws_id}'
+        return self._requestor.delete(path=path)

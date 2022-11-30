@@ -23,7 +23,7 @@ class VariableSets:
             self.ws_id = None
     
     def create(self, name, description=None, is_global=False, workspaces=None,
-                vars=None):
+               vars=None):
         """
         POST organizations/:organization_name/varsets
         """
