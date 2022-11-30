@@ -1,40 +1,21 @@
-"""
-Module for TFC/E Workspace Variables API  endpoint.
-"""
+"""TFC/E Workspace Variables API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
+from pytfc.utils import validate_ws_id_is_set
 import json
 import hcl as pyhcl
-from pytfc.exceptions import MissingWorkspace
 
 
-class WorkspaceVariables:
+class WorkspaceVariables(TfcApiBase):
     """ 
     TFC/E Workspace Variables methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._logger = client._logger
-        
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
-
+    @validate_ws_id_is_set
     def create(self, key, value, description=None, category='terraform',
-        hcl='false', sensitive='false', ws_id=None):
+               hcl='false', sensitive='false', ws_id=None):
         """
         POST /workspaces/:workspace_id/vars
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
         if category not in ['terraform', 'env']:
             raise ValueError("[ERROR] '{}' is an invalid argument for 'category'.\
@@ -67,24 +48,20 @@ class WorkspaceVariables:
         data['attributes'] = attributes
         payload['data'] = data
 
-        return self._requestor.post(url = '/'.join([
-            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']),
-            payload=payload)
+        path = f'/workspaces/{ws_id}/vars'
+        return self._requestor.post(path=path, payload=payload)
 
+    @validate_ws_id_is_set
     def list(self, ws_id=None):
         """
         GET /workspaces/:workspace_id/vars
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
 
-        return self._requestor.get(url = '/'.join([
-            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
+        path = f'/workspaces/{ws_id}/vars'
+        return self._requestor.get(path=path)
     
+    @validate_ws_id_is_set
     def list_all(self, ws_id=None):
         """
         GET /workspaces/:workspace_id/vars
@@ -94,15 +71,10 @@ class WorkspaceVariables:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
-        return self._requestor._list_all(url='/'.join([
-            self.client._base_uri_v2, 'workspaces', ws_id, 'vars']))
+        path = f'/workspaces/{ws_id}/vars'
+        return self._requestor.list_all(path=path)
 
     def update(self, var_name=None, var_id=None, ws_id=None):
         """
@@ -110,23 +82,26 @@ class WorkspaceVariables:
         """
         print('coming soon')
 
+    @validate_ws_id_is_set
     def delete(self, var_name=None, var_id=None, ws_id=None):
         """
         DELETE /workspaces/:workspace_id/vars/:variable_id
         """
-        print('coming soon')
+        ws_id = ws_id if ws_id else self.ws_id
+        
+        # TODO:
+        # Add lookup for `var_name` to `var_id`
+        
+        path = f'/workspaces/{ws_id}/vars/{var_id}'
+        return self._requestor.delete(path=path)
 
+    @validate_ws_id_is_set
     def create_from_file(self, var_file, ws_id=None):
         """
         Method to create Workspace Variables from a terraform.tfvars
         filepath to provide an experience similar to Terraform OSS.
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
         try:
             with open(var_file, 'r') as fp:

@@ -52,6 +52,7 @@ class Client:
         'teams': api.Teams,
         'variable_sets': api.VariableSets,
         'workspaces': api.Workspaces,
+        'workspace_variables': api.WorkspaceVariables,
         'workspace_resources': api.WorkspaceResources,
     }
 
