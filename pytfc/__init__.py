@@ -44,6 +44,7 @@ class Client:
         'plans': api.Plans,
         'registry_modules': api.RegistryModules,
         'run_task_stages': api.RunTaskStages,
+        'run_tasks': api.RunTasks,
         'runs': api.Runs,
         'workspaces': api.Workspaces,
     }

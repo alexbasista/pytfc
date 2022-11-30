@@ -10,6 +10,7 @@ from .plans import Plans
 from .policy_checks import PolicyChecks
 from .registry_modules import RegistryModules
 from .run_task_stages import RunTaskStages
+from .run_tasks import RunTasks
 from .runs import Runs
 from .team_membership import TeamMembership
 from .team_tokens import TeamTokens

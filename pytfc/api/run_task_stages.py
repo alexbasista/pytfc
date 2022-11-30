@@ -1,6 +1,4 @@
-"""
-Module for TFC/E Run Task Stages API endpoints.
-"""
+"""TFC/E Run Task Stages API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 
 
