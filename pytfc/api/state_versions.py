@@ -71,7 +71,7 @@ class StateVersions(TfcApiBase):
             f'[organization][name]={self.client.org}'
         ]
 
-        return self._requestor._list_all(path='/state-versions',
+        return self._requestor.list_all(path='/state-versions',
                                          filters=filters, include=include)
 
     @validate_ws_id_is_set

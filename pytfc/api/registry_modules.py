@@ -24,7 +24,7 @@ class RegistryModules(TfcApiBase):
         Returns object (dict) with two arrays: `data` and `included`.
         """             
         path = f'/organizations/{self.org}/registry-modules'
-        return self._requestor._list_all(path=path, filters=filters)
+        return self._requestor.list_all(path=path, filters=filters)
 
     def publish_from_vcs(self):
         """

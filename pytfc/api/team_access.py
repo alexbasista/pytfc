@@ -43,7 +43,7 @@ class TeamAccess(TfcApiBase):
             f'[workspace][id]={ws_id}'
         ]
 
-        return self._requestor._list_all(path='team-workspaces', filters=filters)
+        return self._requestor.list_all(path='team-workspaces', filters=filters)
 
     def show(self, tws_id):
         """

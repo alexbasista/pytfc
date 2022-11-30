@@ -34,4 +34,4 @@ class WorkspaceResources(TfcApiBase):
         ws_id = ws_id if ws_id else self.ws_id
 
         path = f'/workspaces/{ws_id}/resources'
-        return self._requestor._list_all(path=path)
+        return self._requestor.list_all(path=path)

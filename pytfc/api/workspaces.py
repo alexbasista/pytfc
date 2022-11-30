@@ -243,7 +243,7 @@ class Workspaces(TfcApiBase):
         Returns object (dict) with two arrays: `data` and `included`.
         """
         path = f'/organizations/{self.org}/workspaces/'
-        return self._requestor._list_all(path=path, search=search,
+        return self._requestor.list_all(path=path, search=search,
                                          include=include)
 
     @utils.validate_ws_is_set

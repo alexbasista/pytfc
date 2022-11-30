@@ -51,7 +51,7 @@ class Teams(TfcApiBase):
         # validate `include` is either `users` or `organization-memberships`
 
         path = f'/organizations/{self.org}/teams'
-        return self._requestor._list_all(path=path, filters=filters,
+        return self._requestor.list_all(path=path, filters=filters,
                                          include=include)
 
     def create(self):
