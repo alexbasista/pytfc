@@ -42,6 +42,8 @@ class Client:
         'oauth_tokens': api.OauthTokens,
         'plan_exports': api.PlanExports,
         'plans': api.Plans,
+        'registry_modules': api.RegistryModules,
+        'run_task_stages': api.RunTaskStages,
         'runs': api.Runs,
         'workspaces': api.Workspaces,
     }
