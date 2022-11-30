@@ -34,9 +34,10 @@ class OauthClients(TfcApiBase):
         """
         GET /organizations/:organization_name/oauth-clients
         """
-        if include != 'oauth_tokens':
-            self._logger.error(f"`{include}` is invalid for 'include'."
-                               " Valid value: `oauth_tokens`.")
+        if include:
+            if include != 'oauth_tokens':
+                self._logger.error(f"`{include}` is invalid for 'include'."
+                                   " Valid value: `oauth_tokens`.")
         path = f'/organizations/{self.org}/oauth-clients'
         return self._requestor.get(path=path, page_number=page_number,
                                    page_size=page_size, include=include)
