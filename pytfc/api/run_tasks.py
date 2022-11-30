@@ -7,20 +7,6 @@ class RunTasks(TfcApiBase):
     """
     TFC/E Run Tasks methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._base_api_url = self.client._base_uri_v2
-
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
-
     def create(self, name, url, description, category, hmac_key, enabled=True):
         """
         POST /organizations/:organization_name/tasks

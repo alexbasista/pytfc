@@ -1,5 +1,4 @@
 #from .client import Client
-
 """
 Entry-point module to instantiate an API client object to
 interface with the supported TFC/E API endpoints and resources.
@@ -53,6 +52,7 @@ class Client:
         'teams': api.Teams,
         'variable_sets': api.VariableSets,
         'workspaces': api.Workspaces,
+        'workspace_resources': api.WorkspaceResources,
     }
 
     def __init__(

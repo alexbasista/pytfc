@@ -21,3 +21,4 @@ from .team_tokens import TeamTokens
 from .teams import Teams
 from .variable_sets import VariableSets
 from .workspaces import Workspaces
+from .workspace_resources import WorkspaceResources
