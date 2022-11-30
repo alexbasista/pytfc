@@ -1,41 +1,19 @@
-"""
-Module for TFC/E State Versions API endpoints.
-"""
+"""TFC/E State Versions API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
+from pytfc.utils import validate_ws_id_is_set, validate_ws_is_set
 from urllib import request
-from pytfc.exceptions import MissingWorkspace
 
 
-class StateVersions:
+class StateVersions(TfcApiBase):
     """
     TFC/E State Versions methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
-
+    @validate_ws_id_is_set
     def create(self, serial, md5, state, lineage=None, run_id=None, ws_id=None):
         """
         POST /workspaces/:workspace_id/state-versions
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-        
-        url = '/'.join([
-            self.client._base_uri_v2, 'workspaces', ws_id, 'state-versions'
-        ])
+        ws_id = ws_id if ws_id else self.ws_id
 
         payload = {}
         data = {}
@@ -57,28 +35,26 @@ class StateVersions:
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self._requestor.post(url=url, payload=payload)
+        path = f'/workspaces/{ws_id}/state-versions'
+        return self._requestor.post(path=path, payload=payload)
 
+    @validate_ws_is_set
     def list(self, page_number=None, page_size=None, include=None, ws=None):
         """
         GET /state-versions
         """
-        if ws is not None:
-            ws = ws
-        elif self.ws:
-            ws = self.ws
-        else:
-            raise MissingWorkspace
-        
-        base_url = '/'.join([self.client._base_uri_v2,'state-versions'])
+        ws = ws if ws else self.ws
+
         filters = [
             f'[workspace][name]={ws}',
             f'[organization][name]={self.client.org}'
         ]
 
-        return self._requestor.get(url=base_url, filters=filters,
-            page_number=page_number, page_size=page_size, include=include)
+        return self._requestor.get(path='/state-versions', filters=filters,
+                                   page_number=page_number, page_size=page_size,
+                                   include=include)
 
+    @validate_ws_is_set
     def list_all(self, include=None, ws=None):
         """
         GET /state-versions
@@ -88,45 +64,33 @@ class StateVersions:
 
         Returns object (dict) with two arrays: `data` and `included`.
         """
-        if ws is not None:
-            ws = ws
-        elif self.ws:
-            ws = self.ws
-        else:
-            raise MissingWorkspace
+        ws = ws if ws else self.ws
         
-        base_url = '/'.join([self.client._base_uri_v2,'state-versions'])
         filters = [
             f'[workspace][name]={ws}',
             f'[organization][name]={self.client.org}'
         ]
 
-        return self._requestor._list_all(url=base_url, filters=filters,
-            include=include)
+        return self._requestor._list_all(path='/state-versions',
+                                         filters=filters, include=include)
 
+    @validate_ws_id_is_set
     def get_current(self, include=None, ws_id=None):
         """
         GET /workspaces/:workspace_id/current-state-version
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-
-        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'current-state-version']), include=include)
+        ws_id = ws_id if ws_id else self.ws_id
+        path = f'/workspaces/{ws_id}/current-state-version'
+        return self._requestor.get(path=path, include=include)
     
     def show(self, sv_id, include=None):
         """
         GET /state-versions/:state_version_id
         """
-        return self._requestor.get(url='/'.join([
-            self.client._base_uri_v2, 'state-versions', sv_id]),
-            include=include)
+        path = f'/state-versions/{sv_id}'
+        return self._requestor.get(path=path, include=include)
     
-    def _get_download_url(self, sv_id=None):
+    def get_download_url(self, sv_id=None):
         """
         Helper method to return
         `hosted-state-download-url` of a State Version.
@@ -134,14 +98,18 @@ class StateVersions:
         if a State Version ID is not specified.
         """
         if sv_id is None:
+            self._logger.debug(\
+                "Getting download URL from current State Version.")
             sv = self.get_current()
         else:
+            self._logger.debug(\
+                f"Getting download URL from State Version `{sv_id}`.")
             sv = self.show(sv_id=sv_id)
         
         return sv.json()\
             ['data']['attributes']['hosted-state-download-url']
     
-    def _get_json_download_url(self, sv_id=None):
+    def get_json_download_url(self, sv_id=None):
         """
         Helper method to return
         `hosted-json-state-download-url` of a State Version.
@@ -149,8 +117,12 @@ class StateVersions:
         if a State Version ID is not specified.
         """
         if sv_id is None:
+            self._logger.debug(\
+                "Getting JSON download URL from current State Version.")
             sv = self.get_current()
         else:
+            self._logger.debug(\
+                f"Getting JSON download URL from State Version `{sv_id}`.")
             sv = self.show(sv_id=sv_id)
 
         return sv.json()\
@@ -173,7 +145,7 @@ class StateVersions:
         State Version of the Workspace.
         Returns raw state object in bytes.
         """
-        url = self._get_download_url()
+        url = self.get_download_url()
         state_dl_req = request.Request(url=url, headers=headers, data=None)
         state_dl = request.urlopen(state_dl_req, context=context)
         state_obj = state_dl.read()

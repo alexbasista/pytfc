@@ -14,6 +14,7 @@ from .run_task_stages import RunTaskStages
 from .run_tasks import RunTasks
 from .run_triggers import RunTriggers
 from .ssh_keys import SSHKeys
+from .state_versions import StateVersions
 from .team_membership import TeamMembership
 from .team_tokens import TeamTokens
 from .workspaces import Workspaces

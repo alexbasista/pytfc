@@ -48,6 +48,7 @@ class Client:
         'run_tasks': api.RunTasks,
         'run_triggers': api.RunTriggers,
         'ssh_keys': api.SSHKeys,
+        'state_versions': api.StateVersions,
         'workspaces': api.Workspaces,
     }
 
