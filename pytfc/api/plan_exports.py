@@ -63,9 +63,6 @@ class PlanExports(TfcApiBase):
         payload['data'] = data
 
         pe = self._requestor.post(path='/plan-exports', payload=payload)
-        # self._logger.debug(\
-        #     f"Plan Export `{pe.json()['data']['id']}` has been created.")
-
         return pe
 
     def show(self, pe_id):

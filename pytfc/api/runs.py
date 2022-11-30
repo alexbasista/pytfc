@@ -1,52 +1,40 @@
 """TFC/E Runs API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 from .configuration_versions import ConfigurationVersions
-from pytfc.exceptions import MissingWorkspace
-from pytfc.exceptions import MissingRun
+from pytfc.utils import validate_ws_id_is_set
 
 
 class Runs(TfcApiBase):
     """
     TFC/E Runs methods.
     """
-    # def __init__(self, client, **kwargs):
-    #     self.client = client
-    #     self._logger = client._logger
-        
-    #     if kwargs.get('ws_id'):
-    #         self.ws_id = kwargs.get('ws_id')
-    #         self.ws = self.client.workspaces.get_ws_name(ws_id=self.ws_id)
-    #     elif kwargs.get('ws'):
-    #         self.ws = kwargs.get('ws')
-    #         self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-    #     elif self.client.ws and self.client.ws_id:
-    #         self.ws = self.client.ws
-    #         self.ws_id = self.client.ws_id
-    #     else:
-    #         self.ws = None
-    #         self.ws_id = None
-    
+    @validate_ws_id_is_set
     def create(self, auto_apply=None, is_destroy=False, message='Queued by pytfc',
-                refresh=True, refresh_only=False, replace_addrs=None,
-                target_addrs=None, variables=None, plan_only=None,
-                terraform_version=None, allow_empty_apply=None,
-                cv_id=None, ws_id=None):
+               refresh=True, refresh_only=False, replace_addrs=None,
+               target_addrs=None, variables=None, plan_only=None,
+               terraform_version=None, allow_empty_apply=None,
+               ws_id=None, cv_id=None):
         """
         POST /runs
         
         Defaults to using latest Configuration Version
         in Workspace if `cv_id` arg is not specified.
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
 
         if cv_id is None:
-            cv = ConfigurationVersions(client=self.client, ws_id=ws_id)
-            cv_id = cv._get_latest_cv_id()
+            self._logger.debug("A `cv_id` was not specified. Defaulting to"
+                               " latest Configuration Version in Workspace.")
+            cv_client = ConfigurationVersions(
+                self._requestor,
+                self.org,
+                self.ws,
+                ws_id,
+                self.log_level
+            )
+            cv_id = cv_client._get_latest_cv_id()
+            self._logger.debug(f"Using Configuration Version `{cv_id}`.")
+            del cv_client
         
         payload = {}
         data = {}
@@ -80,150 +68,111 @@ class Runs(TfcApiBase):
         data['relationships'] = relationships
         payload['data'] = data
 
-        return self._requestor.post(url='/'.join([
-            self.client._base_uri_v2, 'runs']), payload=payload)
+        return self._requestor.post(path='/runs', payload=payload)
 
-    def apply(self, run_id=None, commit_message=None, comment='Applied by pytfc'):
+    def apply(self, run_id, comment='Applied by pytfc'):
         """
         POST /runs/:run_id/actions/apply
         """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is None:
-            self._logger.info(\
-                f"Using Run with commit message `{commit_message}` in Workspace.")
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-        else:
-            raise MissingRun
+        payload = {'comment': comment}
+        path = f'/runs/{run_id}/actions/apply'
+        return self._requestor.post(path=path, payload=payload)
 
-        payload = {}
-        payload['comment'] = comment
-        
-        return self._requestor.post(url='/'.join([
-            self.client._base_uri_v2, 'runs', run_id, 'actions', 'apply']),
-            payload=payload)
-
-    def list(self, page_number=None, page_size=None, filters=None, search=None,
-            ws_id=None):
+    @validate_ws_id_is_set
+    def list(self, page_number=None, page_size=None, filters=None,
+             search=None, include=None, ws_id=None):
         """
         GET /workspaces/:workspace_id/runs
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
-        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'workspaces', ws_id, 'runs']), page_number=page_number,
-            page_size=page_size, filters=filters, search=search)
+        path = f'/workspaces/{ws_id}/runs'
+        return self._requestor.get(path=path, page_number=page_number,
+                                   page_size=page_size, filters=filters,
+                                   search=search)
 
-    def show(self, run_id=None, commit_message=None):
+    @validate_ws_id_is_set
+    def list_all(self, filters=None, search=None, include=None, ws_id=None):
+        """
+        GET /workspaces/:workspace_id/runs
+
+        Built-in logic to enumerate all pages in list response
+        for cases where there are more than 100 Runs.
+
+        Returns object (dict) with two arrays: `data` and `included`.
+        """
+        ws_id = ws_id if ws_id else self.ws_id
+        path = f'/workspaces/{ws_id}/runs'
+        return self._requestor.list_all(path=path, filters=filters,
+                                        search=search)
+
+    def show(self, run_id, include=None):
         """
         GET /runs/:run_id
         """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is not None:
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-            print(f"Found Run: {run_id}")
-        else:
-            raise MissingRun
-        
         path = f'/runs/{run_id}'
-        return self._requestor.get(path=path)
+        return self._requestor.get(path=path, include=include)
 
-    def discard(self, run_id=None, commit_message=None,
-            comment='Discarded by pytfc'):
+    def discard(self, run_id, comment='Discarded by pytfc'):
         """
         POST /runs/:run_id/actions/discard
         """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is not None:
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-        else:
-            raise MissingRun
-        
-        payload = {}
-        payload['comment'] = comment
+        payload = {'comment': comment}
+        path = f'/runs/{run_id}/actions/discard'
+        return self._requestor.post(path=path, payload=payload)
 
-        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id, 'actions', 'discard']))
-
-    def cancel(self, run_id=None, commit_message=None,
-            comment='Cancelled by pytfc'):
+    def cancel(self, run_id, comment='Cancelled by pytfc'):
         """
         POST /runs/:run_id/actions/cancel
         """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is not None:
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-        else:
-            raise MissingRun
-        
-        payload = {}
-        payload['comment'] = comment
-        
-        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id, 'actions', 'cancel']))
+        payload = {'comment': comment}
+        path = f'/runs/{run_id}/actions/cancel'
+        return self._requestor.post(path=path, payload=payload)
 
-    def force_cancel(self, run_id=None, commit_message=None,
-            comment='Forcefully cancelled by pytfc'):
+    def force_cancel(self, run_id, comment='Forcefully cancelled by pytfc'):
         """
         POST /runs/:run_id/actions/force-cancel
-        """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is not None:
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-        else:
-            raise MissingRun
-        
-        payload = {}
-        payload['comment'] = comment
-        
-        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id, 'actions', 'force-cancel']))
+        """       
+        # TODO:
+        # Validate the Run to be forcefully cancelled is eligible
+        # to be forcefully cancelled by the value of
+        # `data.attributes.is-force-cancelable`
 
-    def force_execute(self, run_id=None, commit_message=None):
+        payload = {'comment': comment}
+        path = f'/runs/{run_id}/actions/force-cancel'
+        return self._requestor.post(path=path, payload=payload)
+
+    def force_execute(self, run_id):
         """
         POST /runs/:run_id/actions/force-execute
         """
-        if run_id is not None:
-            run_id = run_id
-        elif commit_message is not None:
-            run_id = self._get_run_id_by_commit(commit_message=commit_message)
-        else:
-            raise MissingRun
-        
-        return self._requestor.post(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id, 'actions', 'force-execute']))
+        # TODO:
+        # Validate prereqs of forcefully executing a Run:
+        # 1) Rhe target Run is in a 'pending' state
+        # 2) The Workspace is locked by another Run
+        # 3) The Run that locked the Workspace can be discarded
+
+        path = f'/runs/{run_id}/actions/force-execute'
+        return self._requestor.post(path=path, payload=None)
     
     def get_plan_json_output(self, run_id):
         """
         GET /runs/:id/plan/json-output
         """
-        return self._requestor.get(url='/'.join([self.client._base_uri_v2,
-            'runs', run_id, 'plan', 'json-output']))
+        path = f'/runs/{run_id}/plan/json-output'
+        return self._requestor.get(path=path)
     
-    def _get_run_id_by_commit(self, commit_message, ws_id=None):
+    @validate_ws_id_is_set
+    def get_run_id_by_message(self, message, ws_id=None):
         """
         Helper method that returns Run ID of Run in 
-        Workspace by `commit_message` that is passed in.
+        Workspace by Run `message` specified.
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
         
-        runs_list = self.list(ws_id=ws_id)
-        for run in runs_list.json()['data']:
-            if run['type'] == 'runs' and run['attributes']['message'] == commit_message:
+        runs_list = self.list_all(ws_id=ws_id)
+        for run in runs_list['data']:
+            if run['type'] == 'runs' and run['attributes']['message'] == message:
                 run_id = run['id']
                 break
             else:
@@ -232,23 +181,18 @@ class Runs(TfcApiBase):
         
         if run_id is None:
             self._logger.warning(\
-                f"No Run was found from commit message `{commit_message}`.")
+                f"No Run was found from commit message `{message}`.")
         
         return run_id
 
-    def _get_latest_run_id(self, ws_id):
+    @validate_ws_id_is_set
+    def get_latest_run_id(self, ws_id):
         """
         Helper method that returns Run ID of latest Run in Workspace.
         """       
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-        
+        ws_id = ws_id if ws_id else self.ws_id
         runs_list = self.list(ws_id=ws_id)
-
+        
         return runs_list.json()['data'][0]['id']
 
     def terraform_plan(self, source_tf_path, dest_tf_tar, speculative='false', cleanup='true', **kwargs):

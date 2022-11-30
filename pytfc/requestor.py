@@ -77,6 +77,12 @@ class Requestor:
             
             if 'version' in search:
                 query_params.append(f"search[version]={search['version']}")
+            
+            if 'user' in search:
+                query_params.append(f"search[user]={search['user']}")
+
+            if 'commit' in search:
+                query_params.append(f"search[commit]={search['commit']}")
         
         if query is not None:
             query_params.append(f'q{query}')
