@@ -43,9 +43,10 @@ class Client:
         'plan_exports': api.PlanExports,
         'plans': api.Plans,
         'registry_modules': api.RegistryModules,
+        'runs': api.Runs,
         'run_task_stages': api.RunTaskStages,
         'run_tasks': api.RunTasks,
-        'runs': api.Runs,
+        'run_triggers': api.RunTriggers,
         'workspaces': api.Workspaces,
     }
 
@@ -144,7 +145,7 @@ class Client:
         # Leaving these lines commented means any pre-existing Workspace
         # attributes (`ws` and `ws_id` will be unset when set_org() is called.
         # TODO:
-        # Remove these lines
+        # Remove these lines because that is a good design decision.
         # if ws is None:
         #     ws = self.ws
         

@@ -1,28 +1,13 @@
-"""
-Module for TFC/E Run Triggers API endpoints.
-"""
-from pytfc.exceptions import MissingWorkspace
+"""TFC/E Run Triggers API endpoints module."""
+from pytfc.tfc_api_base import TfcApiBase
+from pytfc.utils import validate_ws_id_is_set
 
 
-class RunTriggers:
+class RunTriggers(TfcApiBase):
     """
     TFC/E Run Triggers methods.
     """
-    def __init__(self, client, **kwargs):
-        self.client = client
-        self._logger = client._logger
-        self._base_api_url = client._base_uri_v2
-
-        if kwargs.get('ws'):
-            self.ws = kwargs.get('ws')
-            self.ws_id = self.client.workspaces.get_ws_id(name=self.ws)
-        elif self.client.ws and self.client.ws_id:
-            self.ws = self.client.ws
-            self.ws_id = self.client.ws_id
-        else:
-            self.ws = None
-            self.ws_id = None
-    
+    @validate_ws_id_is_set
     def create(self, source_ws_obj, ws_id=None):
         """
         POST /workspaces/:workspace_id/run-triggers
@@ -31,30 +16,20 @@ class RunTriggers:
         :type source_ws_obj: Object with `id` and `type` properties. For example:
             { "id": "ws-abcdefghijklmnop", "type": "workspaces" }
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
-        
+        ws_id = ws_id if ws_id else self.ws_id
         print('coming soon')
 
+    @validate_ws_id_is_set
     def list(self, rt_type, ws_id=None, page_number=None, page_size=None,
-            include=None):
+             include=None):
         """
         GET /workspaces/:workspace_id/run-triggers
         """
-        if ws_id is not None:
-            ws_id = ws_id
-        elif self.ws_id:
-            ws_id = self.ws_id
-        else:
-            raise MissingWorkspace
+        ws_id = ws_id if ws_id else self.ws_id
 
         if rt_type not in ['inbound', 'outbound']:
-            self._logger.error(\
-                f"`{rt_type}` is invalid for `rt_type` arg. Valid values are `inbound` and `outbound`.")
+            self._logger.error(f"`{rt_type}` is invalid for `rt_type` arg."
+                               " Valid values are `inbound` and `outbound`.")
             raise ValueError
 
         filters = [
@@ -63,20 +38,21 @@ class RunTriggers:
 
         # TODO:
         # validate include is either `workspace` or `sourceable`
-        return self._requestor.get(url='/'.join([self._base_api_url,
-            'workspaces', ws_id, 'run-triggers']), filters=filters,
-            page_number=page_number, page_size=page_size, include=include)
+        
+        path = f'/workspaces{ws_id}/run-triggers'
+        return self._requestor.get(path=path, filters=filters, include=include,
+                                   page_number=page_number, page_size=page_size)
         
     def show(self, rt_id, include=None):
         """
         GET /run-triggers/:run_trigger_id
         """
-        return self._requestor.get(url='/'.join([self._base_api_url,
-            'run-triggers', rt_id]), include=include)
+        path = f'/run-triggers/{rt_id}'
+        return self._requestor.get(path=path, include=include)
     
     def delete(self, rt_id):
         """
         DELETE /run-triggers/:run_trigger_id
         """
-        return self._requestor.delete(url='/'.join([self._base_api_url,
-            'run-triggers', rt_id]))
+        path = f'/run-triggers/{rt_id}'
+        return self._requestor.delete(path=path)

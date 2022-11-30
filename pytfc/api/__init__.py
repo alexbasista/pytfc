@@ -9,9 +9,10 @@ from .plan_exports import PlanExports
 from .plans import Plans
 from .policy_checks import PolicyChecks
 from .registry_modules import RegistryModules
+from .runs import Runs
 from .run_task_stages import RunTaskStages
 from .run_tasks import RunTasks
-from .runs import Runs
+from .run_triggers import RunTriggers
 from .team_membership import TeamMembership
 from .team_tokens import TeamTokens
 from .workspaces import Workspaces
