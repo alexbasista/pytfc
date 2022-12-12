@@ -83,6 +83,7 @@ class Workspaces(TfcApiBase):
                     f"`{key}` is an invalid key for Workspaces API.")
         
         # handle multiple scenarios with optional VCS integration
+        oc_client = None
         if kwargs.get('identifier'):
             self._logger.debug(f"VCS repo identifier `{kwargs.get('identifier')}`"
                                " was specified.")
@@ -152,7 +153,7 @@ class Workspaces(TfcApiBase):
         else:
             self._logger.debug("No VCS repo `identifier` was specified."
                                " Creating Workspace without VCS connection.")
-        
+
         if oc_client: del oc_client
         
         if len(vcs_repo) > 0:
