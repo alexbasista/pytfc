@@ -60,21 +60,6 @@ class WorkspaceVariables(TfcApiBase):
 
         path = f'/workspaces/{ws_id}/vars'
         return self._requestor.get(path=path)
-    
-    @validate_ws_id_is_set
-    def list_all(self, ws_id=None):
-        """
-        GET /workspaces/:workspace_id/vars
-
-        Built-in logic to enumerate all pages in list response for
-        cases where there are more than 100 Workspace Variables.
-
-        Returns object (dict) with two arrays: `data` and `included`.
-        """
-        ws_id = ws_id if ws_id else self.ws_id
-        
-        path = f'/workspaces/{ws_id}/vars'
-        return self._requestor.list_all(path=path)
 
     def update(self, var_name=None, var_id=None, ws_id=None):
         """
