@@ -1,8 +1,6 @@
 """TFC/E Workspace API endpoints module."""
 from pytfc.tfc_api_base import TfcApiBase
 from pytfc import utils
-from pytfc.exceptions import MissingVcsProvider
-from .oauth_clients import OauthClients
 
 
 class Workspaces(TfcApiBase):
@@ -77,87 +75,17 @@ class Workspaces(TfcApiBase):
             if key in self._ws_attr_list:
                 attributes[key] = value
             elif key in self._ws_vcs_attr_list:
-                vcs_repo[key] = value
+                new_key = key.replace("_", "-" )
+                vcs_repo[new_key] = value
             else:
                 self._logger.warning(\
                     f"`{key}` is an invalid key for Workspaces API.")
         
-        # handle multiple scenarios with optional VCS integration
-        oc_client = None
-        if kwargs.get('identifier'):
-            self._logger.debug(f"VCS repo identifier `{kwargs.get('identifier')}`"
-                               " was specified.")
-            oc_client = OauthClients(
-                requestor = self._requestor,
-                org = self.org,
-                ws = None,
-                ws_id = None,
-                log_level = self.log_level
-            )
-            
-            # validate an OAuth Client (VCS Provider) actually exists in Org
-            try:
-                self._logger.debug("Retrieving list of OAuth Clients"
-                                  f" (VCS Providers) in `{self.org}`.")
-                oc_list = oc_client.list()
-                if len(oc_list.json()['data']) < 1:
-                    self._logger.error("No OAuth Client (VCS Provider) "
-                                       f" was found in `{self.org}`.")
-                    raise MissingVcsProvider
-                elif len(oc_list.json()['data']) >= 1:
-                    oc_name = oc_list.json()['data'][0]['attributes']['name']
-                    ot_id = oc_list.json()\
-                        ['data'][0]['relationships']['oauth-tokens']['data'][0]['id']
-            except Exception as e:
-                self._logger.error("Unable to retrieve OAuth Clients"
-                                   f" (VCS Providers) list from `{self.org}`.")
-                self._logger.error(e)
-            
-            # explicitly specifying an OAuth Token ID gets first priority
-            if kwargs.get('oauth_token_id'):
-                self._logger.debug("An OAuth Token ID was specified.")
-                vcs_repo['oauth-token-id'] = kwargs.get('oauth_token_id')
-            
-            # explicitly specifying an OAuth Client (VCS Provider) Display Name
-            # (`oauth_client_name`) gets second priority
-            elif kwargs.get('oauth_client_name'):
-                self._logger.debug("An OAuth Client Display Name was specified.")
-                oauth_client = oc_client.show(name=kwargs.get('oauth_client_name'))
-                vcs_repo['oauth-token-id'] = oauth_client.json()\
-                    ['data']['relationships']['oauth-tokens']['data'][0]['id']
-            
-            # if neither are specified and there is only one OAuth
-            # Client in the Org - then default to using that one
-            elif kwargs.get('oauth_token_id') is None\
-                and kwargs.get('oauth_client_name') is None\
-                and len(oc_list.json()['data']) == 1:
-                    self._logger.info(f"Detected `{oc_name}` is the only OAuth" 
-                                      " Client, proceeding with this one.")
-                    vcs_repo['oauth-token-id'] = ot_id
-            
-            # if neither are specified and there are multiple OAuth Clients
-            #  in the Org, then log a warning but default to the first 
-            # OAuth Client returned in the list
-            elif kwargs.get('oauth_token_id') is None\
-                and kwargs.get('oauth_client_name') is None\
-                and len(oc_list.json()['data']) > 1:
-                    self._logger.warning("Detected multiple OAuth Clients exist"
-                                         " but one was not specified.")
-                    self._logger.info(f"Proceeding with using `{oc_name}`"
-                                      " because it was first in the list.")
-                    vcs_repo['oauth-token-id'] = ot_id
-            else:
-                self._logger.error("An unknown error occured determining which"
-                                   " OAuth Client and/or OAuth Token to use.")
-                exit
-        else:
-            self._logger.debug("No VCS repo `identifier` was specified."
-                               " Creating Workspace without VCS connection.")
-
-        if oc_client: del oc_client
-        
-        if len(vcs_repo) > 0:
+        if len(vcs_repo) > 0 and not all(i == None for i in vcs_repo.values()):
+            # Check if all VCS repo attributes are null and if they are, do NOT
+            # add to payload to avoid 422 error with Workspace creation.
             attributes['vcs-repo'] = vcs_repo
+
         data['attributes'] = attributes
         payload['data'] = data
         
@@ -187,14 +115,17 @@ class Workspaces(TfcApiBase):
                 if key == 'vcs_repo':
                     pass
                 else:
-                    vcs_repo[key] = value
+                    new_key = key.replace("_", "-" )
+                    vcs_repo[new_key] = value
             else:
                 self._logger.warning(\
                     f"`{key}` is an invalid key for Workspaces API.")
 
         if kwargs.get('vcs_repo') == 'null':
             attributes['vcs-repo'] = None
-        elif len(vcs_repo) > 0:
+        elif len(vcs_repo) > 0 and not all(i == None for i in vcs_repo.values()):
+            # Check if all VCS repo attributes are null and if they are, do NOT
+            # add to payload to avoid 422 error with Workspace creation.
             attributes['vcs-repo'] = vcs_repo
 
         data['attributes'] = attributes
