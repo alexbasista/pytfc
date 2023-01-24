@@ -46,4 +46,4 @@ See the [docs](./docs/) for more details and examples on usage.
 <p>&nbsp;</p>
 
 ---
-> Note: this is repository is not officially supported or mainted by HashiCorp.
+> Note: this is repository is not officially supported or maintained by HashiCorp.

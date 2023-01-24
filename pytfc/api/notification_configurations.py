@@ -14,7 +14,35 @@ class NotificationConfigurations(TfcApiBase):
         POST /workspaces/:workspace_id/notification-configurations
         """
         ws_id = ws_id if ws_id else self.ws_id
-        print('coming soon')
+        
+        payload = {}
+        data = {}
+        data['type'] = 'notification-configuration'
+        attributes = {}
+        attributes['destination-type'] = destination_type
+        attributes['enabled'] = enabled
+        attributes['name'] = name
+        attributes['token'] = token
+        attributes['triggers'] = triggers
+        if destination_type != 'email':
+            attributes['url'] = url
+        data['attributes'] = attributes
+        if users is not None:
+            relationships = {}
+            relationships_users = {}
+            relationships_users_data = []
+            for i in users:
+                user = {'id': i, 'type': 'users'}
+                relationships_users_data.append(user)
+            
+            relationships_users['data'] = relationships_users_data
+            relationships['users'] = relationships_users
+            data['relationships'] = relationships
+        
+        payload['data'] = data
+
+        path = f'/workspaces/{ws_id}/notification-configurations'
+        return self._requestor.post(path=path, payload=payload)
     
     @validate_ws_id_is_set
     def list(self, ws_id=None, page_number=None, page_size=None):

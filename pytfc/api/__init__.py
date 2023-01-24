@@ -8,6 +8,7 @@ from .organizations import Organizations
 from .plan_exports import PlanExports
 from .plans import Plans
 from .policy_checks import PolicyChecks
+from .projects import Projects
 from .registry_modules import RegistryModules
 from .runs import Runs
 from .run_task_stages import RunTaskStages
