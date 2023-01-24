@@ -58,7 +58,7 @@ class Workspaces(TfcApiBase):
         return ws.json()['data']['attributes']['name']
 
     @utils.validate_ws_is_set
-    def create(self, name=None, **kwargs):
+    def create(self, name=None, project_id=None, **kwargs):
         """
         POST /organizations/:organization_name/workspaces
         """
@@ -80,20 +80,27 @@ class Workspaces(TfcApiBase):
             else:
                 self._logger.warning(\
                     f"`{key}` is an invalid key for Workspaces API.")
-        
         if len(vcs_repo) > 0 and not all(i == None for i in vcs_repo.values()):
             # Check if all VCS repo attributes are null and if they are, do NOT
             # add to payload to avoid 422 error with Workspace creation.
             attributes['vcs-repo'] = vcs_repo
-
         data['attributes'] = attributes
-        payload['data'] = data
+
+        if project_id is not None:
+            relationships = {}
+            project = {}
+            project_data = {}
+            project_data['id'] = project_id
+            project['data'] = project_data
+            relationships['project'] = project
+            data['relationships'] = relationships
         
+        payload['data'] = data
         path = f'/organizations/{self.org}/workspaces'
         return self._requestor.post(path=path, payload=payload)
 
     @utils.validate_ws_is_set
-    def update(self, name=None, **kwargs):
+    def update(self, name=None, project_id=None, **kwargs):
         """
         PATCH /organizations/:organization_name/workspaces/:name
         """
@@ -107,7 +114,6 @@ class Workspaces(TfcApiBase):
         if kwargs.get('new_name'):
             attributes['name'] = kwargs.get('new_name')
             kwargs.pop('new_name')
-        
         for key, value in kwargs.items():
             if key in self._ws_attr_list:
                 attributes[key] = value
@@ -120,17 +126,24 @@ class Workspaces(TfcApiBase):
             else:
                 self._logger.warning(\
                     f"`{key}` is an invalid key for Workspaces API.")
-
         if kwargs.get('vcs_repo') == 'null':
             attributes['vcs-repo'] = None
         elif len(vcs_repo) > 0 and not all(i == None for i in vcs_repo.values()):
             # Check if all VCS repo attributes are null and if they are, do NOT
             # add to payload to avoid 422 error with Workspace creation.
             attributes['vcs-repo'] = vcs_repo
-
         data['attributes'] = attributes
+        
+        if project_id is not None:
+            relationships = {}
+            project = {}
+            project_data = {}
+            project_data['id'] = project_id
+            project['data'] = project_data
+            relationships['project'] = project
+            data['relationships'] = relationships
+        
         payload['data'] = data
-
         path = f'/organizations/{self.org}/workspaces/{ws_name}'
         return self._requestor.patch(path=path, payload=payload)
 

@@ -85,7 +85,7 @@ class Requestor:
                 query_params.append(f"search[commit]={search['commit']}")
         
         if query is not None:
-            query_params.append(f'q{query}')
+            query_params.append(f'q={query}')
 
         if query_params:
             url += '?' + '&'.join(query_params)

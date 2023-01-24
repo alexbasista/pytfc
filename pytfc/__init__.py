@@ -40,6 +40,7 @@ class Client:
         'oauth_tokens': api.OauthTokens,
         'plan_exports': api.PlanExports,
         'plans': api.Plans,
+        'projects': api.Projects,
         'registry_modules': api.RegistryModules,
         'runs': api.Runs,
         'run_task_stages': api.RunTaskStages,
