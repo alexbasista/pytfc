@@ -40,7 +40,7 @@ class Requestor:
         return r
 
     def get(self, path, filters=None, page_number=None, page_size=None,
-            include=None, search=None, query=None):
+            include=None, search=None, query=None, since=None):
         r = None
         url = self._base_uri + path
         
@@ -87,6 +87,9 @@ class Requestor:
         if query is not None:
             query_params.append(f'q={query}')
 
+        if since is not None:
+            query_params.append(f'since={since}')
+
         if query_params:
             url += '?' + '&'.join(query_params)
         
@@ -112,7 +115,8 @@ class Requestor:
         r.raise_for_status()
         return r
 
-    def list_all(self, path, filters=None, include=None, search=None, query=None):
+    def list_all(self, path, filters=None, include=None, search=None,
+                 query=None, since=None):
         """
         Utility method to enumerage pages in a response from a `get`
         request to a list API endpoint and returns all of the results.
@@ -120,21 +124,21 @@ class Requestor:
         current_page_number = 1
         list_resp = self.get(path=path, page_number=current_page_number,
             page_size=MAX_PAGE_SIZE, filters=filters, include=include,
-            search=search).json()
+            search=search, query=query, since=since).json()
 
         if 'meta' in list_resp:
             self._logger.debug("Found `meta` block in list response.")
             total_pages = list_resp['meta']['pagination']['total-pages']
         elif 'pagination' in list_resp:
             self._logger.debug("Found `pagination` block in list response.")
-            total_pages = list_resp['pagination']['total-pages']
+            total_pages = list_resp['pagination']['total_pages']
 
         data = []
         included = []
         while current_page_number <= total_pages:
             list_resp = self.get(path=path, page_number=current_page_number,
                 page_size=MAX_PAGE_SIZE, filters=filters, include=include,
-                search=search, query=query).json()
+                search=search, query=query, since=since).json()
             data += list_resp['data']
 
             if 'included' in list_resp:
