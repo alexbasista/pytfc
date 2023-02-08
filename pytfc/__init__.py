@@ -34,6 +34,7 @@ class Client:
     _org_required_classes = {
         'agent_pools': api.AgentPools,
         'applies': api.Applies,
+        'audit_trails': api.AuditTrails,
         'configuration_versions': api.ConfigurationVersions,
         'notification_configurations': api.NotificationConfigurations,
         'oauth_clients': api.OauthClients,

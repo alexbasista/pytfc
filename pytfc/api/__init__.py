@@ -1,5 +1,6 @@
 from .agent_pools import AgentPools
 from .applies import Applies
+from .audit_trails import AuditTrails
 from .configuration_versions import ConfigurationVersions
 from .notification_configurations import NotificationConfigurations
 from .oauth_clients import OauthClients
