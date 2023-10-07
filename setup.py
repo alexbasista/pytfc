@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.0.19'
+VERSION = '0.0.20'
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
@@ -19,8 +19,8 @@ setup(
     py_modules=['pytfc'],
     packages=find_packages(),
     install_requires=[
+        'requests>=2.31.0',
         'pyhcl>=0.4.4',
-        'requests>=2.26.0',
     ],
     keywords=['tfe', 'terraform enterprise', 'tfc', 'terraform cloud', 'terraform'],
     classifiers=[

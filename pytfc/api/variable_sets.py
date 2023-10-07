@@ -7,6 +7,17 @@ class VariableSets(TfcApiBase):
     """
     TFC/E Variable Sets methods.
     """
+    def get_varset_id(self, name):
+        """
+        Helper method that returns Variable
+        Set ID based on Variable Set name.
+        """
+        varsets_list = self.list()
+        varset_id = [ i['id'] for i in varsets_list.json()['data']\
+                       if i['attributes']['name'] == name ]
+        
+        return varset_id[0]
+    
     def create(self, name, description=None, is_global=False, workspaces=None,
                vars=None):
         """
@@ -73,7 +84,19 @@ class VariableSets(TfcApiBase):
         POST /varsets/:varset_id/relationships/workspaces
         """
         ws_id = ws_id if ws_id else self.ws_id
-        print('coming soon')
+
+        payload = \
+        {
+            "data": [
+                {
+                    "type": "workspaces",
+                    "id": ws_id
+                }
+            ]
+        }
+
+        path = f'/varsets/{varset_id}/relationships/workspaces'
+        return self._requestor.post(path=path, payload=payload)
 
     @validate_ws_id_is_set
     def remove_from_workspace(self, varset_id, ws_id=None):
@@ -81,4 +104,16 @@ class VariableSets(TfcApiBase):
         DELETE /varsets/:varset_id/relationships/workspaces
         """
         ws_id = ws_id if ws_id else self.ws_id
-        print('coming soon')
+
+        payload = \
+        {
+            "data": [
+                {
+                    "type": "workspaces",
+                    "id": ws_id
+                }
+            ]
+        }
+
+        path = f'/varsets/{varset_id}/relationships/workspaces'
+        return self._requestor.delete(path=path, payload=payload)

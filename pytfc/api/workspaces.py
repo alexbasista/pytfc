@@ -17,8 +17,8 @@ class Workspaces(TfcApiBase):
         'file_triggers_enabled',
         'global_remote_state',
         'queue_all_runs',
-        'source_name', # beta
-        'source_url', # beta
+        'source_name',
+        'source_url',
         'speculative_enabled',
         'terraform_version',
         'trigger_prefixes',
@@ -32,6 +32,7 @@ class Workspaces(TfcApiBase):
         'ingress_submodules',
         'identifier',
         'tags_regex',
+        'github_app_installation_id',
         'vcs_repo' # only used by `update()` to remove repo from Workspace
     ]
 
