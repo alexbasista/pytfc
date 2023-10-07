@@ -107,11 +107,11 @@ class Requestor:
         r.raise_for_status()
         return r
 
-    def delete(self, path):
+    def delete(self, path, payload=None):
         r = None
         url = self._base_uri + path
         self._logger.debug(f"Sending HTTP DELETE to {url}")
-        r = requests.delete(url=url, headers=self._headers)
+        r = requests.delete(url=url, headers=self._headers, data=json.dumps(payload))
         r.raise_for_status()
         return r
 
