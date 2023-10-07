@@ -1,42 +1,27 @@
-import pytest
 
 
-# --- create basic Workspace --- #
 def test_create_workspace(client):
-    name       = "pytest-create-workspace"
-    project_id = "prj-ju6pfT7sp5gA84U4"
-
     response = client.workspaces.create(
-        name=name,
-        project_id=project_id
+        name='pytest-create-workspace',
+        project_id='prj-ju6pfT7sp5gA84U4'
     )
-
+    client.workspaces.delete(name='pytest-create-workspace')
     assert response.status_code == 201
 
-    client.workspaces.delete(name=name)
+def test_delete_workspace(client):
+    client.workspaces.create(
+        name='pytest-delete-workspace',
+        project_id='prj-ju6pfT7sp5gA84U4'
+    )
+    response = client.workspaces.delete(name='pytest-delete-workspace')
+    assert response.status_code == 204
 
-# --- create Workspace with VCS --- #
 def test_create_workspace_vcs(client, tfe_ghain):
-    name       = "pytest-create-workspace-vcs"
-    project_id = "prj-ju6pfT7sp5gA84U4"
-    repo       = "alexbasista/terraform-random-thrones"
-    ghain      = tfe_ghain
-
     response = client.workspaces.create(
-        name=name,
-        project_id=project_id,
-        identifier=repo,
-        github_app_installation_id=ghain
+        name='pytest-create-workspace-vcs',
+        project_id='prj-ju6pfT7sp5gA84U4',
+        identifier='alexbasista/terraform-random-thrones',
+        github_app_installation_id=tfe_ghain
     )
-
+    client.workspaces.delete(name='pytest-create-workspace-vcs')
     assert response.status_code == 201
-
-    client.workspaces.delete(name=name)
-
-# --- Update basic Workspace --- #
-def test_update_worksace(client):
-    ""
-
-# --- Update Workspace with VCS --- #
-def test_update_workspace_vcs(client):
-    ""
