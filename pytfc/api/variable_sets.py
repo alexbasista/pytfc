@@ -18,12 +18,56 @@ class VariableSets(TfcApiBase):
         
         return varset_id[0]
     
-    def create(self, name, description=None, is_global=False, workspaces=None,
-               vars=None):
+    def create(self, name, description=None, is_global=False, workspace_ids=[],
+               vars=[]):
         """
         POST /organizations/:organization_name/varsets
         """
-        print('coming soon')
+        workspaces_data = \
+        {
+            "data": [
+                {
+                    "id": ws_id, 
+                    "type": "workspaces"
+                }
+                for ws_id in workspace_ids
+            ]
+        }
+
+        vars_data = \
+        {
+            "data" : [
+                {
+                    "type": "vars",
+                    "attributes": {
+                        "key": var.get('key', ''),
+                        "value": var.get('value', ''),
+                        "category": var.get('category', 'terraform'),
+                        "sensitive": var.get('sensitive', False)
+                    }
+                }
+                for var in vars
+            ]
+        }
+        
+        payload = \
+        {
+            "data": {
+                "type": "varsets",
+                "attributes": {
+                    "name": name,
+                    "description": description,
+                    "global": is_global
+                },
+                "relationships": {
+                    "workspaces": workspaces_data,
+                    "vars": vars_data
+                }
+            }
+        }
+
+        path = f'/organizations/{self.org}/varsets'
+        return self._requestor.post(path=path, payload=payload)
     
     def update(self, varset_id):
         """
