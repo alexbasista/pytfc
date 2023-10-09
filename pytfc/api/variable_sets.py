@@ -161,3 +161,39 @@ class VariableSets(TfcApiBase):
 
         path = f'/varsets/{varset_id}/relationships/workspaces'
         return self._requestor.delete(path=path, payload=payload)
+
+    def apply_to_project(self, varset_id, project_ids=[]):
+        """
+        POST /varsets/:varset_id/relationships/projects
+        """
+        payload = \
+        {
+            "data": [
+                {
+                    "type": "projects", 
+                    "id": prj_id
+                }
+                for prj_id in project_ids
+            ]
+        }
+
+        path = f'/varsets/{varset_id}/relationships/projects'
+        return self._requestor.post(path=path, payload=payload)
+    
+    def remove_from_project(self, varset_id, project_ids=[]):
+        """
+        DELETE /varsets/:varset_id/relationships/projects
+        """
+        payload = \
+        {
+            "data": [
+                {
+                    "type": "projects", 
+                    "id": prj_id
+                }
+                for prj_id in project_ids
+            ]
+        }
+
+        path = f'/varsets/{varset_id}/relationships/projects'
+        return self._requestor.delete(path=path, payload=payload)

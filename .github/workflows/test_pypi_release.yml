@@ -19,6 +19,7 @@ jobs:
       with:
         python-version: '3.11'
         cache: 'pip'
+        cache-dependency-path: '**/requirements-dev.txt'
 
     - name: Install dependencies
       run: |
@@ -27,7 +28,7 @@ jobs:
 
     - name: Run pytest
       run: |
-          pytest pytfc/tests/
+          pytest tests/
       env:
           TFE_TOKEN: ${{ secrets.PYTEST_TFE_TOKEN }}
           TFE_GHAIN: ${{ secrets.PYTEST_TFE_GHAIN }}
