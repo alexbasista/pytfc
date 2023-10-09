@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.0.20'
+VERSION = '0.0.21'
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
@@ -24,8 +24,7 @@ setup(
     ],
     keywords=['tfe', 'terraform enterprise', 'tfc', 'terraform cloud', 'terraform'],
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
+        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
         'Operating System :: OS Independent',
