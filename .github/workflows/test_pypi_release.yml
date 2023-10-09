@@ -27,7 +27,7 @@ jobs:
 
     - name: Run pytest
       run: |
-          pytest pytfc/tests/
+          pytest tests/
       env:
           TFE_TOKEN: ${{ secrets.PYTEST_TFE_TOKEN }}
           TFE_GHAIN: ${{ secrets.PYTEST_TFE_GHAIN }}
