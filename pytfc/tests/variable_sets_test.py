@@ -1,5 +1,4 @@
 def test_create_varset(client):
-
     ws_id_1 = client.workspaces.create(name='pytest-varsets-tmp-1').json()['data']['id']
     ws_id_2 = client.workspaces.create(name='pytest-varsets-tmp-2').json()['data']['id']
     
@@ -47,4 +46,41 @@ def test_remove_varset_to_ws(client):
     response = client.variable_sets.remove_from_workspace(varset_id=varset_id, ws_id=ws_id)
     client.workspaces.delete(name=ws_name)
 
+    assert response.status_code == 204
+
+def test_apply_varset_to_project(client):
+    varset_id = client.variable_sets.create(name='pytest-vs-prj-tst-1').json()['data']['id']
+    prj_id_1 = client.projects.create(name='pytest-prj-vs-tst-1').json()['data']['id']
+    prj_id_2 = client.projects.create(name='pytest-prj-vs-tst-2').json()['data']['id']
+    
+    response = client.variable_sets.apply_to_project(
+        varset_id=varset_id,
+        project_ids=[prj_id_1, prj_id_2]
+    )
+
+    client.projects.delete(project_id=prj_id_1)
+    client.projects.delete(project_id=prj_id_2)
+    client.variable_sets.delete(varset_id=varset_id)
+    
+    assert response.status_code == 204
+
+def test_remove_varset_from_project(client):
+    varset_id = client.variable_sets.create(name='pytest-vs-prj-tst-2').json()['data']['id']
+    prj_id_1 = client.projects.create(name='pytest-prj-tmp-3').json()['data']['id']
+    prj_id_2 = client.projects.create(name='pytest-prj-tmp-4').json()['data']['id']
+    
+    client.variable_sets.apply_to_project(
+        varset_id=varset_id,
+        project_ids=[prj_id_1, prj_id_2]
+    )
+    
+    response = client.variable_sets.remove_from_project(
+        varset_id=varset_id,
+        project_ids=[prj_id_1, prj_id_2]
+    )
+
+    client.projects.delete(project_id=prj_id_1)
+    client.projects.delete(project_id=prj_id_2)
+    client.variable_sets.delete(varset_id=varset_id)
+   
     assert response.status_code == 204
