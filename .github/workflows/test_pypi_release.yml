@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
@@ -45,29 +45,32 @@ jobs:
           pip install -r requirements-dev.txt
       
       - name: Tag check
-        id: tagCheck
+        id: tag_check
         run: |
-          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "{isTag}={true}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-test$ ]]; then
+            echo "{is_tag}={true}" >> $GITHUB_OUTPUT
           else
-            echo "{isTag}={false}" >> $GITHUB_OUTPUT
+            echo "{is_tag}={false}" >> $GITHUB_OUTPUT
           fi
-        env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
 
-      - name: Set version
-        if: steps.tagCheck.outputs.isTag == 'true'
+      - name: Set version from tag
+        if: steps.tag_check.outputs.is_tag == 'true'
         run: |
-          echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
           echo "Tag name from github.ref_name: ${{  github.ref_name }}"
           sed -i "s/VERSION = 'TAG'/VERSION = '${{ github.ref_name }}'/" setup.py
       
+      - name: Set version from run number
+        if: steps.tag_check.outputs.is_tag == 'false'
+        run: |
+          VERSION_PREFIX="v0.0."
+          NEW_VERSION="$VERSION_PREFIX${{ github.run_number }}"
+          echo "$NEW_VERSION"
+          sed -i "s/VERSION = 'TAG'/VERSION = '$NEW_VERSION'/" setup.py
+
       - name: Build package
-        if: steps.tagCheck.outputs.isTag == 'true'  
         run: python -m build
     
       - name: Publish package to TestPyPI
-        if: steps.tagCheck.outputs.isTag == 'true'  
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
