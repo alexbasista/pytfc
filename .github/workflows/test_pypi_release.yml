@@ -22,7 +22,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        #pip install .[dev]
         pip install -r requirements-dev.txt
 
     - name: Run pytest
@@ -43,10 +42,21 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          #pip install .[dev]
           pip install -r requirements-dev.txt
       
-      - name: Bump version
+      - name: Tag check
+        id: tagCheck
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::set-output name=isTag::true"
+          else
+            echo "::set-output name=isTag::false"
+          fi
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+
+      - name: Set version
+        if: steps.tagCheck.outputs.isTag == 'true'
         run: |
           echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
           echo "Tag name from github.ref_name: ${{  github.ref_name }}"
