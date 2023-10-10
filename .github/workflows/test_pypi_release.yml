@@ -45,7 +45,7 @@ jobs:
           pip install -r requirements-dev.txt
       
       - name: Tag check
-        id: tag_check
+        id: tagCheck
         run: |
           if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-test$ ]]; then
             echo "{is_tag}={true}" >> $GITHUB_OUTPUT
@@ -54,13 +54,13 @@ jobs:
           fi
 
       - name: Set version from tag
-        if: steps.tag_check.outputs.is_tag == 'true'
+        if: steps.tagCheck.outputs.is_tag == 'true'
         run: |
           echo "Tag name from github.ref_name: ${{  github.ref_name }}"
           sed -i "s/VERSION = 'TAG'/VERSION = '${{ github.ref_name }}'/" setup.py
       
       - name: Set version from run number
-        if: steps.tag_check.outputs.is_tag == 'false'
+        if: steps.tagCheck.outputs.is_tag == 'false'
         run: |
           VERSION_PREFIX="v0.0."
           NEW_VERSION="$VERSION_PREFIX${{ github.run_number }}"
