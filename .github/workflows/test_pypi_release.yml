@@ -63,7 +63,7 @@ jobs:
         run: |
           VERSION_PREFIX="v0.0."
           NEW_VERSION="$VERSION_PREFIX${{ github.run_number }}"
-          echo "$NEW_VERSION"
+          echo "New version: $NEW_VERSION"
           sed -i "s/VERSION = 'TAG'/VERSION = '$NEW_VERSION'/" setup.py
 
       - name: Build package
