@@ -62,7 +62,8 @@ jobs:
       - name: Set version from run number
         run: |
           VERSION_PREFIX="v0.0."
-          NEW_VERSION="$VERSION_PREFIX${{ github.run_number }}"
+          VERSION_SUFFIX="${{ github.run_number }}"
+          NEW_VERSION="$VERSION_PREFIX$VERSION_SUFFIX"
           echo "New version: $NEW_VERSION"
           sed -i "s/VERSION = 'TAG'/VERSION = '$NEW_VERSION'/" setup.py
 
