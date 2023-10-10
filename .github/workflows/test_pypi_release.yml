@@ -60,7 +60,6 @@ jobs:
           sed -i "s/VERSION = 'TAG'/VERSION = '${{ github.ref_name }}'/" setup.py
       
       - name: Set version from run number
-        if: steps.tagCheck.outputs.isTag == 'false'
         run: |
           VERSION_PREFIX="v0.0."
           NEW_VERSION="$VERSION_PREFIX${{ github.run_number }}"
