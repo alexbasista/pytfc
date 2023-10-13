@@ -44,21 +44,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       
-      - name: Tag check
-        id: tagCheck
-        run: |
-          if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-test$ ]]; then
-            echo "{isTag}={true}" >> $GITHUB_OUTPUT
-          else
-            echo "{isTag}={false}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Set version from tag
-        if: steps.tagCheck.outputs.isTag == 'true'
-        run: |
-          echo "Tag name from github.ref_name: ${{  github.ref_name }}"
-          sed -i "s/VERSION = 'TAG'/VERSION = '${{ github.ref_name }}'/" setup.py
-      
       - name: Set version from run number
         run: |
           VERSION_PREFIX="v0.0."
