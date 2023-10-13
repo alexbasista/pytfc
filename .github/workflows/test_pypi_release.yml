@@ -17,9 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
-        cache: 'pip'
-        cache-dependency-path: '**/requirements-dev.txt'
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
@@ -46,6 +44,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       
+      - name: Set version from run number
+        run: |
+          VERSION_PREFIX="v0.0."
+          VERSION_SUFFIX="${{ github.run_number }}"
+          NEW_VERSION="$VERSION_PREFIX$VERSION_SUFFIX"
+          echo "New version: $NEW_VERSION"
+          sed -i "s/VERSION = 'TAG'/VERSION = '$NEW_VERSION'/" setup.py
+
       - name: Build package
         run: python -m build
     

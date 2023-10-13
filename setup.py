@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.0.21'
+VERSION = 'TAG' # value is updated by release pipeline
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
@@ -22,6 +22,9 @@ setup(
         'requests>=2.31.0',
         'pyhcl>=0.4.4',
     ],
+    extras_require={
+        'dev': ['build==1.0.3', 'pytest==7.4.2'],
+    },
     keywords=['tfe', 'terraform enterprise', 'tfc', 'terraform cloud', 'terraform'],
     classifiers=[
         'Development Status :: 3 - Alpha',
