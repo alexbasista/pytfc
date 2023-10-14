@@ -49,6 +49,7 @@ class Client:
         'run_triggers': api.RunTriggers,
         'ssh_keys': api.SSHKeys,
         'state_versions': api.StateVersions,
+        'state_version_outputs': api.StateVersionOutputs,
         'team_access': api.TeamAccess,
         'teams': api.Teams,
         'variable_sets': api.VariableSets,
