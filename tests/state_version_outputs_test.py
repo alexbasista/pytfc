@@ -8,8 +8,7 @@ def test_list_sv_outputs(client, tfe_ghain):
         github_app_installation_id=tfe_ghain,
         working_directory='tests/testdata',
         queue_all_runs = True,
-        auto_apply = True,
-        branch = 'f-state-version-outputs'
+        auto_apply = True
     )
     ws_id = ws.json()['data']['id']
     
