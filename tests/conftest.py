@@ -5,7 +5,7 @@ from os import getenv
 
 @pytest.fixture
 def client():
-    client = pytfc.Client(org='abasista-tfc')
+    client = pytfc.Client()
     return client
 
 @pytest.fixture
