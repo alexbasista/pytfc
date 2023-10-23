@@ -17,6 +17,7 @@ from .run_tasks import RunTasks
 from .run_triggers import RunTriggers
 from .ssh_keys import SSHKeys
 from .state_versions import StateVersions
+from .state_version_outputs import StateVersionOutputs
 from .team_access import TeamAccess
 from .team_membership import TeamMembership
 from .team_tokens import TeamTokens

@@ -49,6 +49,7 @@ class Client:
         'run_triggers': api.RunTriggers,
         'ssh_keys': api.SSHKeys,
         'state_versions': api.StateVersions,
+        'state_version_outputs': api.StateVersionOutputs,
         'team_access': api.TeamAccess,
         'teams': api.Teams,
         'variable_sets': api.VariableSets,
@@ -72,13 +73,16 @@ class Client:
         self._log_level = getattr(logging, log_level.upper())
         self._logger.setLevel(self._log_level)
         self._logger.addHandler(logging.StreamHandler(sys.stdout))
-        self._logger.debug("Instantiating TFC/E API Client.")
+        self._logger.debug("Instantiating TFC/E API client.")
 
         if hostname is not None:
+            self._logger.debug("Setting hostname from argument.")
             self.hostname = hostname
         elif getenv('TFE_HOSTNAME'):
+            self._logger.debug("Setting hostname from environment variable.")
             self.hostname = getenv('TFE_HOSTNAME')
         else:
+            self._logger.debug("Setting hostname from package default.")
             self.hostname = 'app.terraform.io'
 
         if self.hostname[-1] == '/':
@@ -86,10 +90,10 @@ class Client:
         self._logger.debug(f"Setting hostname to `{self.hostname}`.")
 
         if token is not None:
-            self._logger.debug(f"Setting token directly from argument.")
+            self._logger.debug("Setting token from argument.")
             self._token = token
         elif getenv('TFE_TOKEN'):
-            self._logger.debug(f"Setting token from environment variable.")
+            self._logger.debug("Setting token from environment variable.")
             self._token = getenv('TFE_TOKEN')
         else:
             raise MissingToken
@@ -106,70 +110,67 @@ class Client:
             verify=verify,
             log_level=self._log_level
         )
-        
-        self.org = org
-        self.ws = ws
-        self.ws_id = (self._get_ws_id(ws)) if org and ws else None
+
+        if org is not None:
+            self._logger.debug("Setting org from argument.")
+            self.org = org
+        elif getenv('TFE_ORG'):
+            self._logger.debug("Setting org from environment variable.")
+            self.org = getenv('TFE_ORG')
+        else:
+            self._logger.debug("An org was not set.")
+            self.org = org
+
+        if ws is not None:
+            self._logger.debug("Setting ws from argument.")
+            self.ws = ws
+            if self.org is not None:
+                self._logger.debug(f"Fetching and setting ws_id from ws argument.")
+                self.ws_id = self._get_ws_id(self.ws)
+            else:
+                self.ws_id = None
+        else:
+            self._logger.debug("A ws was not set.")
+            self.ws = ws
+            self.ws_id = None
 
         self._logger.debug("Initializing API classes that do not"
-                           " require an `org` to be set...")
+                           " require an org to be set...")
         self._init_api_classes(
             classes_dict=self._no_org_required_classes,
-            org=org,
-            ws=ws,
+            org=self.org,
+            ws=self.ws,
             ws_id=self.ws_id
         )
-        
-        self._logger.debug("Initializing API classes that"
-                           " require an `org` to be set...")
-        if org is not None:
+
+        if self.org is not None:
+            self._logger.debug("Initializing API classes that"
+                    " require an org to be set...")
             self._init_api_classes(
                 classes_dict=self._org_required_classes,
-                org=org,
-                ws=ws,
-                ws_id=self.ws_id
+                org=self.org, # needed ?
+                ws=self.ws, # needed ?
+                ws_id=self.ws_id # needed ?
             )
-
-    # @property
-    # def requestor(self):
-    #     return self._requestor
-        
-    # @requestor.setter
-    # def requestor(self, requestor):
-    #     self._requestor = requestor
     
     def _get_ws_id(self, ws_name):
         path = f'/organizations/{self.org}/workspaces/{ws_name}'
         return self._requestor.get(path=path).json()['data']['id']
-    
+
     def _init_api_classes(self, classes_dict, org=None, ws=None, ws_id=None):
         """
         Initialize all supported API endpoint classes.
         """
-        if org is None:
-            org = self.org
-
-        # Leaving these lines commented means any pre-existing Workspace
-        # attributes (`ws` and `ws_id` will be unset when set_org() is called.
-        # TODO:
-        # Remove these lines because that is a good design decision.
-        # if ws is None:
-        #     ws = self.ws
-        
-        # if ws_id is None:
-        #     ws_id = self.ws_id
-
         for cls_name in classes_dict:
             cls = classes_dict[cls_name]
             initialized_cls = cls(
                 requestor=self._requestor,
-                org=org,
-                ws=ws,
-                ws_id=ws_id,
+                org=self.org,
+                ws=self.ws,
+                ws_id=self.ws_id,
                 log_level=self._log_level
             )
 
-            #self._logger.debug(f"Initializing {cls.__name__}.")
             setattr(self, cls_name, initialized_cls)
 
     def set_org(self, name):
@@ -182,11 +183,10 @@ class Client:
         Workspace attributes on the Client object.
         """
         self._logger.debug(f"Setting `org` attribute on client to `{name}`.")
-        self.__setattr__('org', name)
-        self._init_api_classes(
-            classes_dict=self._org_required_classes,
-            org=name
-        )
+        self.org = name
+        self.ws = None
+        self.ws_id = None
+        self._init_api_classes(classes_dict=self._org_required_classes)
     
     def set_ws(self, name):
         """
@@ -195,18 +195,13 @@ class Client:
         require an `org` to be set.
         """
         if not self.org:
-            self._logger.error("Cannot set a Workspace on client without an"
+            self._logger.error("Cannot set a Workspace (`ws`) on without an"
                                " Organization (`org`) having already been set.")
             raise MissingOrganization
 
         self._logger.debug(f"Setting `ws` attribute on client to `{name}`.")
         ws_id = self._get_ws_id(name)
         self._logger.debug(f"Setting `ws_id` attribute on client to `{ws_id}`.")
-        self.__setattr__('ws', name)
-        self.__setattr__('ws_id', ws_id)
-        self._init_api_classes(
-            classes_dict=self._org_required_classes,
-            org=self.org,
-            ws=name,
-            ws_id=ws_id
-        )
+        self.ws = name
+        self.ws_id = ws_id
+        self._init_api_classes(classes_dict=self._org_required_classes)

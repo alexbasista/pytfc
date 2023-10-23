@@ -122,6 +122,9 @@ class Requestor:
         request to a list API endpoint and returns all of the results.
         """
         current_page_number = 1
+        data = []
+        included = []
+
         list_resp = self.get(path=path, page_number=current_page_number,
             page_size=MAX_PAGE_SIZE, filters=filters, include=include,
             search=search, query=query, since=since).json()
@@ -133,8 +136,6 @@ class Requestor:
             self._logger.debug("Found `pagination` block in list response.")
             total_pages = list_resp['pagination']['total_pages']
 
-        data = []
-        included = []
         while current_page_number <= total_pages:
             list_resp = self.get(path=path, page_number=current_page_number,
                 page_size=MAX_PAGE_SIZE, filters=filters, include=include,
