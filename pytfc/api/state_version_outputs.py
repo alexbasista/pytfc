@@ -33,7 +33,7 @@ class StateVersionOutputs(TfcApiBase):
         Optional: `include=outputs` for full details.
         """
         path = f'/state-version-outputs/{svo_id}'
-        return self._requestor.get(path=path)
+        return self._requestor.get(path=path, include=include)
 
     def show_current_for_ws(self, ws_id):
         """
