@@ -1,36 +1,134 @@
-resource "random_pet" "test0" {}
-resource "random_pet" "test1" {}
-resource "random_pet" "test2" {}
-resource "random_pet" "test3" {}
-resource "random_pet" "test4" {}
-resource "random_pet" "test5" {}
-resource "random_pet" "test6" {}
-resource "random_pet" "test7" {}
-resource "random_pet" "test8" {}
-resource "random_pet" "test9" {}
-resource "random_pet" "testa" {}
-resource "random_pet" "testb" {}
-resource "random_pet" "testc" {}
-resource "random_pet" "testd" {}
-resource "random_pet" "teste" {}
-resource "random_pet" "testf" {}
-resource "random_pet" "testg" {}
-resource "random_pet" "testh" {}
-resource "random_pet" "testi" {}
-resource "random_pet" "testj" {}
-resource "random_pet" "testk" {}
-resource "random_pet" "testl" {}
-resource "random_pet" "testm" {}
-resource "random_pet" "testn" {}
-resource "random_pet" "testo" {}
-resource "random_pet" "testp" {}
-resource "random_pet" "testq" {}
-resource "random_pet" "testr" {}
-resource "random_pet" "tests" {}
-resource "random_pet" "testt" {}
-resource "random_pet" "testu" {}
-resource "random_pet" "testv" {}
-resource "random_pet" "testw" {}
-resource "random_pet" "testx" {}
-resource "random_pet" "testy" {}
-resource "random_pet" "testz" {}
+#------------------------------------------------------------------------------
+# Variables
+#------------------------------------------------------------------------------
+variable "pet_length" {
+  type    = number
+  default = 3
+}
+
+variable "pet_prefix" {
+  type    = string
+  default = "test"
+}
+
+variable "pet_separator" {
+  type    = string
+  default = "-"
+}
+
+#------------------------------------------------------------------------------
+# Resources
+#------------------------------------------------------------------------------
+resource "random_pet" "test0" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test1" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test2" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test3" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test4" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test5" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test6" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test7" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test8" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "test9" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testa" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testb" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testc" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testd" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "teste" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testf" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+resource "random_pet" "testg" {
+  length    = var.pet_length
+  prefix    = var.pet_prefix
+  separator = var.pet_separator
+}
+
+#------------------------------------------------------------------------------
+# Outputs
+#------------------------------------------------------------------------------
+output "test0" {
+  value = random_pet.test0.id
+}
+
+output "test1" {
+  value     = random_pet.test1.id
+  sensitive = true
+}

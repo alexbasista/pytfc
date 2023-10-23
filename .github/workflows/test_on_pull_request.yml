@@ -26,4 +26,5 @@ jobs:
                   pytest tests/
               env:
                   TFE_TOKEN: ${{ secrets.PYTEST_TFE_TOKEN }}
+                  TFE_ORG: ${{ vars.TFE_ORG }}
                   TFE_GHAIN: ${{ secrets.PYTEST_TFE_GHAIN }}
