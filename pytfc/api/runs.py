@@ -9,10 +9,11 @@ class Runs(TfcApiBase):
     TFC/E Runs methods.
     """
     @validate_ws_id_is_set
-    def create(self, auto_apply=None, is_destroy=False, message='Queued by pytfc',
+    def create(self, allow_empty_apply=None, allow_config_generation=False,
+               auto_apply=False, is_destroy=False, message='Queued by pytfc',
                refresh=True, refresh_only=False, replace_addrs=None,
-               target_addrs=None, variables=None, plan_only=None,
-               terraform_version=None, allow_empty_apply=None,
+               target_addrs=None, variables=None, plan_only=False,
+               save_plan=False, terraform_version=None,
                ws_id=None, cv_id=None):
         """
         POST /runs
@@ -40,6 +41,8 @@ class Runs(TfcApiBase):
         data = {}
         data['type'] = 'runs'
         attributes = {}
+        attributes['allow-empty-apply'] = allow_empty_apply
+        attributes['allow-config-generation'] = allow_config_generation
         attributes['auto-apply'] = auto_apply
         attributes['is-destroy'] = is_destroy
         attributes['message'] = message
@@ -49,8 +52,8 @@ class Runs(TfcApiBase):
         attributes['target-addrs'] = target_addrs
         attributes['variables'] = variables
         attributes['plan-only'] = plan_only
+        attributes['save-plan'] = save_plan
         attributes['terraform-version'] = terraform_version
-        attributes['allow-empty-apply'] = allow_empty_apply
         data['attributes'] = attributes
         relationships = {}
         workspace = {}
@@ -148,7 +151,7 @@ class Runs(TfcApiBase):
         """
         # TODO:
         # Validate prereqs of forcefully executing a Run:
-        # 1) Rhe target Run is in a 'pending' state
+        # 1) The target Run is in a 'pending' state
         # 2) The Workspace is locked by another Run
         # 3) The Run that locked the Workspace can be discarded
 
