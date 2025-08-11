@@ -1,25 +1,107 @@
-"""TFC/E Runs API endpoints module."""
+"""
+TFC/E Runs API endpoints module.
+
+This module provides a modern, type-safe interface to Terraform Cloud/Enterprise
+run management operations including creation, execution control, and monitoring.
+"""
+from typing import Any, Dict, List, Optional, Union
+
 from pytfc.tfc_api_base import TfcApiBase
+from pytfc.exceptions import PyTFCError
 from .configuration_versions import ConfigurationVersions
 from pytfc.utils import validate_ws_id_is_set
 
 
 class Runs(TfcApiBase):
     """
-    TFC/E Runs methods.
+    TFC/E Runs API client.
+    
+    Provides methods for managing Terraform Cloud/Enterprise runs including
+    creation, execution control, monitoring, and state management.
+    
+    Examples:
+        Create a new run:
+        >>> run = client.runs.create(
+        ...     message='Deploy infrastructure',
+        ...     auto_apply=True
+        ... )
+        
+        Apply a planned run:
+        >>> client.runs.apply(
+        ...     run_id='run-abc123',
+        ...     comment='Approved for deployment'
+        ... )
+        
+        List workspace runs:
+        >>> runs = client.runs.list()
+        >>> for run in runs['data']:
+        ...     print(f"{run['id']}: {run['attributes']['message']}")
     """
     @validate_ws_id_is_set
-    def create(self, allow_empty_apply=None, allow_config_generation=False,
-               auto_apply=False, is_destroy=False, message='Queued by pytfc',
-               refresh=True, refresh_only=False, replace_addrs=None,
-               target_addrs=None, variables=None, plan_only=False,
-               save_plan=False, terraform_version=None,
-               ws_id=None, cv_id=None):
+    def create(
+        self,
+        message: str = 'Queued by pytfc',
+        auto_apply: bool = False,
+        is_destroy: bool = False,
+        refresh: bool = True,
+        refresh_only: bool = False,
+        plan_only: bool = False,
+        save_plan: bool = False,
+        allow_empty_apply: Optional[bool] = None,
+        allow_config_generation: bool = False,
+        replace_addrs: Optional[List[str]] = None,
+        target_addrs: Optional[List[str]] = None,
+        variables: Optional[List[Dict[str, Any]]] = None,
+        terraform_version: Optional[str] = None,
+        ws_id: Optional[str] = None,
+        cv_id: Optional[str] = None,
+        **kwargs: Any
+    ) -> Any:
         """
-        POST /runs
+        Create a new run in the workspace.
         
-        Defaults to using latest Configuration Version
-        in Workspace if `cv_id` arg is not specified.
+        Args:
+            message: Run message/description
+            auto_apply: Whether to automatically apply after planning
+            is_destroy: Whether this is a destroy run
+            refresh: Whether to refresh state before planning
+            refresh_only: Whether to only refresh state (no plan/apply)
+            plan_only: Whether to only plan (no apply even if auto_apply=True)
+            save_plan: Whether to save the plan for later application
+            allow_empty_apply: Whether to allow applies with no changes
+            allow_config_generation: Whether to allow config generation
+            replace_addrs: List of resource addresses to replace
+            target_addrs: List of resource addresses to target
+            variables: List of variables for this run
+            terraform_version: Specific Terraform version to use
+            ws_id: Workspace ID (uses self.ws_id if not provided)
+            cv_id: Configuration version ID (uses latest if not provided)
+            **kwargs: Additional run attributes
+            
+        Returns:
+            API response with created run data
+            
+        Examples:
+            Basic run:
+            >>> run = client.runs.create(message='Deploy infrastructure')
+            
+            Auto-apply run:
+            >>> run = client.runs.create(
+            ...     message='Deploy to production',
+            ...     auto_apply=True
+            ... )
+            
+            Destroy run:
+            >>> run = client.runs.create(
+            ...     message='Destroy old resources',
+            ...     is_destroy=True
+            ... )
+            
+            Targeted run:
+            >>> run = client.runs.create(
+            ...     message='Update specific resources',
+            ...     target_addrs=['aws_instance.web', 'aws_s3_bucket.data']
+            ... )
         """
         ws_id = ws_id if ws_id else self.ws_id
 
@@ -73,9 +155,26 @@ class Runs(TfcApiBase):
 
         return self._requestor.post(path='/runs', payload=payload)
 
-    def apply(self, run_id, comment='Applied by pytfc'):
+    def apply(self, run_id: str, comment: str = 'Applied by pytfc') -> Any:
         """
-        POST /runs/:run_id/actions/apply
+        Apply a planned run.
+        
+        Args:
+            run_id: ID of the run to apply
+            comment: Comment for the apply action
+            
+        Returns:
+            API response confirming apply action
+            
+        Examples:
+            Apply with default comment:
+            >>> client.runs.apply(run_id='run-abc123')
+            
+            Apply with custom comment:
+            >>> client.runs.apply(
+            ...     run_id='run-abc123',
+            ...     comment='Approved by security team'
+            ... )
         """
         payload = {'comment': comment}
         path = f'/runs/{run_id}/actions/apply'
