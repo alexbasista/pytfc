@@ -23,7 +23,7 @@ setup(
         'pyhcl>=0.4.4',
     ],
     extras_require={
-        'dev': ['build==1.0.3', 'pytest==7.4.2'],
+        'dev': ['build==1.0.3', 'pytest==9.0.3'],
     },
     keywords=['tfe', 'terraform enterprise', 'tfc', 'terraform cloud', 'terraform'],
     classifiers=[
